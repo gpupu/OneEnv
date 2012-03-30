@@ -3,14 +3,11 @@ require 'active_record'
 require 'base64'
 
 
-YAML_NAME_ENV = "env.yaml"
+
 MY_DB_NAME = "oneenv.db"
 
 # get active record set up
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => MY_DB_NAME)
-
-#Open file
-yaml = YAML::load_stream( File.open( YAML_NAME_ENV ) ).documents
 
 
 #Enviroment
@@ -71,12 +68,11 @@ end
 
 
 descript = Description.new(2,"/path/to/ssh/.idpub","small", 3,"yes")
+descript64 = Description.to_64 descript
+Enviroment.create(:name=>'cosa', :description=>descript64)
 
-#descript64 = Description.to_64 descript
-#Enviroment.create(:name=>'cosa', :description=>descript64)
-
-#puts Enviroment.find(1).name
-#puts Enviroment.find(1).description
+puts Enviroment.find(1).name
+puts Enviroment.find(1).description
 
 
 

@@ -1,0 +1,24 @@
+type: map
+mapping:
+   "name":
+    type: str
+    required: yes
+   "image":
+    type: int
+    required: yes
+   "cookbooks":
+    type: str
+    required: yes
+   "ssh":
+    type: str
+    required: yes
+    pattern: ///
+   "type":
+    type: str
+    required: yes
+   "network":
+    enum: [public, private]
+    default: public
+   "vnc":
+    type: bool
+    default: false
