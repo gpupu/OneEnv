@@ -27,9 +27,10 @@ class Env_db < ActiveRecord::Base
     belongs_to :cookbook
     #set_table_name :enviroments
     self.table_name= 'enviroments'
+    #self.primary_key= 'id'
     self.connection.create_table(:enviroments,:force=>true) do |t|
         # El identificador autonumerado se crea automaticamente
-        t.column :name, :string, :default=>'env-' #+:id.to_s
+        t.column :name, :string, :default=>'env-'+ (last.id-1).to_s
         t.column :ssh, :string, :default=>nil
         t.column :cookbooks, :cookbook
     end
