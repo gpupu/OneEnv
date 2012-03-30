@@ -71,7 +71,7 @@ end
 
 
 descript = Description.new(2,"/path/to/ssh/.idpub","small", 3,"yes")
-puts descript[:image].to_s
+
 #descript64 = Description.to_64 descript
 #Enviroment.create(:name=>'cosa', :description=>descript64)
 
