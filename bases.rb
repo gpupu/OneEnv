@@ -15,9 +15,12 @@ class Cookbook < ActiveRecord::Base
     self.connection.create_table(:cookbooks,:force=>true) do |t|
         t.column :name, :string, :null=>false, :unique=>true
         t.column :path, :string
+        # Parece ser que type esta reservado por ruby, cambiado por place
         t.column :place, :string, :default=>'L'
     end
     validates_uniqueness_of :name
+    # Obliga a que el campo :place sea R o L
+    validates :place, :inclusion => {:in=> ['R', 'L'], :message=> "%{value} no es un valor correcto" }
 end
 
 class Env_db < ActiveRecord::Base
