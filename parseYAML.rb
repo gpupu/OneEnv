@@ -1,7 +1,5 @@
 require 'yaml'
 
-YAML_NAME_ENV = "env.yaml"
-
 
 class Enviroment
 	attr_accessor :name, :image, :cookbooks, :ssh, :type, :network, :vnc
@@ -50,35 +48,23 @@ class Conector_yaml
 				end					
 			}
 		end
-		return enviroments
-	end
 
-	def to_s
+		return enviroments
 	end
 
 end
 
 
-c = Conector_yaml.yaml2env("env.yaml")
-puts c
 
 
+YAML_NAME_ENV = ARGV[0]
+if YAML_NAME_ENV.nil? then
+	puts "FICHERO NO ENCONTRADO\n"
+	Process.exit
+else
+	c = Conector_yaml.yaml2env(YAML_NAME_ENV)
+	puts c
+end
 
 
-
-
-=begin
-env1 = Enviroment.new("WEB", 3, ["APACHE", "CHEF"], "/path/to/ssh/.id.pub", "small", "public", "no" )
-
-env2 = Enviroment.new("DEV", 4, ["ECLIPSE", "ANDROID"], "/path/to/ssh/.id.pub", "small", "public", "no" )
-
-enviroments = []
-enviroments << env1
-enviroments << env2
-
-puts enviroments[0]
-puts "---"
-puts enviroments[1]
-
-=end
 
