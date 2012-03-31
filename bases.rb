@@ -10,16 +10,7 @@ MY_DB = SQLite3::Database.new(MY_DB_NAME)
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => MY_DB_NAME)
 
 class Cookbook < ActiveRecord::Base
-    has_and_belongs_to_many :enviroments
-
-    self.connection.create_table(:cookbooks,:force=>true) do |t|
-        t.column :name, :string, :null=>false, :unique=>true
-        t.column :path, :string
-        # Parece ser que type esta reservado por ruby, cambiado por place
-        t.column :place, :string, :default=>'L'
-        t.column :enviroments, :enviroment, :foreign_key=>true
-    end
-    
+    has_and_belongs_to_many :enviroments 
     validates_uniqueness_of :name
     # Obliga a que el campo :place sea R o L
     validates :place, :inclusion => {:in=> ['R', 'L'], :message=> "%{value} no es un valor correcto" }
@@ -28,18 +19,26 @@ end
 
 class Enviroment < ActiveRecord::Base
     has_and_belongs_to_many :cookbooks
-    
-    self.connection.create_table(:enviroments, :force=>true) do |t|
-        # El identificador autonumerado se crea automaticamente
-        t.column :name, :string, :default=>'env-' #+ (last.id-1).to_s
-        t.column :ssh, :string, :default=>nil
-        t.column :cookbooks, :cookbook, :foreign_key=> true #, :default=>nil
-    end
-   
 end
 
 class CreateSchema < ActiveRecord::Migration
-    create_table :cookbooks_enviroments, :id=>false do |t|
+
+    create_table(:cookbooks,:force=>true) do |t|
+        t.column :name, :string, :null=>false, :unique=>true
+        t.column :path, :string
+        # Parece ser que type esta reservado por ruby, cambiado por place
+        t.column :place, :string, :default=>'L'
+        t.column :enviroments, :enviroment #, :foreign_key=>true
+    end
+
+    create_table(:enviroments, :force=>true) do |t|
+        # El identificador autonumerado se crea automaticamente
+        t.column :name, :string, :default=>'env-' #+ (last.id-1).to_s
+        t.column :ssh, :string, :default=>nil
+        t.column :cookbooks, :cookbook #, :foreign_key=> true #, :default=>nil
+    end
+
+    create_table(:cookbooks_enviroments, :id=>false, :force=>true) do |t|
         t.references :cookbook
         t.references :enviroment
     end
