@@ -10,6 +10,7 @@ MY_DB_NAME = "oneenv.db"
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => MY_DB_NAME)
 
 
+
 #Enviroment
 class Enviroment < ActiveRecord::Base
 	has_many :cookbook
@@ -17,12 +18,13 @@ class Enviroment < ActiveRecord::Base
 	##BASE DE DATOS
 	self.connection.create_table(:enviroments,:force=>true) do |t|
 		# El identificador autonumerado se crea automaticamente
-		t.column :name, :string, :default=>'env-' #+:id.to_s
+		t.column :name, :string, :default=>'env-' + (last.id-1).to_s
 		t.column :description, :string,:null=>false
 	end
 
 	
 end
+
 
 #Description
 class Description

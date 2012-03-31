@@ -32,7 +32,7 @@ end
 class Conector_yaml
 
 	def self.yaml2env(path)		
-		obj_yaml = YAML::load_stream( File.open( path ) ).documents
+		obj_yaml = YAML::load( File.open( path ) )
 		enviroments = []
 		if !obj_yaml.nil?
 			obj_yaml.each{|env_yaml|
