@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'sqlite3'
 require 'active_record'
+require 'yaml'
 
 # connect to database.  This will create one if it doesn't exist
 MY_DB_NAME = "oneenv.db"
@@ -36,10 +37,24 @@ class EnvDescription
 end
 
 class Cookbook < ActiveRecord::Base
+    after_create :create_defaults
     has_and_belongs_to_many :enviroments 
     validates_uniqueness_of :name
     # Obliga a que el campo :place sea R o L
     validates :place, :inclusion => {:in=> ['R', 'L'], :message=> "%{value} no es un valor correcto" }
+
+    def create_defaults
+        conf = YAML.load_file('oneenv.cnf')
+        #puts conf['default_local']
+        if self.path == nil
+            if self.place.eql?('R')
+                self.path = conf['default_repository']
+            else
+                self.path = conf['default_local']
+            end
+        end
+    end
+
 end
 
 
@@ -52,9 +67,9 @@ class CreateSchema < ActiveRecord::Migration
 
     create_table(:cookbooks,:force=>true) do |t|
         t.column :name, :string, :null=>false, :unique=>true
-        t.column :path, :string
+        t.column :path, :string, :default=>nil
         # Parece ser que type esta reservado por ruby, cambiado por place
-        t.column :place, :string, :default=>'L'
+        t.column :place, :string, :default=>'L', :limit=>1
         t.column :enviroments, :enviroment #, :foreign_key=>true
     end
 
@@ -78,6 +93,7 @@ e3 = EnvDescription.new('env3',12,'clave3','small','public',true)
 Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
 Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
 Cookbook.create(:name=>'apache', :path=>'/ruta/hacia/apache')
+Cookbook.create(:name=>'nginx', :place=>'R')
 #=end
 #=begin
 Enviroment.create(:name=>'nombre1', :description => e1) #, :cookbooks => Cookbook.find(2))

@@ -1,0 +1,3 @@
+#COOKBOOKS
+default_repository: git://github.com/opscode/cookbooks.git
+default_local: /srv/cloud/cookbooks
