@@ -7,6 +7,8 @@ require 'yaml'
 MY_DB_NAME = "oneenv.db"
 MY_DB = SQLite3::Database.new(MY_DB_NAME)
 
+CONFIG_FILE = 'oneenv.cnf'
+
 # get active record set up
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => MY_DB_NAME)
 
@@ -45,11 +47,8 @@ class Cookbook < ActiveRecord::Base
 
     private
     def create_defaults
-        conf = YAML.load_file('oneenv.cnf')
-        #puts conf['default_local']
-        puts 'llega aqui'
-        if self.path == nil
-            puts 'pasa por aqui'
+        conf = YAML.load_file(CONFIG_FILE)
+        if self.path == nil 
             if self.place.eql?('R')
                 self.path = conf['default_repository']
             else
@@ -68,14 +67,13 @@ class Enviroment < ActiveRecord::Base
     
     private
     def create_defaults
-        #puts 'llega aqui'
-        if self.name == nil
+        if name == nil
             s = 'env-' + self.id.to_s
-            #puts s
             self.name = s
             self.save
         end
     end
+
 end
 
 class CreateSchema < ActiveRecord::Migration
@@ -85,14 +83,14 @@ class CreateSchema < ActiveRecord::Migration
         t.column :path, :string, :default=>nil
         # Parece ser que type esta reservado por ruby, cambiado por place
         t.column :place, :string, :default=>'L', :limit=>1
-        t.column :enviroments, :enviroment #, :foreign_key=>true
+        t.column :enviroments, :enviroment 
     end
 
     create_table(:enviroments, :force=>true) do |t|
         # El identificador autonumerado se crea automaticamente
-        t.column :name, :string, :default=> nil #'env-' #+ (last.id-1).to_s
+        t.column :name, :string, :default=> nil 
         t.column :description, :string, :default=>nil
-        t.column :cookbooks, :cookbook #, :foreign_key=> true #, :default=>nil
+        t.column :cookbooks, :cookbook 
     end
 
     create_table(:cookbooks_enviroments, :id=>false, :force=>true) do |t|
