@@ -37,16 +37,19 @@ class EnvDescription
 end
 
 class Cookbook < ActiveRecord::Base
-    after_create :create_defaults
+    before_validation :create_defaults
     has_and_belongs_to_many :enviroments 
     validates_uniqueness_of :name
     # Obliga a que el campo :place sea R o L
     validates :place, :inclusion => {:in=> ['R', 'L'], :message=> "%{value} no es un valor correcto" }
 
+    private
     def create_defaults
         conf = YAML.load_file('oneenv.cnf')
         #puts conf['default_local']
+        puts 'llega aqui'
         if self.path == nil
+            puts 'pasa por aqui'
             if self.place.eql?('R')
                 self.path = conf['default_repository']
             else
@@ -59,8 +62,20 @@ end
 
 
 class Enviroment < ActiveRecord::Base
+    after_create :create_defaults
     has_and_belongs_to_many :cookbooks
     serialize :description
+    
+    private
+    def create_defaults
+        #puts 'llega aqui'
+        if self.name == nil
+            s = 'env-' + self.id.to_s
+            #puts s
+            self.name = s
+            self.save
+        end
+    end
 end
 
 class CreateSchema < ActiveRecord::Migration
@@ -75,7 +90,7 @@ class CreateSchema < ActiveRecord::Migration
 
     create_table(:enviroments, :force=>true) do |t|
         # El identificador autonumerado se crea automaticamente
-        t.column :name, :string, :default=>'env-' #+ (last.id-1).to_s
+        t.column :name, :string, :default=> nil #'env-' #+ (last.id-1).to_s
         t.column :description, :string, :default=>nil
         t.column :cookbooks, :cookbook #, :foreign_key=> true #, :default=>nil
     end
