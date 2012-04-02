@@ -1,3 +1,5 @@
+require 'bases.rb'
+
 class Shell
     def initialize()
         @arguments = []
@@ -50,6 +52,17 @@ class Shell
     def command2()
         raise ArgumentError if @arguments.length == 0
         puts "Executing command2"
+    end
+
+    def oneenv()
+        raise ArgumentError if @arguments.length == 0
+        if @arguments[0] == 'list'
+            puts "NAME\tIMAGE\tTYPE\tSSH\tNETWORK"
+            Enviroment.find(:all).each do |e|
+                puts e.to_s
+                #puts
+            end
+        end
     end
 
     def help()

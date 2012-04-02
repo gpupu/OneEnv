@@ -74,6 +74,16 @@ class Enviroment < ActiveRecord::Base
         end
     end
 
+    public
+    def to_s
+        s = name + "\t"
+        s += description.image.to_s + "\t"
+        s += description.type + "\t"
+        s += description.ssh + "\t"
+        s += description.network
+        s
+    end
+
 end
 
 class CreateSchema < ActiveRecord::Migration
@@ -121,7 +131,7 @@ ent2 = Env_db.create(:ssh => 'clave2')
 ent1.cookbooks.create(:name=>'vim', :path=>'/ruta/hacia/vim')
 ent1.cookbooks.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
 =end
-
+=begin
 desc1 = Enviroment.find(1).description
 desc2 = Enviroment.find(2).description
 desc3 = Enviroment.find(3).description
@@ -129,3 +139,4 @@ desc3 = Enviroment.find(3).description
 puts desc1.to_s
 puts desc2.to_s
 puts desc3.to_s
+=end
