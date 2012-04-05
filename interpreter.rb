@@ -56,13 +56,32 @@ class Shell
 
     def oneenv()
         raise ArgumentError if @arguments.length == 0
-        if @arguments[0] == 'list'
-            puts "NAME\tIMAGE\tTYPE\tSSH\tNETWORK"
+
+		case @arguments[0]
+		when 'create'
+
+		when 'list'
+			raise ArgumentError if @arguments.length != 1
+		    puts "NAME\tIMAGE\tTYPE\tSSH\tNETWORK"
             Enviroment.find(:all).each do |e|
                 puts e.to_s
                 #puts
             end
-        end
+		
+		when 'delete'
+			raise ArgumentError if @arguments.length != 2
+			Enviroment.delete(@arguments[1])
+
+		when 'clone'
+		when 'add-ssh'
+		when 'update-ssh'
+		when 'up'
+		when 'add-cookbook'
+		when 'update-cookbook'
+		when 'delete-cookbook'
+
+		end
+
     end
 
     def help()
