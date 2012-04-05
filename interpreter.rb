@@ -70,15 +70,32 @@ class Shell
 		
 		when 'delete'
 			raise ArgumentError if @arguments.length != 2
-			Enviroment.delete(@arguments[1])
+			if Enviroment.exists?(@arguments[1])
+				Enviroment.delete(@arguments[1])
+			else
+				puts 'This enviroment don\'t exists'
+			end
 
 		when 'clone'
+			raise ArgumentError if @arguments.length != 2
+			if Enviroment.exists?(@arguments[1])
+				Enviroment.clone_env(@arguments[1])
+			else
+				puts 'This enviroment don\'t exists'
+			end
+
 		when 'add-ssh'
 		when 'update-ssh'
 		when 'up'
 		when 'add-cookbook'
 		when 'update-cookbook'
 		when 'delete-cookbook'
+			raise ArgumentError if @arguments.length != 3
+			if Enviroment.exists?(@arguments[1])
+				Enviroment.delete_cookbook(@arguments[1],@arguments[2])
+			else
+				puts 'This enviroment don\'t exists'
+			end
 
 		end
 

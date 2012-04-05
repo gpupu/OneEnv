@@ -84,6 +84,26 @@ class Enviroment < ActiveRecord::Base
         s
     end
 
+	public
+	def self.clone_env id
+		copy = self.find(id).clone
+		Enviroment.create(:description => copy.description)
+		# introduce los cookbooks de la copia en el nuevo registro
+		Enviroment.last.cookbooks << copy.cookbooks
+	end
+
+	public
+	def self.delete_cookbook id, cb_name
+		cb = Cookbook.first(:conditions => {:name => cb_name})
+		if find(id).cookbooks.exists?(cb.id)
+			#puts 'existe el cb: ' + cb_id.to_s
+			find(id).cookbooks.delete(cb)
+		else
+			puts cb_name + ' is not a cookbook from the selected enviroment'
+		end
+
+	end
+
 end
 
 class CreateSchema < ActiveRecord::Migration
@@ -123,6 +143,9 @@ Enviroment.create(:name=>'nombre1', :description => e1) #, :cookbooks => Cookboo
 Enviroment.create(:description => e2)
 Enviroment.create(:name=>'nombre3', :description=> e3) #, :cookbooks => Cookbook.first(:conditions => {:name => 'emacs'}))
 #=end
+
+Enviroment.find(2).cookbooks << Cookbook.find(4)
+Enviroment.find(2).cookbooks << Cookbook.find(3)
 
 =begin
 ent1 = Env_db.create(:ssh=>'clave1')
