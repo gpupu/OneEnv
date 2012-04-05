@@ -55,7 +55,17 @@ class Cookbook < ActiveRecord::Base
                 self.path = conf['default_local']
             end
         end
-    end
+	end
+
+	public
+	def to_s
+		s  = id.to_s + "\t"
+		s += name + "\t"
+		s += path + "\t"
+		s += place + "\t"
+		s
+	end
+
 
 end
 
@@ -76,7 +86,8 @@ class Enviroment < ActiveRecord::Base
 
     public
     def to_s
-        s = name + "\t"
+		s  = id.to_s + "\t"
+        s += name + "\t"
         s += description.image.to_s + "\t"
         s += description.type + "\t"
         s += description.ssh + "\t"
@@ -90,6 +101,17 @@ class Enviroment < ActiveRecord::Base
 		Enviroment.create(:description => copy.description)
 		# introduce los cookbooks de la copia en el nuevo registro
 		Enviroment.last.cookbooks << copy.cookbooks
+	end
+
+	public
+	def self.add_cookbook id, cb_name
+		cb = Cookbook.first(:conditions => {:name => cb_name})
+		if Cookbook.exists?(cb.id)
+			#puts 'existe el cb: ' + cb_id.to_s
+			find(id).cookbooks << cb
+		else
+			puts 'Can\'t find the cookbook ' + cb_name
+		end
 	end
 
 	public

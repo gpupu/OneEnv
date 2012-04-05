@@ -45,15 +45,6 @@ class Shell
         raise SystemExit
     end
 
-    def command1()
-        puts "Executing command1"
-    end
-
-    def command2()
-        raise ArgumentError if @arguments.length == 0
-        puts "Executing command2"
-    end
-
     def oneenv()
         raise ArgumentError if @arguments.length == 0
 
@@ -62,7 +53,7 @@ class Shell
 
 		when 'list'
 			raise ArgumentError if @arguments.length != 1
-		    puts "NAME\tIMAGE\tTYPE\tSSH\tNETWORK"
+		    puts "ID\tNAME\tIMAGE\tTYPE\tSSH\tNETWORK"
             Enviroment.find(:all).each do |e|
                 puts e.to_s
                 #puts
@@ -88,6 +79,13 @@ class Shell
 		when 'update-ssh'
 		when 'up'
 		when 'add-cookbook'
+			raise ArgumentError if @arguments.length != 3
+			if Enviroment.exists?(@arguments[1])
+				Enviroment.add_cookbook(@arguments[1],@arguments[2])
+			else
+				puts 'This enviroment don\'t exists'
+			end
+
 		when 'update-cookbook'
 		when 'delete-cookbook'
 			raise ArgumentError if @arguments.length != 3
@@ -100,6 +98,26 @@ class Shell
 		end
 
     end
+
+	def onecook()
+		raise ArgumentError if @arguments.length == 0
+
+		case @arguments[0]
+
+		when 'list'
+			raise ArgumentError if @arguments.length != 1
+			puts 'dentro de la lista'
+		    puts "ID\tNAME\tPATH\tPLACE"
+            Cookbook.find(:all).each do |cb|
+                puts cb.to_s
+            end
+
+		when 'create'
+		when 'update'
+		when 'delete'
+
+		end
+	end
 
     def help()
         puts 'ayuda'
