@@ -77,7 +77,6 @@ class Cookbook < ActiveRecord::Base
 		else
 			puts cb_name + ' is yet on the database'
 		end
-
 	end
 
 end
@@ -136,7 +135,6 @@ class Enviroment < ActiveRecord::Base
 		else
 			puts cb_name + ' is not a cookbook from the selected enviroment'
 		end
-
 	end
 
 end

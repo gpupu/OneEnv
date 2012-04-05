@@ -95,6 +95,9 @@ class Shell
 				puts 'This enviroment don\'t exists'
 			end
 
+		else
+			raise ArgumentError
+
 		end
 
     end
@@ -121,8 +124,33 @@ class Shell
 			raise ArgumentError if @arguments.length != 3 && @arguments.length != 4
 			Cookbook.cb_create(@arguments[2],@arguments[3],true)
 
-		when @arguments[0] == 'update'
+		when @arguments[0] == 'update' && @arguments[1] != '--from-repo'			
+			raise ArgumentError if @arguments.length != 2 && @arguments.length != 3
+
+			if Cookbook.exists?(:name => @arguments[1])
+				cb = Cookbook.first(:conditions => {:name => @arguments[1]})
+				Cookbook.update(cb.id, {:path=> @arguments[2], :place => 'L'})
+			else
+				puts 'This cookbook don\'t exists'
+			end
+
+		when @arguments[0] == 'update' && @arguments[1] == '--from-repo'
+			raise ArgumentError if @arguments.length != 3 && @arguments.length != 4
+
+			if Cookbook.exists?(:name => @arguments[2])
+				cb = Cookbook.first(:conditions => {:name => @arguments[2]})
+				Cookbook.update(cb.id, {:path=> @arguments[3], :place => 'R'})
+			else
+				puts 'This cookbook don\'t exists'
+			end
+
 		when @arguments[0] == 'delete'
+			raise ArgumentError if @arguments.length != 2
+			if Cookbook.exists?(:name => @arguments[1])
+				Cookbook.delete_all(:name => @arguments[1])
+			else
+				puts 'This cookbook don\'t exists'
+			end
 
 		else
 			raise ArgumentError
