@@ -102,19 +102,30 @@ class Shell
 	def onecook()
 		raise ArgumentError if @arguments.length == 0
 
-		case @arguments[0]
-
-		when 'list'
+		case
+		when @arguments[0] == 'list'
 			raise ArgumentError if @arguments.length != 1
-			puts 'dentro de la lista'
+			#puts 'dentro de la lista'
 		    puts "ID\tNAME\tPATH\tPLACE"
             Cookbook.find(:all).each do |cb|
                 puts cb.to_s
             end
 
-		when 'create'
-		when 'update'
-		when 'delete'
+		when @arguments[0] == 'create' && @arguments[1] != '--from-repo'
+			#puts 'esto es una prueba sin repo'
+			raise ArgumentError if @arguments.length != 2 && @arguments.length != 3
+			Cookbook.cb_create(@arguments[1],@arguments[2],false)
+
+		when @arguments[0] == 'create' && @arguments[1] == '--from-repo'
+			#puts 'esto es una prueba CON repo'
+			raise ArgumentError if @arguments.length != 3 && @arguments.length != 4
+			Cookbook.cb_create(@arguments[2],@arguments[3],true)
+
+		when @arguments[0] == 'update'
+		when @arguments[0] == 'delete'
+
+		else
+			raise ArgumentError
 
 		end
 	end

@@ -66,6 +66,19 @@ class Cookbook < ActiveRecord::Base
 		s
 	end
 
+	public
+	def self.cb_create cb_name, cb_path, cb_repo
+		cb_type = 'L'
+		if cb_repo 
+			cb_type = 'R' 
+		end
+		if !exists?(:name => cb_name)
+			create(:name => cb_name, :path => cb_path, :place => cb_type)
+		else
+			puts cb_name + ' is yet on the database'
+		end
+
+	end
 
 end
 
