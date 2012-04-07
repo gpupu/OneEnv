@@ -1,7 +1,7 @@
 require 'yaml'
 
-
-class Enviroment
+#Aqui he tenido que cambiar el nombre ya que hay una clase igual en database.rb
+class Enviroments
 	attr_accessor :name, :image, :cookbooks, :ssh, :type, :network, :vnc
 	
 	def initialize(name, image, cookbooks, ssh, type, network, vnc)
@@ -43,8 +43,8 @@ class Conector_yaml
 					network = env_yaml['network']
 					vnc = env_yaml['vnc']
 					
-					env = Enviroment.new(name, image,cookbooks,ssh,type,network,vnc)
-					enviroments << env
+					env = Enviroments.new(name, image,cookbooks,ssh,type,network,vnc)
+					enviroments << env 
 				end					
 			}
 		end
@@ -56,14 +56,25 @@ end
 
 
 
+def converter(path)
+	if path.nil? then
+		puts "FICHERO NO ENCONTRADO\n"
+		Process.exit
+	else
+		c = Conector_yaml.yaml2env(path)
+		return c
+	end
+end
 
+=begin
 YAML_NAME_ENV = ARGV[0]
 if YAML_NAME_ENV.nil? then
-	puts "FICHERO NO ENCONTRADO\n"
-	Process.exit
+        puts "FICHERO NO ENCONTRADO\n"
+        Process.exit
 else
-	c = Conector_yaml.yaml2env(YAML_NAME_ENV)
-	puts c
-end
+        c = Conector_yaml.yaml2env(YAML_NAME_ENV)
+        puts c
+=end
+
 
 

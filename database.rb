@@ -1,16 +1,18 @@
 require 'rubygems'
-require 'sqlite3'
+#require 'sqlite3'
 require 'active_record'
 require 'yaml'
 
 # connect to database.  This will create one if it doesn't exist
-MY_DB_NAME = "oneenv.db"
-MY_DB = SQLite3::Database.new(MY_DB_NAME)
+#MY_DB_NAME = "oneenv.db"
+#MY_DB = SQLite3::Database.new(MY_DB_NAME)
 
 CONFIG_FILE = 'oneenv.cnf'
 
 # get active record set up
-ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => MY_DB_NAME)
+ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
+
+#MY_DB_NAME)
 
 #Pongo esto aquí de forma provisional para no tocarle nada a bae
 class EnvDescription
@@ -136,7 +138,16 @@ class Enviroment < ActiveRecord::Base
 			puts cb_name + ' is not a cookbook from the selected enviroment'
 		end
 	end
-
+	def self.add(f)
+#Comprueba si hay un entorno con el mismo nombre y si asi es muestra un mensaje.
+		select = self.find{|k| k.name==f.name}
+#si es distinto de nil es que ha encontrado un entorno que se llama igual
+		if select!=nil 
+			puts "Un entorno con el nombre #{f.name} ya existia"
+		else 
+			self.create(:name=>f.name, :description => f)
+		end
+	end
 end
 
 class CreateSchema < ActiveRecord::Migration

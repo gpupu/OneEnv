@@ -1,4 +1,6 @@
 require 'database.rb'
+require 'validation/validation'
+require 'parseYAML'
 
 class Shell
     def initialize()
@@ -50,7 +52,18 @@ class Shell
 
 		case @arguments[0]
 		when 'create'
-
+			raise ArgumentError if @arguments.length != 2
+			cad2=@arguments[1]
+#Aqui se comprueba si el fichero es valido. He puesto como que haya que meter obligatoriamente el fichero por parametro. El metodo validationYAML esta en validation.rb		
+			if validationYAML(cad2)
+#converter es el metodo de parseYAML.rb
+				aux=converter(cad2)
+				aux.each do |f|
+#Para cada elemento de la lista de entornos hacemos un add
+					Enviroment.add(f)
+				end
+			else 'No se ha podido crear'
+			end
 		when 'list'
 			raise ArgumentError if @arguments.length != 1
 		    puts "ID\tNAME\tIMAGE\tTYPE\tSSH\tNETWORK"
