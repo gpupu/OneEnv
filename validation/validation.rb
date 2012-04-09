@@ -1,6 +1,25 @@
-require 'rubygems'
-require 'kwalify'
+require "rubygems"
+require "kwalify"
 
+#Entiendo que solo hay un esquema de validacion
+SCHEMA='./validation/schema_env.yaml' 
+
+#doc es el documento yaml que queremos comprobar si es valido
+def validationYAML(doc)
+	schema = Kwalify::Yaml.load_file(SCHEMA)
+	validator = Kwalify::Validator.new(schema)
+	document = Kwalify::Yaml.load_file(doc)
+	errors = validator.validate(document)
+	if errors && !errors.empty?
+  		for e in errors
+    			puts "[#{e.path}] #{e.message}"
+  		end
+	else
+		return true
+	end
+end
+
+=begin
 PATH_SCHEMA = ARGV[0]
 PATH_DOCUMENT = ARGV[1]
 
@@ -43,4 +62,5 @@ if errors && !errors.empty?
   end
 else
   puts "TODO BIEN"
-end
+=end
+
