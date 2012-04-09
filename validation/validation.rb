@@ -4,6 +4,22 @@ require 'kwalify'
 PATH_SCHEMA = ARGV[0]
 PATH_DOCUMENT = ARGV[1]
 
+
+class Checker
+
+	def self.validate(path_schema,path_document)
+		schema = Kwalify::Yaml.load_file(path_schema)
+		validator = Kwalify::Validator.new(schema)
+		document = Kwalify::Yaml.load_file(path_document)
+		
+	end
+
+end
+
+
+
+
+
 ## load schema data
 schema = Kwalify::Yaml.load_file(PATH_SCHEMA)
 ## or
