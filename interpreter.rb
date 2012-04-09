@@ -64,6 +64,7 @@ class Shell
 				end
 			else 'No se ha podido crear'
 			end
+
 		when 'list'
 			raise ArgumentError if @arguments.length != 1
 		    puts "ID\tNAME\tIMAGE\tTYPE\tSSH\tNETWORK"

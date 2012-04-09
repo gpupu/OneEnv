@@ -1,0 +1,15 @@
+- name: WEB1
+  cookbooks: [APACHE, MYSQL]
+  image: 23
+  ssh: uidsa/oiasdh
+  type: small
+  network: public
+  vnc: false
+
+- name: WEB2
+  cookbooks: [APACHE, MYSQL]
+  image: 23
+  ssh: uidsa/oiasdh
+  type: small
+  network: public
+  vnc: false

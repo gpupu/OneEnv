@@ -2,6 +2,7 @@ require 'rubygems'
 #require 'sqlite3'
 require 'active_record'
 require 'yaml'
+require 'oneenv.rb'
 
 # connect to database.  This will create one if it doesn't exist
 #MY_DB_NAME = "oneenv.db"
@@ -13,32 +14,6 @@ CONFIG_FILE = 'oneenv.cnf'
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
 
 #MY_DB_NAME)
-
-#Pongo esto aquí de forma provisional para no tocarle nada a bae
-class EnvDescription
-	attr_accessor :name, :image, :ssh, :type, :network, :vnc
-	
-	def initialize(name, image, ssh, type, network, vnc)
-		@name = name
-		@image = image
-		#@cookbooks = cookbooks
-		@ssh = ssh
-		@type = type
-		@network = network
-		@vnc = vnc
-	end
-	
-	def to_s
-		str = "Name :" + @name.to_s + "\n"  
-		str += "Image :" + @image.to_s + "\n"
-		str += "SSH :" + @ssh.to_s + "\n"
-		str += "Type :" + @type.to_s + "\n"
-		str += "Network :" + @network.to_s + "\n"
-		str += "VNC :" + @vnc.to_s + "\n"
-		str
-	end
-
-end
 
 class Cookbook < ActiveRecord::Base
     before_validation :create_defaults
@@ -138,16 +113,19 @@ class Enviroment < ActiveRecord::Base
 			puts cb_name + ' is not a cookbook from the selected enviroment'
 		end
 	end
+
+    public
 	def self.add(f)
-#Comprueba si hay un entorno con el mismo nombre y si asi es muestra un mensaje.
+        # Comprueba si hay un entorno con el mismo nombre y si asi es muestra un mensaje.
 		select = self.find{|k| k.name==f.name}
-#si es distinto de nil es que ha encontrado un entorno que se llama igual
+        # si es distinto de nil es que ha encontrado un entorno que se llama igual
 		if select!=nil 
 			puts "Un entorno con el nombre #{f.name} ya existia"
 		else 
 			self.create(:name=>f.name, :description => f)
 		end
 	end
+
 end
 
 class CreateSchema < ActiveRecord::Migration
