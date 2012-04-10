@@ -16,22 +16,22 @@ ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "one
 #MY_DB_NAME)
 
 class Cookbook < ActiveRecord::Base
-    before_validation :create_defaults
-    has_and_belongs_to_many :enviroments 
     validates_uniqueness_of :name
+    before_validation :create_defaults
+    has_and_belongs_to_many :enviroments
     # Obliga a que el campo :place sea R o L
     validates :place, :inclusion => {:in=> ['R', 'L'], :message=> "%{value} no es un valor correcto" }
 
-    private
-    def create_defaults
-        conf = YAML.load_file(CONFIG_FILE)
-        if self.path == nil 
-            if self.place.eql?('R')
-                self.path = conf['default_repository']
-            else
-                self.path = conf['default_local']
-            end
-        end
+	private
+	def create_defaults
+		conf = YAML.load_file(CONFIG_FILE)
+		if self.path == nil 
+		    if self.place.eql?('R')
+		        self.path = conf['default_repository']
+		    else
+		        self.path = conf['default_local']
+		    end
+		end
 	end
 
 	public
@@ -60,6 +60,7 @@ end
 
 
 class Enviroment < ActiveRecord::Base
+    validates_uniqueness_of :name
     after_create :create_defaults
     has_and_belongs_to_many :cookbooks
     serialize :description
@@ -122,6 +123,7 @@ class Enviroment < ActiveRecord::Base
 		if select!=nil 
 			puts "Un entorno con el nombre #{f.name} ya existia"
 		else 
+	##HAY QUE METER TB LA RELACIONDE COOKBOOKS
 			self.create(:name=>f.name, :description => f)
 		end
 	end
@@ -140,7 +142,7 @@ class CreateSchema < ActiveRecord::Migration
 
     create_table(:enviroments, :force=>true) do |t|
         # El identificador autonumerado se crea automaticamente
-        t.column :name, :string, :default=> nil 
+        t.column :name, :string, :default=> nil,:unique=>true
         t.column :description, :string, :default=>nil
         t.column :cookbooks, :cookbook 
     end
@@ -164,10 +166,14 @@ Cookbook.create(:name=>'nginx', :place=>'R')
 Enviroment.create(:name=>'nombre1', :description => e1) #, :cookbooks => Cookbook.find(2))
 Enviroment.create(:description => e2)
 Enviroment.create(:name=>'nombre3', :description=> e3) #, :cookbooks => Cookbook.first(:conditions => {:name => 'emacs'}))
+Enviroment.create(:name=>'nombre3', :description=> e3) #, :cookbooks => Cookbook.first(:conditions => {:name => 'emacs'}))
+Enviroment.create(:description => e2)
 #=end
 
+=begin
 Enviroment.find(2).cookbooks << Cookbook.find(4)
 Enviroment.find(2).cookbooks << Cookbook.find(3)
+=end
 
 =begin
 ent1 = Env_db.create(:ssh=>'clave1')

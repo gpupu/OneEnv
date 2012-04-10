@@ -47,32 +47,36 @@ class Shell
         raise SystemExit
     end
 
-    def oneenv()
+	def oneenv()
         raise ArgumentError if @arguments.length == 0
 
 		case @arguments[0]
+
+		##USO: oneenv create [YAML] 
 		when 'create'
 			raise ArgumentError if @arguments.length != 2
 			cad2=@arguments[1]
-#Aqui se comprueba si el fichero es valido. He puesto como que haya que meter obligatoriamente el fichero por parametro. El metodo validationYAML esta en validation.rb		
+			#Aqui se comprueba si el fichero es valido. He puesto como que haya que meter obligatoriamente el fichero por parametro. El metodo 				validationYAML esta en validation.rb		
 			if validationYAML(cad2)
-#converter es el metodo de parseYAML.rb
+				#converter es el metodo de parseYAML.rb
 				aux=converter(cad2)
 				aux.each do |f|
-#Para cada elemento de la lista de entornos hacemos un add
+					#Para cada elemento de la lista de entornos hacemos un add
 					Enviroment.add(f)
 				end
-			else 'No se ha podido crear'
+			else 
+				'No se ha podido crear'
 			end
 
+		##USO:oneenv list
 		when 'list'
 			raise ArgumentError if @arguments.length != 1
-		    puts "ID\tNAME\tIMAGE\tTYPE\tSSH\tNETWORK"
-            Enviroment.find(:all).each do |e|
-                puts e.to_s
-                #puts
-            end
-		
+			puts "ID\tNAME\tIMAGE\tTYPE\tSSH\tNETWORK"
+           		Enviroment.find(:all).each do |e|
+				puts e.to_s
+			end
+
+		##USO:oneenv delete [ID_Env]
 		when 'delete'
 			raise ArgumentError if @arguments.length != 2
 			if Enviroment.exists?(@arguments[1])
@@ -81,6 +85,7 @@ class Shell
 				puts 'This enviroment don\'t exists'
 			end
 
+		##USO:oneenv clone [ID_Env]
 		when 'clone'
 			raise ArgumentError if @arguments.length != 2
 			if Enviroment.exists?(@arguments[1])
@@ -89,9 +94,17 @@ class Shell
 				puts 'This enviroment don\'t exists'
 			end
 
+
 		when 'add-ssh'
+
 		when 'update-ssh'
+
+
+		##USO:oneenv up [ID_entorno]
 		when 'up'
+
+
+		##USO:oneenv add-cookbook [ID_entorno] [cb_name]
 		when 'add-cookbook'
 			raise ArgumentError if @arguments.length != 3
 			if Enviroment.exists?(@arguments[1])
@@ -100,7 +113,10 @@ class Shell
 				puts 'This enviroment don\'t exists'
 			end
 
+
 		when 'update-cookbook'
+
+		##USO:oneenv delete-cookbook [ID_entorno] [cb_name]
 		when 'delete-cookbook'
 			raise ArgumentError if @arguments.length != 3
 			if Enviroment.exists?(@arguments[1])
@@ -114,7 +130,7 @@ class Shell
 
 		end
 
-    end
+	end
 
 	def onecook()
 		raise ArgumentError if @arguments.length == 0

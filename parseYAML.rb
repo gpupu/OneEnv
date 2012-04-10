@@ -1,35 +1,6 @@
 require 'yaml'
 require 'oneenv.rb'
 
-=begin
-#Aqui he tenido que cambiar el nombre ya que hay una clase igual en database.rb
-class Enviroments
-	attr_accessor :name, :image, :cookbooks, :ssh, :type, :network, :vnc
-	
-	def initialize(name, image, cookbooks, ssh, type, network, vnc)
-		@name = name
-		@image = image
-		@cookbooks = cookbooks
-		@ssh = ssh
-		@type = type
-		@network = network
-		@vnc = vnc
-	end
-	
-	def to_s
-		str = "Name :" + @name.to_s + "\n"  
-		str += "Image :" + @image.to_s + "\n"
-		str += "Cookboks :" + @cookbooks.to_s + "\n"
-		str += "SSH :" + @ssh.to_s + "\n"
-		str += "Type :" + @type.to_s + "\n"
-		str += "Network :" + @network.to_s + "\n"
-		str += "VNC :" + @vnc.to_s + "\n"
-		str
-	end
-
-end
-=end
-
 class Conector_yaml
 
 	def self.yaml2env(path)		
@@ -47,7 +18,9 @@ class Conector_yaml
 					vnc = env_yaml['vnc']
 					
                     #TODO Hay que ver como guardamos los cookbooks, estos no van en la descripcion 
-					env = EnvDescription.new(name,Integer(image),ssh,type,network,vnc)
+			##SE TIENE QUE USAR UN OBJETO ENTORNO QUE RECOJA TODA LA INFORMACION DEL YAML, Y LUEGO PASARSELO A LA CLASE ENTORNODB
+
+					env = Enviroment2.new(name,Integer(image),cookbooks,ssh,type,network,vnc)
                     # Guarda la descripcion en el array
 					descriptions << env 
 				end					
