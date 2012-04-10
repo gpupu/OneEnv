@@ -16,6 +16,7 @@ ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "one
 #MY_DB_NAME)
 
 class Cookbook < ActiveRecord::Base
+
     validates_uniqueness_of :name
     before_validation :create_defaults
     has_and_belongs_to_many :enviroments
@@ -60,6 +61,7 @@ end
 
 
 class Enviroment < ActiveRecord::Base
+
     validates_uniqueness_of :name
     after_create :create_defaults
     has_and_belongs_to_many :cookbooks
@@ -76,27 +78,38 @@ class Enviroment < ActiveRecord::Base
 
     public
     def to_s
-		s  = id.to_s + "\t"
+	s  = id.to_s + "\t"
         s += name + "\t"
         s += description.image.to_s + "\t"
         s += description.type + "\t"
         s += description.ssh + "\t"
-        s += description.network
+        s += description.network + "\t"
+	s += cookbooks.size.to_s
+       # cookbooks.each{|cb| s += cb.name + " " + cb.path + " " + "|" }
         s
     end
 
+
 	public
 	def self.clone_env id
-		copy = self.find(id).clone
-		Enviroment.create(:description => copy.description)
-		# introduce los cookbooks de la copia en el nuevo registro
-		Enviroment.last.cookbooks << copy.cookbooks
+		env = first(:conditions => {:id => id})
+		if !env.nil?
+			copy = self.find(id).clone
+			Enviroment.create(:description => copy.description)
+			# introduce los cookbooks de la copia en el nuevo registro
+			Enviroment.last.cookbooks << copy.cookbooks
+		else
+			puts 'Can\'t find the enviroment ' + id.to_s
+		end
 	end
 
 	public
 	def self.add_cookbook id, cb_name
 		cb = Cookbook.first(:conditions => {:name => cb_name})
-		if Cookbook.exists?(cb.id)
+		
+		##FALLABA AL ACCEDER A CB.ID YA QUE ERA NIL
+		if !cb.nil?
+			##MIRAR REPETIDOS
 			#puts 'existe el cb: ' + cb_id.to_s
 			find(id).cookbooks << cb
 		else
@@ -107,7 +120,7 @@ class Enviroment < ActiveRecord::Base
 	public
 	def self.delete_cookbook id, cb_name
 		cb = Cookbook.first(:conditions => {:name => cb_name})
-		if find(id).cookbooks.exists?(cb.id)
+		if find(id).cookbooks.exists?(cb.object_id)
 			#puts 'existe el cb: ' + cb_id.to_s
 			find(id).cookbooks.delete(cb)
 		else
@@ -124,7 +137,9 @@ class Enviroment < ActiveRecord::Base
 			puts "Un entorno con el nombre #{f.name} ya existia"
 		else 
 	##HAY QUE METER TB LA RELACIONDE COOKBOOKS
-			self.create(:name=>f.name, :description => f)
+			self.create(:name=>f.name, :description => f.description)
+			f.cookbooks.each{|cb|
+					self.add_cookbook Enviroment.last.id, cb}
 		end
 	end
 
@@ -137,14 +152,14 @@ class CreateSchema < ActiveRecord::Migration
         t.column :path, :string, :default=>nil
         # Parece ser que type esta reservado por ruby, cambiado por place
         t.column :place, :string, :default=>'L', :limit=>1
-        t.column :enviroments, :enviroment 
+        t.column :enviroments, :enviroment
     end
 
     create_table(:enviroments, :force=>true) do |t|
         # El identificador autonumerado se crea automaticamente
         t.column :name, :string, :default=> nil,:unique=>true
         t.column :description, :string, :default=>nil
-        t.column :cookbooks, :cookbook 
+        t.column :cookbooks, :cookbook
     end
 
     create_table(:cookbooks_enviroments, :id=>false, :force=>true) do |t|
@@ -153,22 +168,36 @@ class CreateSchema < ActiveRecord::Migration
     end
 end
 
-e1 = EnvDescription.new('env1',8,'clave1','small','public',true)
-e2 = EnvDescription.new('env2',7,'clave2','small','public',true)
-e3 = EnvDescription.new('env3',12,'clave3','small','public',true)
+
+
+d1 = Description.new(8, 'clave1', 'small', 'public',true)
+d2 = Description.new(7, 'clave2', 'small', 'public',true)
+d3 = Description.new(12, 'clave3', 'small', 'public',true)
+
 #=begin
+Cookbook.create(:name=>'APACHE', :path=>'/ruta/hacia/emacs')
+Cookbook.create(:name=>'MYSQL', :path=>'/ruta/hacia/vim')
 Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
 Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
-Cookbook.create(:name=>'apache', :path=>'/ruta/hacia/apache')
 Cookbook.create(:name=>'nginx', :place=>'R')
 #=end
-#=begin
-Enviroment.create(:name=>'nombre1', :description => e1) #, :cookbooks => Cookbook.find(2))
-Enviroment.create(:description => e2)
-Enviroment.create(:name=>'nombre3', :description=> e3) #, :cookbooks => Cookbook.first(:conditions => {:name => 'emacs'}))
-Enviroment.create(:name=>'nombre3', :description=> e3) #, :cookbooks => Cookbook.first(:conditions => {:name => 'emacs'}))
-Enviroment.create(:description => e2)
-#=end
+
+
+cb1=['emacs','vim']
+cb2=['nginx','APACHE']
+
+
+e1= Enviroment2.new("env1",d1,cb1)
+e2= Enviroment2.new("env2",d2,cb2)
+#e3= Enviroment2.new("env3",d3,cb1)
+#e4= Enviroment2.new("env4",d1,cb1)
+
+Enviroment.add(e1)
+Enviroment.add(e2)
+#Enviroment.add(e3)
+#Enviroment.add(e4)
+
+Enviroment.add_cookbook 1, "vim"
 
 =begin
 Enviroment.find(2).cookbooks << Cookbook.find(4)

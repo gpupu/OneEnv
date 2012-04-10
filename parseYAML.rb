@@ -5,7 +5,7 @@ class Conector_yaml
 
 	def self.yaml2env(path)		
 		obj_yaml = YAML::load( File.open( path ) )
-		descriptions = []
+		enviroments = []
 		if !obj_yaml.nil?
 			obj_yaml.each{|env_yaml|
 				if !env_yaml.nil?
@@ -17,17 +17,16 @@ class Conector_yaml
 					network = env_yaml['network']
 					vnc = env_yaml['vnc']
 					
-                    #TODO Hay que ver como guardamos los cookbooks, estos no van en la descripcion 
-			##SE TIENE QUE USAR UN OBJETO ENTORNO QUE RECOJA TODA LA INFORMACION DEL YAML, Y LUEGO PASARSELO A LA CLASE ENTORNODB
 
-					env = Enviroment2.new(name,Integer(image),cookbooks,ssh,type,network,vnc)
-                    # Guarda la descripcion en el array
-					descriptions << env 
+					des = Description.new(image,ssh,type,network,vnc)
+					env = Enviroment2.new(name,des,cookbooks)
+			                # Guarda el entorno en el array
+					enviroments << env 
 				end					
 			}
 		end
 
-		return descriptions
+		return enviroments
 	end
 
 end
@@ -52,6 +51,7 @@ if YAML_NAME_ENV.nil? then
 else
         c = Conector_yaml.yaml2env(YAML_NAME_ENV)
         puts c
+end
 =end
 
 

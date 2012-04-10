@@ -71,11 +71,18 @@ class Shell
 		##USO:oneenv list
 		when 'list'
 			raise ArgumentError if @arguments.length != 1
-			puts "ID\tNAME\tIMAGE\tTYPE\tSSH\tNETWORK"
+			puts "ID\tNAME\tIMAGE\tTYPE\tSSH\tNETWORK\tCOOKBOOKS"
            		Enviroment.find(:all).each do |e|
 				puts e.to_s
 			end
+		##USO:oneenv show [ID_Env]
+		when 'show'
+			raise ArgumentError if @arguments.length != 2
+			puts "ID\tNAME\tIMAGE\tTYPE\tSSH\tNETWORK\tCOOKBOOKS"
 
+			####!!!MIRAR SI EXISTE!!!
+           		e =Enviroment.find(@arguments[1])
+			puts e.to_s
 		##USO:oneenv delete [ID_Env]
 		when 'delete'
 			raise ArgumentError if @arguments.length != 2

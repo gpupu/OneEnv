@@ -1,6 +1,6 @@
 
 
-class Enviroment
+class Enviroment2
 	attr_accessor :name, :description, :cookbooks
 	
 	def initialize(name, description, cookbooks)
@@ -41,9 +41,4 @@ class Description
 	end
 
 end
-
-
-env = Enviroment2.new('web',des,'dadas')
-puts env
-
 
