@@ -1,4 +1,6 @@
-
+require 'database.rb'
+require 'validation/validation'
+require 'parseYAML'
 
 class OneCook
 	def self.run commands

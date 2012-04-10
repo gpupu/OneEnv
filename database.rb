@@ -41,7 +41,7 @@ class Cookbook < ActiveRecord::Base
 
     validates_uniqueness_of :name
     before_validation :create_defaults
-    has_and_belongs_to_many :enviroments
+    has_and_belongs_to_many :enviroments, :uniq => true
     # Obliga a que el campo :place sea R o L
     validates :place, :inclusion => {:in=> ['R', 'L'], :message=> "%{value} no es un valor correcto" }
 
@@ -86,7 +86,7 @@ class Enviroment < ActiveRecord::Base
 
     validates_uniqueness_of :name
     after_create :create_defaults
-    has_and_belongs_to_many :cookbooks
+    has_and_belongs_to_many :cookbooks, :uniq => true
     serialize :description
     
     private
@@ -100,13 +100,13 @@ class Enviroment < ActiveRecord::Base
 
     public
     def to_s
-	s  = id.to_s + "\t"
+		s  = id.to_s + "\t"
         s += name + "\t"
         s += description.image.to_s + "\t"
         s += description.type + "\t"
         s += description.ssh + "\t"
         s += description.network + "\t"
-	s += cookbooks.size.to_s
+		s += cookbooks.size.to_s
        # cookbooks.each{|cb| s += cb.name + " " + cb.path + " " + "|" }
         s
     end
@@ -131,9 +131,12 @@ class Enviroment < ActiveRecord::Base
 		
 		##FALLABA AL ACCEDER A CB.ID YA QUE ERA NIL
 		if !cb.nil?
-			##MIRAR REPETIDOS
-			#puts 'existe el cb: ' + cb_id.to_s
-			find(id).cookbooks << cb
+			cb_list = find(id).cookbooks
+			if cb_list.include?(cb.id)
+				find(id).cookbooks << cb
+			else
+				puts cb_name + ' is yet included'
+			end
 		else
 			puts 'Can\'t find the cookbook ' + cb_name
 		end
@@ -158,7 +161,6 @@ class Enviroment < ActiveRecord::Base
 		if select!=nil 
 			puts "Un entorno con el nombre #{f.name} ya existia"
 		else 
-	##HAY QUE METER TB LA RELACIONDE COOKBOOKS
 			self.create(:name=>f.name, :description => f.description)
 			f.cookbooks.each{|cb|
 				self.add_cookbook Enviroment.last.id, cb
