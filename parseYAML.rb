@@ -1,5 +1,23 @@
 require 'yaml'
-require 'oneenv.rb'
+#require 'oneenv.rb'
+
+class Enviroment2
+	attr_accessor :name, :description, :cookbooks
+	
+	def initialize(name, description, cookbooks)
+		@name = name
+		@description = description
+		@cookbooks = cookbooks
+	end
+	
+	def to_s
+		str = "Name :" + @name.to_s + "\n"  
+		str += description.to_s  + "\n"
+		str += "Cookboks :" + @cookbooks.to_s + "\n"
+		str
+	end
+
+end
 
 class Conector_yaml
 

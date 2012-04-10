@@ -2,7 +2,7 @@ require 'rubygems'
 #require 'sqlite3'
 require 'active_record'
 require 'yaml'
-require 'oneenv.rb'
+#require 'oneenv.rb'
 
 # connect to database.  This will create one if it doesn't exist
 #MY_DB_NAME = "oneenv.db"
@@ -14,6 +14,28 @@ CONFIG_FILE = 'oneenv.cnf'
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
 
 #MY_DB_NAME)
+
+class Description
+	attr_accessor :image, :ssh, :type, :network, :vnc
+	
+	def initialize(image, ssh, type, network, vnc)
+		@image = image
+		@ssh = ssh
+		@type = type
+		@network = network
+		@vnc = vnc
+	end
+	
+	def to_s
+		str = "Image :" + @image.to_s + "\n"
+		str += "SSH :" + @ssh.to_s + "\n"
+		str += "Type :" + @type.to_s + "\n"
+		str += "Network :" + @network.to_s + "\n"
+		str += "VNC :" + @vnc.to_s + "\n"
+		str
+	end
+
+end
 
 class Cookbook < ActiveRecord::Base
 
@@ -139,7 +161,8 @@ class Enviroment < ActiveRecord::Base
 	##HAY QUE METER TB LA RELACIONDE COOKBOOKS
 			self.create(:name=>f.name, :description => f.description)
 			f.cookbooks.each{|cb|
-					self.add_cookbook Enviroment.last.id, cb}
+				self.add_cookbook Enviroment.last.id, cb
+			}
 		end
 	end
 
@@ -182,26 +205,38 @@ Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
 Cookbook.create(:name=>'nginx', :place=>'R')
 #=end
 
+Enviroment.create(:description=>d1)
+Enviroment.create(:description=>d2)
+Enviroment.create(:description=>d3)
 
+=begin
 cb1=['emacs','vim']
 cb2=['nginx','APACHE']
-
 
 e1= Enviroment2.new("env1",d1,cb1)
 e2= Enviroment2.new("env2",d2,cb2)
 #e3= Enviroment2.new("env3",d3,cb1)
 #e4= Enviroment2.new("env4",d1,cb1)
 
+cb3 = Cookbooks.find(3)
+cb4 = Cookbooks.find(4)
+
 Enviroment.add(e1)
 Enviroment.add(e2)
 #Enviroment.add(e3)
 #Enviroment.add(e4)
+=end
+
+Enviroment.find(1).cookbooks << Cookbook.find(4)
+Enviroment.find(1).cookbooks << Cookbook.find(3)
+
+Enviroment.find(2).cookbooks << Cookbook.find(5)
+Enviroment.find(2).cookbooks << Cookbook.find(1)
+
 
 Enviroment.add_cookbook 1, "vim"
 
 =begin
-Enviroment.find(2).cookbooks << Cookbook.find(4)
-Enviroment.find(2).cookbooks << Cookbook.find(3)
 =end
 
 =begin

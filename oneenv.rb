@@ -1,44 +1,101 @@
+require 'database.rb'
+require 'validation/validation'
+require 'parseYAML'
 
 
-class Enviroment2
-	attr_accessor :name, :description, :cookbooks
-	
-	def initialize(name, description, cookbooks)
-		@name = name
-		@description = description
-		@cookbooks = cookbooks
-	end
-	
-	def to_s
-		str = "Name :" + @name.to_s + "\n"  
-		str += description.to_s  + "\n"
-		str += "Cookboks :" + @cookbooks.to_s + "\n"
-		str
+class OneEnv
+	def self.run commands
+		case commands[0]
+
+		##USO: oneenv create [YAML] 
+		when 'create'
+			raise ArgumentError if commands.length != 2
+			cad2=commands[1]
+			#Aqui se comprueba si el fichero es valido. He puesto como que haya que meter obligatoriamente el fichero por parametro. El metodo 				validationYAML esta en validation.rb		
+			if validationYAML(cad2)
+				#converter es el metodo de parseYAML.rb
+				aux=converter(cad2)
+				aux.each do |f|
+					#Para cada elemento de la lista de entornos hacemos un add
+					Enviroment.add(f)
+				end
+			else 
+				'No se ha podido crear'
+			end
+
+		##USO:oneenv list
+		when 'list'
+			raise ArgumentError if commands.length != 1
+			puts "ID\tNAME\tIMAGE\tTYPE\tSSH\tNETWORK\tCOOKBOOKS"
+           	Enviroment.find(:all).each do |e|
+				puts e.to_s
+			end
+
+		##USO:oneenv show [ID_Env]
+		when 'show'
+			raise ArgumentError if commands.length != 2
+			puts "ID\tNAME\tIMAGE\tTYPE\tSSH\tNETWORK\tCOOKBOOKS"
+			if Enviroment.exists?(commands[1])
+           		e =Enviroment.find(commands[1])
+			else
+				puts 'This enviroment dont\' exits'
+			end
+			puts e.to_s
+
+		##USO:oneenv delete [ID_Env]
+		when 'delete'
+			raise ArgumentError if commands.length != 2
+			if Enviroment.exists?(commands[1])
+				Enviroment.delete(commands[1])
+			else
+				puts 'This enviroment don\'t exists'
+			end
+
+		##USO:oneenv clone [ID_Env]
+		when 'clone'
+			raise ArgumentError if commands.length != 2
+			if Enviroment.exists?(commands[1])
+				Enviroment.clone_env(commands[1])
+			else
+				puts 'This enviroment don\'t exists'
+			end
+
+
+		when 'add-ssh'
+
+		when 'update-ssh'
+
+
+		##USO:oneenv up [ID_entorno]
+		when 'up'
+
+
+		##USO:oneenv add-cookbook [ID_entorno] [cb_name]
+		when 'add-cookbook'
+			raise ArgumentError if commands.length != 3
+			if Enviroment.exists?(commands[1])
+				Enviroment.add_cookbook(commands[1],commands[2])
+			else
+				puts 'This enviroment don\'t exists'
+			end
+
+
+		when 'update-cookbook'
+
+		##USO:oneenv delete-cookbook [ID_entorno] [cb_name]
+		when 'delete-cookbook'
+			raise ArgumentError if commands.length != 3
+			if Enviroment.exists?(commands[1])
+				Enviroment.delete_cookbook(commands[1],commands[2])
+			else
+				puts 'This enviroment don\'t exists'
+			end
+
+		else
+			raise ArgumentError
+
+		end
+
 	end
 
 end
-
-
-
-class Description
-	attr_accessor :image, :ssh, :type, :network, :vnc
-	
-	def initialize(image, ssh, type, network, vnc)
-		@image = image
-		@ssh = ssh
-		@type = type
-		@network = network
-		@vnc = vnc
-	end
-	
-	def to_s
-		str = "Image :" + @image.to_s + "\n"
-		str += "SSH :" + @ssh.to_s + "\n"
-		str += "Type :" + @type.to_s + "\n"
-		str += "Network :" + @network.to_s + "\n"
-		str += "VNC :" + @vnc.to_s + "\n"
-		str
-	end
-
-end
-
