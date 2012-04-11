@@ -100,16 +100,31 @@ class Enviroment < ActiveRecord::Base
 
     public
     def to_s
-		s  = id.to_s + "\t"
+	s  = id.to_s + "\t"
         s += name + "\t"
         s += description.image.to_s + "\t"
         s += description.type + "\t"
         s += description.ssh + "\t"
         s += description.network + "\t"
-		s += cookbooks.size.to_s
-       # cookbooks.each{|cb| s += cb.name + " " + cb.path + " " + "|" }
+	s += cookbooks.size.to_s
         s
     end
+	public
+	def self.view_enviroment id
+		env=first(:conditions => {:id => id})
+		if !env.nil?
+		s  = "ID: " + env.id.to_s + "\n"
+		s += "NAME: " + env.name + "\n"
+		s += "Descripcion: " + env.description.image.to_s + "\n"
+		s += "Tipo" + env.description.type + "\n"
+		s += "Clave" + env.description.ssh + "\n"
+		s += "Network" + env.description.network + "\n"
+		s += "CookBooks: " + "\n"
+		env.cookbooks.each{|cb| s += cb.name + " " + cb.path + "\n" }
+		else
+			s +='Can\'t find the enviroment ' + id.to_s
+		end
+	end
 
 
 	public
@@ -128,8 +143,6 @@ class Enviroment < ActiveRecord::Base
 	public
 	def self.add_cookbook id, cb_name
 		cb = Cookbook.first(:conditions => {:name => cb_name})
-		
-		
 		if !cb.nil?
 			cb_list = find(id).cookbooks
 			if !cb_list.include?(cb.id)
@@ -153,7 +166,7 @@ class Enviroment < ActiveRecord::Base
 		end
 	end
 
-    public
+	public
 	def self.add(f)
         # Comprueba si hay un entorno con el mismo nombre y si asi es muestra un mensaje.
 		select = self.find{|k| k.name==f.name}
@@ -167,11 +180,12 @@ class Enviroment < ActiveRecord::Base
 			}
 		end
 	end
-    public 
+
+	public 
 	def self.addSSH(id,ssh)
 		if self.exists?(id)
 			entorno= self.find(id)
-			desc = entorno[:description]
+			desc = entorno.description
 			desc.ssh = ssh
 			self.update(entorno.id, {:description => desc})
 		else 
