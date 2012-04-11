@@ -32,11 +32,11 @@ class Template
 	max = cookbooks.length
 	cont = 0
 	cookbooks.each{|cb| 
-		s += cb.path 
+		s += "'"+cb.path+"'" 
 		cont += 1		
 		if max== cont
 		else
-			s += ' , '
+			s += ','
 		end		
 		}
 	@values[ 'receipt' ] = s
