@@ -167,6 +167,17 @@ class Enviroment < ActiveRecord::Base
 			}
 		end
 	end
+    public 
+	def self.addSSH(id,ssh)
+		if self.exists?(id)
+			entorno= self.find(id)
+			desc = entorno[:description]
+			desc.ssh = ssh
+			self.update(entorno.id, {:description => desc})
+		else 
+			puts 'There is not an environment with that id'
+		end
+	end
 
 end
 

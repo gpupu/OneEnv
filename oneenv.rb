@@ -62,6 +62,12 @@ class OneEnv
 
 
 		when 'add-ssh'
+			raise ArgumentError if commands.length != 3
+			if validationSSH(commands[2])
+				Enviroment.addSSH(commands[1],commands[2])
+			else
+				puts "#{commands[2]} is not a valid SSH"
+			end
 
 		when 'update-ssh'
 
