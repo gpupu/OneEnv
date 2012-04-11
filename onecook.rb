@@ -59,3 +59,5 @@ class OneCook
 	end
 
 end
+
+OneCook.run ARGV
