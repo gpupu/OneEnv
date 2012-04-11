@@ -70,12 +70,26 @@ class OneEnv
 			end
 		##USO:oneenv update-ssh [ID_entorno] [SSH_path]
 		when 'update-ssh'
+
 			raise ArgumentError if commands.length != 3
 			if validationSSH(commands[2])
 				Enviroment.addSSH(commands[1],commands[2])
 			else
 				puts "#{commands[2]} is not a valid SSH"
 			end
+
+
+		##USO:oneenv up [ID_entorno]
+		when 'up'
+			raise ArgumentError if commands.length != 2
+			if Enviroment.exists?(commands[1])
+				entorno= Enviroment.find(commands[1])
+				constructTemplate(entorno)
+			else 
+				puts 'There is not an environment with that id'
+			end
+
+
 		##USO:oneenv add-cookbook [ID_entorno] [cb_name]
 		when 'add-cookbook'
 			raise ArgumentError if commands.length != 3
@@ -96,15 +110,7 @@ class OneEnv
 			else
 				puts 'This enviroment don\'t exists'
 			end
-		##USO:oneenv up [ID_entorno]
-		when 'up'
-			raise ArgumentError if commands.length != 2
-			if Enviroment.exists?(commands[1])
-				entorno= Enviroment.find(commands[1])
-				constructTemplate(entorno)
-			else 
-				puts 'There is not an environment with that id'
-			end
+
 		else
 			raise ArgumentError
 
@@ -114,4 +120,4 @@ class OneEnv
 
 end
 
-OneEnv.run ARGV
+#OneEnv.run ARGV

@@ -165,6 +165,24 @@ class Enviroment < ActiveRecord::Base
 			puts cb_name + ' is not a cookbook from the selected enviroment'
 		end
 	end
+	
+	public	
+	def self.delete_allCB cb_name
+		cb = Cookbook.first(:conditions => {:name => cb_name})	
+		if !cb.nil?
+			self.each{|k|
+				cb_list = k.cookbooks
+				if !cb_list.include?(cb.id)
+					k.cookbooks.delete(cb)
+				end
+			}
+		else
+			puts cb_name + 'is not an existing cookbook'
+		end
+
+	end
+
+
 
 	public
 	def self.add(f)
