@@ -179,6 +179,7 @@ class Enviroment < ActiveRecord::Base
 		end
 	end
 
+
 end
 
 class CreateSchema < ActiveRecord::Migration

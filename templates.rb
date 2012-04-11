@@ -15,6 +15,32 @@ class Template
       @values[ name ] = value
   end
 
+  def setCM( type )
+	case type
+	when 'small'
+		@values[ 'cpu' ] = '0.5'
+      		@values[ 'memory' ] = '256'
+        when 'medium'
+		@values[ 'cpu' ] = '1'
+      		@values[ 'memory' ] = '512'
+	else
+	end
+  end
+
+  def setCB( cookbooks )
+	s = ''
+	max = cookbooks.length
+	cont = 0
+	cookbooks.each{|cb| 
+		s += cb.path 
+		cont += 1		
+		if max== cont
+		else
+			s += ' , '
+		end		
+		}
+	@values[ 'receipt' ] = s
+  end
   # Run the template with the given parameters and return
   # the template with the values replaced
   
@@ -30,19 +56,17 @@ class Template
   end
 end
 
-# Create the template object with the template string
-
-temp = Template.new( "NAME = :::nombre:::\nCPU    = :::numero1:::\nMEMORY = :::numero2:::\nDISK = [\n\s\simage     = :::imagen:::\s]\nNIC = [ network_id = :::network:::\s]\nCONTEXT = [\n\s\sFILES = :::receta:::\n\s\sSSH_KEY= :::ssh:::\n]")
-
-# Set the names and values of the replacement items
-
 def constructTemplate(env)
-	temp.set( 'nombre', env.nombre )
-	temp.set( 'numero1', '1' )
-	temp.set( 'numero2', '512' )
-	temp.set( 'imagen', "5" )
-	temp.set( 'network', "4" )
-	temp.set( 'receta', "coso" )
-	temp.set( 'ssh', "clave" )
+# Create the template object with the template string
+	temp = Template.new( "NAME = :::nombre:::\nCPU    = :::cpu:::\nMEMORY = :::memory:::\nDISK = [\n\s\sIMAGE     = :::image:::\s]\nNIC = [ network_id = :::network:::\s]\nCONTEXT = [\n\s\sFILES = :::receipt:::\n\s\sSSH_KEY= :::ssh:::\n]")
+
+	desc = env[:description]
+# Set the names and values of the replacement items
+	temp.set( 'nombre', env.name )
+	temp.setCM( desc.type )
+	temp.set( 'image', desc.image )
+	temp.set( 'network', desc.network )
+	temp.setCB( env.cookbooks )
+	temp.set( 'ssh', desc.ssh )
 	print temp
-}
+end

@@ -1,7 +1,7 @@
 require 'database.rb'
 require 'validation/validation'
 require 'parseYAML'
-
+require 'templates.rb'
 
 class OneEnv
 	def self.run commands
@@ -71,7 +71,6 @@ class OneEnv
 
 		when 'update-ssh'
 
-
 		##USO:oneenv up [ID_entorno]
 		when 'up'
 
@@ -96,7 +95,14 @@ class OneEnv
 			else
 				puts 'This enviroment don\'t exists'
 			end
-
+		when 'create-template'
+			raise ArgumentError if commands.length != 2
+			if Enviroment.exists?(commands[1])
+				entorno= Enviroment.find(commands[1])
+				constructTemplate(entorno)
+			else 
+				puts 'There is not an environment with that id'
+			end
 		else
 			raise ArgumentError
 
