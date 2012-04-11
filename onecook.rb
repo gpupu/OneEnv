@@ -48,15 +48,28 @@ class OneCook
 				end
 			else puts "'#{commands[3]}' has not a valid URL format"
 			end
+
 		when commands[0] == 'delete'
 			raise ArgumentError if commands.length != 2
 			if Cookbook.exists?(:name => commands[1])
 				Enviroment.delete_allCB(commands[1])
 				Cookbook.delete_all(:name => commands[1])
+
+
+
 			else
 				puts 'This cookbook don\'t exists'
 			end
+		when commands[0] == 'load'
+			raise ArgumentError if commands.length != 1
+			Cookbook.create(:name=>'APACHE', :path=>'/ruta/hacia/emacs')
+			Cookbook.create(:name=>'MYSQL', :path=>'/ruta/hacia/vim')
+			Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
+			Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
+			Cookbook.create(:name=>'nginx', :place=>'R')
 
+
+ 
 		else
 			raise ArgumentError
 
@@ -66,7 +79,7 @@ class OneCook
 
 end
 
-#catch (:callCommand) do
+
 begin
 	OneCook.run ARGV
 	rescue ArgumentError
