@@ -118,12 +118,13 @@ class Enviroment < ActiveRecord::Base
 		s += "Descripcion: " + env.description.image.to_s + "\n"
 		s += "Tipo" + env.description.type + "\n"
 		s += "Clave" + env.description.ssh + "\n"
-		s += "Network" + env.description.network + "\n"
+		s += "Network" + env.description.network + "\n\n"
 		s += "CookBooks: " + "\n"
-		env.cookbooks.each{|cb| s += cb.name + " " + cb.path + "\n" }
+		env.cookbooks.each{|cb| s += "-" + cb.name + " " + cb.path + "\n" }
 		else
 			s +='Can\'t find the enviroment ' + id.to_s
 		end
+		s
 	end
 
 
