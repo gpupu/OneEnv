@@ -60,7 +60,7 @@ class OneEnv
 				puts 'This enviroment don\'t exists'
 			end
 
-
+		
 		when 'add-ssh'
 			raise ArgumentError if commands.length != 3
 			if validationSSH(commands[2])
@@ -111,3 +111,5 @@ class OneEnv
 	end
 
 end
+
+OneEnv.run ARGV

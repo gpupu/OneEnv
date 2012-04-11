@@ -129,10 +129,10 @@ class Enviroment < ActiveRecord::Base
 	def self.add_cookbook id, cb_name
 		cb = Cookbook.first(:conditions => {:name => cb_name})
 		
-		##FALLABA AL ACCEDER A CB.ID YA QUE ERA NIL
+		
 		if !cb.nil?
 			cb_list = find(id).cookbooks
-			if cb_list.include?(cb.id)
+			if !cb_list.include?(cb.id)
 				find(id).cookbooks << cb
 			else
 				puts cb_name + ' is yet included'
@@ -184,32 +184,37 @@ end
 
 class CreateSchema < ActiveRecord::Migration
 
-    create_table(:cookbooks,:force=>true) do |t|
+if !table_exists?(:cookbooks)
+    create_table(:cookbooks) do |t|
         t.column :name, :string, :null=>false, :unique=>true
         t.column :path, :string, :default=>nil
         # Parece ser que type esta reservado por ruby, cambiado por place
         t.column :place, :string, :default=>'L', :limit=>1
         t.column :enviroments, :enviroment
     end
+end
 
-    create_table(:enviroments, :force=>true) do |t|
+if !table_exists?(:enviroments)
+    create_table(:enviroments) do |t|
         # El identificador autonumerado se crea automaticamente
         t.column :name, :string, :default=> nil,:unique=>true
         t.column :description, :string, :default=>nil
         t.column :cookbooks, :cookbook
     end
+end
 
-    create_table(:cookbooks_enviroments, :id=>false, :force=>true) do |t|
+if !table_exists?(:cookbooks_enviroments)
+    create_table(:cookbooks_enviroments, :id=>false) do |t|
         t.references :cookbook
         t.references :enviroment
     end
 end
 
+end
 
 
-d1 = Description.new(8, 'clave1', 'small', 'public',true)
-d2 = Description.new(7, 'clave2', 'small', 'public',true)
-d3 = Description.new(12, 'clave3', 'small', 'public',true)
+
+
 
 #=begin
 Cookbook.create(:name=>'APACHE', :path=>'/ruta/hacia/emacs')
@@ -219,11 +224,17 @@ Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
 Cookbook.create(:name=>'nginx', :place=>'R')
 #=end
 
+=begin
+
+d1 = Description.new(8, 'clave1', 'small', 'public',true)
+d2 = Description.new(7, 'clave2', 'small', 'public',true)
+d3 = Description.new(12, 'clave3', 'small', 'public',true)
+
 Enviroment.create(:description=>d1)
 Enviroment.create(:description=>d2)
 Enviroment.create(:description=>d3)
 
-=begin
+
 cb1=['emacs','vim']
 cb2=['nginx','APACHE']
 
@@ -240,7 +251,7 @@ Enviroment.add(e2)
 #Enviroment.add(e3)
 #Enviroment.add(e4)
 =end
-
+=begin
 Enviroment.find(1).cookbooks << Cookbook.find(4)
 Enviroment.find(1).cookbooks << Cookbook.find(3)
 
@@ -248,9 +259,7 @@ Enviroment.find(2).cookbooks << Cookbook.find(5)
 Enviroment.find(2).cookbooks << Cookbook.find(1)
 
 
-Enviroment.add_cookbook 1, "vim"
 
-=begin
 =end
 
 =begin
