@@ -146,7 +146,7 @@ class Enviroment < ActiveRecord::Base
 		cb = Cookbook.first(:conditions => {:name => cb_name})
 		if !cb.nil?
 			cb_list = find(id).cookbooks
-			if !cb_list.include?(cb.id)
+			if !cb_list.include?(cb)
 				find(id).cookbooks << cb
 			else
 				puts cb_name + ' is yet included'
@@ -173,9 +173,8 @@ class Enviroment < ActiveRecord::Base
 		if !cb.nil?
 			self.find(:all).each{|k|
 				cb_list = k.cookbooks
-				if !cb_list.include?(cb.id)
+				if cb_list.include?(cb)
 					k.cookbooks.delete(cb)
-					puts 'bien!'
 				end
 			}
 		else
@@ -250,13 +249,13 @@ end
 
 
 
-#=begin
+=begin
 Cookbook.create(:name=>'APACHE', :path=>'/ruta/hacia/emacs')
 Cookbook.create(:name=>'MYSQL', :path=>'/ruta/hacia/vim')
 Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
 Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
 Cookbook.create(:name=>'nginx', :place=>'R')
-#=end
+=end
 
 =begin
 

@@ -68,5 +68,5 @@ def constructTemplate(env)
 	temp.set( 'network', desc.network )
 	temp.setCB( env.cookbooks )
 	temp.set( 'ssh', desc.ssh )
-	print temp
+	File.open(env.name, 'w') {|f| f.write(temp) }
 end
