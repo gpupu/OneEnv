@@ -170,14 +170,15 @@ class Enviroment < ActiveRecord::Base
 	def self.delete_allCB cb_name
 		cb = Cookbook.first(:conditions => {:name => cb_name})	
 		if !cb.nil?
-			self.each{|k|
+			self.find(:all).each{|k|
 				cb_list = k.cookbooks
 				if !cb_list.include?(cb.id)
 					k.cookbooks.delete(cb)
+					puts 'bien!'
 				end
 			}
 		else
-			puts cb_name + 'is not an existing cookbook'
+			puts cb_name + ' is not an existing cookbook'
 		end
 
 	end

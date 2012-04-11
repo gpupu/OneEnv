@@ -51,10 +51,8 @@ class OneCook
 		when commands[0] == 'delete'
 			raise ArgumentError if commands.length != 2
 			if Cookbook.exists?(:name => commands[1])
+				Enviroment.delete_allCB(commands[1])
 				Cookbook.delete_all(:name => commands[1])
-
-				Enviroment.delete_allCB commands[1]
-
 			else
 				puts 'This cookbook don\'t exists'
 			end
