@@ -66,4 +66,9 @@ class OneCook
 
 end
 
-#OneCook.run ARGV
+#catch (:callCommand) do
+begin
+	OneCook.run ARGV
+	rescue ArgumentError
+	puts "Argument error"
+end

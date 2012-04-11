@@ -120,4 +120,9 @@ class OneEnv
 
 end
 
-#OneEnv.run ARGV
+
+begin
+	OneEnv.run ARGV
+	rescue ArgumentError
+	puts "Argument error"
+end
