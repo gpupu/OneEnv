@@ -48,11 +48,11 @@ class OneCook
 				end
 			else puts "'#{commands[3]}' has not a valid URL format"
 			end
+
 		when commands[0] == 'delete'
 			raise ArgumentError if commands.length != 2
 			if Cookbook.exists?(:name => commands[1])
 				Cookbook.delete_all(:name => commands[1])
-
 				Enviroment.delete_allCB commands[1]
 
 			else
@@ -68,7 +68,7 @@ class OneCook
 
 end
 
-#catch (:callCommand) do
+
 begin
 	OneCook.run ARGV
 	rescue ArgumentError
