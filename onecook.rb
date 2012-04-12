@@ -52,14 +52,15 @@ class OneCook
 		when commands[0] == 'delete'
 			raise ArgumentError if commands.length != 2
 			if Cookbook.exists?(:name => commands[1])
-				Enviroment.delete_allCB(commands[1])
-				Cookbook.delete_all(:name => commands[1])
-
-
-
+				#Enviroment.delete_allCB(commands[1])
+				#Cookbook.delete_all(:name => commands[1])
+				cb = Cookbook.first(:conditions => {:name => commands[1]})
+				cb.enviroments.clear
+				cb.delete
 			else
 				puts 'This cookbook don\'t exists'
 			end
+
 		when commands[0] == 'load'
 			raise ArgumentError if commands.length != 1
 			Cookbook.create(:name=>'APACHE', :path=>'/ruta/hacia/emacs')

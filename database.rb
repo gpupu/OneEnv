@@ -2,7 +2,6 @@ require 'rubygems'
 #require 'sqlite3'
 require 'active_record'
 require 'yaml'
-#require 'oneenv.rb'
 
 # connect to database.  This will create one if it doesn't exist
 #MY_DB_NAME = "oneenv.db"
@@ -167,6 +166,7 @@ class Enviroment < ActiveRecord::Base
 		end
 	end
 	
+=begin
 	public	
 	def self.delete_allCB cb_name
 		cb = Cookbook.first(:conditions => {:name => cb_name})	
@@ -182,8 +182,7 @@ class Enviroment < ActiveRecord::Base
 		end
 
 	end
-
-
+=end
 
 	public
 	def self.add(f)
@@ -255,9 +254,6 @@ Cookbook.create(:name=>'MYSQL', :path=>'/ruta/hacia/vim')
 Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
 Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
 Cookbook.create(:name=>'nginx', :place=>'R')
-=end
-
-=begin
 
 d1 = Description.new(8, 'clave1', 'small', 'public',true)
 d2 = Description.new(7, 'clave2', 'small', 'public',true)
@@ -266,8 +262,9 @@ d3 = Description.new(12, 'clave3', 'small', 'public',true)
 Enviroment.create(:description=>d1)
 Enviroment.create(:description=>d2)
 Enviroment.create(:description=>d3)
+=end
 
-
+=begin
 cb1=['emacs','vim']
 cb2=['nginx','APACHE']
 
