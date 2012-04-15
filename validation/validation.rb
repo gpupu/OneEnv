@@ -1,6 +1,9 @@
 require "rubygems"
 require "kwalify"
 
+#esta gema se instalaría con 'gem install sshkey'
+require 'sshkey'
+
 #Entiendo que solo hay un esquema de validacion
 SCHEMA='./validation/schema_env.yaml' 
 
@@ -16,6 +19,20 @@ def validationYAML(doc)
   		end
 	else
 		return true
+	end
+end
+
+def validationSSH(ssh)
+	contents = ""
+	file = File.open(ssh)
+	file.each {|line|
+  		contents << line
+	}
+	if SSHKey.valid_ssh_public_key? contents
+		return true
+	else 
+		return false
+
 	end
 end
 
