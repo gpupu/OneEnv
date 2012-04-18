@@ -43,6 +43,7 @@ class Cookbook < ActiveRecord::Base
     has_and_belongs_to_many :enviroments, :uniq => true
     # Obliga a que el campo :place sea R o L
     validates :place, :inclusion => {:in=> ['R', 'L'], :message=> "%{value} no es un valor correcto" }
+    serialize :recipes, Array
 
 	private
 	def create_defaults
@@ -87,6 +88,7 @@ class Enviroment < ActiveRecord::Base
     after_create :create_defaults
     has_and_belongs_to_many :cookbooks, :uniq => true
     serialize :description
+    serialize :roles, Hash
     
     private
     def create_defaults
@@ -108,6 +110,7 @@ class Enviroment < ActiveRecord::Base
 	s += cookbooks.size.to_s
         s
     end
+    
 	public
 	def self.view_enviroment id
 		env=first(:conditions => {:id => id})
@@ -222,6 +225,7 @@ if !table_exists?(:cookbooks)
         t.column :path, :string, :default=>nil
         # Parece ser que type esta reservado por ruby, cambiado por place
         t.column :place, :string, :default=>'L', :limit=>1
+        t.text :recipes
         t.column :enviroments, :enviroment
     end
 end
@@ -231,6 +235,7 @@ if !table_exists?(:enviroments)
         # El identificador autonumerado se crea automaticamente
         t.column :name, :string, :default=> nil,:unique=>true
         t.column :description, :string, :default=>nil
+        t.text :roles
         t.column :cookbooks, :cookbook
     end
 end
@@ -248,7 +253,7 @@ end
 
 
 
-=begin
+#=begin
 Cookbook.create(:name=>'APACHE', :path=>'/ruta/hacia/emacs')
 Cookbook.create(:name=>'MYSQL', :path=>'/ruta/hacia/vim')
 Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
@@ -262,7 +267,7 @@ d3 = Description.new(12, 'clave3', 'small', 'public',true)
 Enviroment.create(:description=>d1)
 Enviroment.create(:description=>d2)
 Enviroment.create(:description=>d3)
-=end
+#=end
 
 =begin
 cb1=['emacs','vim']
