@@ -73,10 +73,35 @@ class Cookbook < ActiveRecord::Base
 			cb_type = 'R' 
 		end
 		if !exists?(:name => cb_name)
-			create(:name => cb_name, :path => cb_path, :place => cb_type)
+			create(:name => cb_name, :path => cb_path, :place => cb_type, :recipes => get_recipes(cb_path))
 		else
 			puts cb_name + ' is yet on the database'
 		end
+	end
+
+	private
+	def self.get_recipes cb_path
+		# Cuidado!!! esto no funcionará cuando place=R
+		r_path = cb_path + '/recipes'
+		#puts r_path
+		recs = Dir.entries(r_path)
+		#puts recs
+		if recs.size > 2
+			recs = recs[1..-2]
+			recipe_names= Array.new
+			recs.each{|r|
+				recipe_names << r.split('.')[0]
+			}
+			return recipe_names
+		else
+			return []
+		end
+	end
+
+	public
+	def add_recipe name_recipe
+		recipes.push name_recipe
+		self.save
 	end
 
 end
@@ -101,13 +126,13 @@ class Enviroment < ActiveRecord::Base
 
     public
     def to_s
-	s  = id.to_s + "\t"
+		s  = id.to_s + "\t"
         s += name + "\t"
         s += description.image.to_s + "\t"
         s += description.type + "\t"
         s += description.ssh + "\t"
         s += description.network + "\t"
-	s += cookbooks.size.to_s
+		s += cookbooks.size.to_s
         s
     end
     
@@ -168,24 +193,6 @@ class Enviroment < ActiveRecord::Base
 			puts cb_name + ' is not a cookbook from the selected enviroment'
 		end
 	end
-	
-=begin
-	public	
-	def self.delete_allCB cb_name
-		cb = Cookbook.first(:conditions => {:name => cb_name})	
-		if !cb.nil?
-			self.find(:all).each{|k|
-				cb_list = k.cookbooks
-				if cb_list.include?(cb)
-					k.cookbooks.delete(cb)
-				end
-			}
-		else
-			puts cb_name + ' is not an existing cookbook'
-		end
-
-	end
-=end
 
 	public
 	def self.add(f)
@@ -214,6 +221,11 @@ class Enviroment < ActiveRecord::Base
 		end
 	end
 
+	public 
+	def add_role(role_name,path_role)
+		roles[role_name] = path_role
+		self.save
+	end
 
 end
 
