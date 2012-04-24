@@ -39,12 +39,10 @@ end
 class Cookbook < ActiveRecord::Base
 
     validates_uniqueness_of :name
-    before_validation :create_defaults
     has_and_belongs_to_many :enviroments, :uniq => true
-    # Obliga a que el campo :place sea R o L
-    validates :place, :inclusion => {:in=> ['R', 'L'], :message=> "%{value} no es un valor correcto" }
     serialize :recipes, Array
 
+=begin
 	private
 	def create_defaults
 		conf = YAML.load_file(CONFIG_FILE)
@@ -103,17 +101,21 @@ class Cookbook < ActiveRecord::Base
 		recipes.push name_recipe
 		self.save
 	end
+=end
 
 end
 
+class Role < ActiveRecord::Base
+    validates_uniqueness_of :name
+    has_and_belongs_to_many :enviroments, :uniq => true
+end
 
 class Enviroment < ActiveRecord::Base
 
     validates_uniqueness_of :name
     after_create :create_defaults
     has_and_belongs_to_many :cookbooks, :uniq => true
-    serialize :description
-    serialize :roles, Hash
+	has_and_belongs_to_many :roles, :uniq => true
     
     private
     def create_defaults
@@ -124,6 +126,7 @@ class Enviroment < ActiveRecord::Base
         end
     end
 
+=begin
     public
     def to_s
 		s  = id.to_s + "\t"
@@ -226,6 +229,7 @@ class Enviroment < ActiveRecord::Base
 		roles[role_name] = path_role
 		self.save
 	end
+=end
 
 end
 
@@ -234,21 +238,28 @@ class CreateSchema < ActiveRecord::Migration
 if !table_exists?(:cookbooks)
     create_table(:cookbooks) do |t|
         t.column :name, :string, :null=>false, :unique=>true
-        t.column :path, :string, :default=>nil
-        # Parece ser que type esta reservado por ruby, cambiado por place
-        t.column :place, :string, :default=>'L', :limit=>1
+        t.column :path, :string, :null=>false
         t.text :recipes
         t.column :enviroments, :enviroment
     end
 end
 
+if !table_exists?(:roles)
+	create_table(:roles) do |t|
+		t.column :name, :string, :null=>false, :unique=>true
+        t.column :path, :string, :null=>false
+        t.column :enviroments, :enviroment
+	end
+end
+
 if !table_exists?(:enviroments)
     create_table(:enviroments) do |t|
-        # El identificador autonumerado se crea automaticamente
         t.column :name, :string, :default=> nil,:unique=>true
-        t.column :description, :string, :default=>nil
-        t.text :roles
-        t.column :cookbooks, :cookbook
+		t.column :template, :integer, :null=> false
+		t.column :node, :string, :null=> false
+		t.column :databags, :string, :default=> nil
+		t.column :roles, :role
+		t.column :cookbooks, :cookbook
     end
 end
 
@@ -259,13 +270,21 @@ if !table_exists?(:cookbooks_enviroments)
     end
 end
 
+if !table_exists?(:enviroments_roles)
+    create_table(:enviroments_roles, :id=>false) do |t|
+        t.references :enviroment
+		t.references :role
+    end
+end
+
+
 end
 
 
 
 
 
-#=begin
+=begin
 Cookbook.create(:name=>'APACHE', :path=>'/ruta/hacia/emacs')
 Cookbook.create(:name=>'MYSQL', :path=>'/ruta/hacia/vim')
 Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
@@ -279,7 +298,7 @@ d3 = Description.new(12, 'clave3', 'small', 'public',true)
 Enviroment.create(:description=>d1)
 Enviroment.create(:description=>d2)
 Enviroment.create(:description=>d3)
-#=end
+=end
 
 =begin
 cb1=['emacs','vim']
