@@ -1,3 +1,4 @@
 #COOKBOOKS
-default_repository: git://github.com/opscode/cookbooks.git
-default_local: /srv/cloud/cookbooks
+#default_repository: git://github.com/opscode/cookbooks.git
+default_cb_dir: /srv/cloud/cookbooks
+default_role_dir: /srv/cloud/roles

@@ -8,52 +8,19 @@ require 'yaml'
 #MY_DB = SQLite3::Database.new(MY_DB_NAME)
 
 CONFIG_FILE = 'oneenv.cnf'
+CONFIG = YAML.load_file(CONFIG_FILE)
 
 # get active record set up
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
 
 #MY_DB_NAME)
 
-class Description
-	attr_accessor :image, :ssh, :type, :network, :vnc
-	
-	def initialize(image, ssh, type, network, vnc)
-		@image = image
-		@ssh = ssh
-		@type = type
-		@network = network
-		@vnc = vnc
-	end
-	
-	def to_s
-		str = "Image :" + @image.to_s + "\n"
-		str += "SSH :" + @ssh.to_s + "\n"
-		str += "Type :" + @type.to_s + "\n"
-		str += "Network :" + @network.to_s + "\n"
-		str += "VNC :" + @vnc.to_s + "\n"
-		str
-	end
-
-end
-
 class Cookbook < ActiveRecord::Base
-
     validates_uniqueness_of :name
+#	before_validation :create_defaults
     has_and_belongs_to_many :enviroments, :uniq => true
     serialize :recipes, Array
 
-=begin
-	private
-	def create_defaults
-		conf = YAML.load_file(CONFIG_FILE)
-		if self.path == nil 
-		    if self.place.eql?('R')
-		        self.path = conf['default_repository']
-		    else
-		        self.path = conf['default_local']
-		    end
-		end
-	end
 
 	public
 	def to_s
@@ -66,12 +33,8 @@ class Cookbook < ActiveRecord::Base
 
 	public
 	def self.cb_create cb_name, cb_path, cb_repo
-		cb_type = 'L'
-		if cb_repo 
-			cb_type = 'R' 
-		end
 		if !exists?(:name => cb_name)
-			create(:name => cb_name, :path => cb_path, :place => cb_type, :recipes => get_recipes(cb_path))
+			create(:name => cb_name, :path => cb_path, :recipes => get_recipes(cb_path))
 		else
 			puts cb_name + ' is yet on the database'
 		end
@@ -79,7 +42,6 @@ class Cookbook < ActiveRecord::Base
 
 	private
 	def self.get_recipes cb_path
-		# Cuidado!!! esto no funcionará cuando place=R
 		r_path = cb_path + '/recipes'
 		#puts r_path
 		recs = Dir.entries(r_path)
@@ -88,6 +50,7 @@ class Cookbook < ActiveRecord::Base
 			recs = recs[1..-2]
 			recipe_names= Array.new
 			recs.each{|r|
+				# TODO:Hacer mejor esto
 				recipe_names << r.split('.')[0]
 			}
 			return recipe_names
@@ -96,6 +59,8 @@ class Cookbook < ActiveRecord::Base
 		end
 	end
 
+
+=begin
 	public
 	def add_recipe name_recipe
 		recipes.push name_recipe
@@ -238,7 +203,7 @@ class CreateSchema < ActiveRecord::Migration
 if !table_exists?(:cookbooks)
     create_table(:cookbooks) do |t|
         t.column :name, :string, :null=>false, :unique=>true
-        t.column :path, :string, :null=>false
+        t.column :path, :string, :default=>CONFIG['default_cb_dir']
         t.text :recipes
         t.column :enviroments, :enviroment
     end
@@ -247,7 +212,7 @@ end
 if !table_exists?(:roles)
 	create_table(:roles) do |t|
 		t.column :name, :string, :null=>false, :unique=>true
-        t.column :path, :string, :null=>false
+        t.column :path, :string, :default=>CONFIG['default_role_dir']
         t.column :enviroments, :enviroment
 	end
 end
@@ -281,66 +246,25 @@ end
 end
 
 
+env1=Enviroment.create(:template=>2, :node=>'/ruta/hacia/nodo1')
+env2=Enviroment.create(:template=>3, :node=>'/ruta/hacia/nodo2')
+env3=Enviroment.create(:template=>4, :node=>'/ruta/hacia/nodo3')
+env4=Enviroment.create(:template=>5, :node=>'/ruta/hacia/nodo4')
+
+cb1=Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
+cb2=Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
+cb3=Cookbook.create(:name=>'nginx')
+
+r1= Role.create(:name=>"dev", :path=>'/ruta/hacia/roldev')
+r2= Role.create(:name=>"admin", :path=>'/ruta/hacia/roladmin')
+r3= Role.create(:name=>'otro_rol')
+
+env1.cookbooks << cb1
+env1.roles << r2
+env1.roles << r1
+
+env2.cookbooks << cb1
+env2.cookbooks << cb3
+env2.roles << r2
 
 
-
-=begin
-Cookbook.create(:name=>'APACHE', :path=>'/ruta/hacia/emacs')
-Cookbook.create(:name=>'MYSQL', :path=>'/ruta/hacia/vim')
-Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
-Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
-Cookbook.create(:name=>'nginx', :place=>'R')
-
-d1 = Description.new(8, 'clave1', 'small', 'public',true)
-d2 = Description.new(7, 'clave2', 'small', 'public',true)
-d3 = Description.new(12, 'clave3', 'small', 'public',true)
-
-Enviroment.create(:description=>d1)
-Enviroment.create(:description=>d2)
-Enviroment.create(:description=>d3)
-=end
-
-=begin
-cb1=['emacs','vim']
-cb2=['nginx','APACHE']
-
-e1= Enviroment2.new("env1",d1,cb1)
-e2= Enviroment2.new("env2",d2,cb2)
-#e3= Enviroment2.new("env3",d3,cb1)
-#e4= Enviroment2.new("env4",d1,cb1)
-
-cb3 = Cookbooks.find(3)
-cb4 = Cookbooks.find(4)
-
-Enviroment.add(e1)
-Enviroment.add(e2)
-#Enviroment.add(e3)
-#Enviroment.add(e4)
-=end
-=begin
-Enviroment.find(1).cookbooks << Cookbook.find(4)
-Enviroment.find(1).cookbooks << Cookbook.find(3)
-
-Enviroment.find(2).cookbooks << Cookbook.find(5)
-Enviroment.find(2).cookbooks << Cookbook.find(1)
-
-
-
-=end
-
-=begin
-ent1 = Env_db.create(:ssh=>'clave1')
-ent2 = Env_db.create(:ssh => 'clave2')
-
-ent1.cookbooks.create(:name=>'vim', :path=>'/ruta/hacia/vim')
-ent1.cookbooks.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
-=end
-=begin
-desc1 = Enviroment.find(1).description
-desc2 = Enviroment.find(2).description
-desc3 = Enviroment.find(3).description
-
-puts desc1.to_s
-puts desc2.to_s
-puts desc3.to_s
-=end
