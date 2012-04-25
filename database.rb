@@ -91,18 +91,18 @@ class Enviroment < ActiveRecord::Base
         end
     end
 
-=begin
     public
     def to_s
 		s  = id.to_s + "\t"
         s += name + "\t"
-        s += description.image.to_s + "\t"
-        s += description.type + "\t"
-        s += description.ssh + "\t"
-        s += description.network + "\t"
-		s += cookbooks.size.to_s
-        s
+        s += template.to_s + "\t"
+        s += node + "\t"
+        s += databags.to_s + "\t"
+		s += cookbooks.size.to_s + "\t"
+        s += roles.size.to_s
     end
+
+=begin
     
 	public
 	def self.view_enviroment id

@@ -7,8 +7,14 @@ class OneEnv
 	def self.run commands
 		case commands[0]
 
-		##USO: oneenv create [YAML] 
+		##USO: oneenv create NAME ID_TEMPLATE NODE_PATH [DATABAG_PATH]
 		when 'create'
+			raise ArgumentError if commands.length !=4 and commands.length !=5
+			# TODO: Comprobar que el template existe en opennebula
+			# TODO: Comprobar dependencias del NODE¿?
+			Enviroment.create(:name=> commands[1], :template=> commands[2], :node=> commands[3], :databags=> commands[4])
+			
+=begin
 			raise ArgumentError if commands.length != 2
 			cad2=commands[1]
 			#Aqui se comprueba si el fichero es valido. He puesto como que haya que meter obligatoriamente el fichero por parametro. El metodo 				validationYAML esta en validation.rb		
@@ -22,17 +28,18 @@ class OneEnv
 			else 
 				'No se ha podido crear'
 			end
+=end
 
 		##USO:oneenv list
 		when 'list'
 			raise ArgumentError if commands.length != 1
-			puts "ID\tNAME\tIMAGE\tTYPE\tSSH\tNETWORK\tCOOKBOOKS"
-           		Enviroment.find(:all).each do |e|
+			puts "ID\tNAME\tTEMPLATE\tNODE\tDATA BAGS"
+           	Enviroment.find(:all).each do |e|
 				puts e.to_s
 			end
 
 		##USO:oneenv show [ID_Env]
-		when 'show'
+		when 'show'	#TODO
 			raise ArgumentError if commands.length != 2
 			if Enviroment.exists?(commands[1])
            			env = Enviroment.find(commands[1])
@@ -41,16 +48,44 @@ class OneEnv
 				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
 			end
 			
-
 		##USO:oneenv delete [ID_Env]
 		when 'delete'
 			raise ArgumentError if commands.length != 2
 			if Enviroment.exists?(commands[1])
-				Enviroment.delete(commands[1])
+				env = Enviroment.find(commands[1])
+				env.cookbooks.clear
+				env.roles.clear
+				env.delete
+				#Enviroment.delete(commands[1])
 			else
 				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
 			end
 
+		##USO: oneenv update-node ID_ENV NODE_PATH
+		when 'update-node'
+			raise ArgumentError if commands.length != 3
+			if Enviroment.exists?(commands[1])
+				env= Enviroment.find(commands[1])
+				# limpia lista de roles y cbs
+				#env.cookbooks.clear
+				#env.roles.clear
+				# recorre el arbol marcando contenidos
+			else
+				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
+			end
+
+		##USO oneenv update-databags ID_ENV [DB_PATH]
+		when 'update-databag'
+			raise ArgumentError if commands.length != 2 and commands.length != 3
+			if Enviroment.exists?(commands[1])
+				env= Enviroment.find(commands[1])
+				Enviroment.update(commands[1], {:databags=> commands[2]})
+			else
+				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
+			end
+
+
+=begin
 		##USO:oneenv clone [ID_Env]
 		when 'clone'
 			raise ArgumentError if commands.length != 2
@@ -77,10 +112,10 @@ class OneEnv
 			else
 				puts "#{commands[2]} is not a valid SSH"
 			end
+=end
 
-
-		##USO:oneenv up [ID_entorno]
-		when 'up'
+		##USO:oneenv up [ID_entorno] 
+		when 'up'	#TODO
 			raise ArgumentError if commands.length != 2
 			if Enviroment.exists?(commands[1])
 				entorno= Enviroment.find(commands[1])
@@ -89,7 +124,7 @@ class OneEnv
 				puts 'There is not an environment with that id'
 			end
 
-
+=begin
 		##USO:oneenv add-cookbook [ID_entorno] [cb_name]
 		when 'add-cookbook'
 			raise ArgumentError if commands.length != 3
@@ -116,6 +151,9 @@ class OneEnv
 
 		end
 
+=end
+
+		end
 	end
 
 end
