@@ -1,11 +1,12 @@
 require 'database.rb'
 require 'validation/validation'
 require 'parseYAML'
-#require 'uri'
+require 'uri'
 
 class OneCook
 	def self.run commands
 		case
+
 		#USO onecook list
 		when commands[0] == 'list'
 			raise ArgumentError if commands.length != 1

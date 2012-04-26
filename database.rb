@@ -92,6 +92,33 @@ end
 class Role < ActiveRecord::Base
     validates_uniqueness_of :name
     has_and_belongs_to_many :enviroments, :uniq => true
+
+	public
+	def to_s
+		s  = id.to_s + "\t"
+		s += name + "\t"
+		s += path + "\t"
+		s
+	end
+
+	public
+	def self.role_create r_name, r_path
+		if r_path == nil 
+			r_path = ROLE_DIR
+		end
+
+		if !exists?(:name=>r_name)
+			r_path = File.expand_path(r_path)
+			if File.exists?(r_path)
+				create(:name=> r_name, :path=> r_path)
+			else
+				puts r_path + ' is not a correct path'
+			end
+		else
+			puts r_name + 'is yet on the database'
+		end
+	end
+
 end
 
 class Enviroment < ActiveRecord::Base
