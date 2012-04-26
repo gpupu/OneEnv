@@ -21,7 +21,6 @@ ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "one
 
 class Cookbook < ActiveRecord::Base
     validates_uniqueness_of :name
-#	before_validation :create_defaults
     has_and_belongs_to_many :enviroments, :uniq => true
     serialize :recipes, Array
 
@@ -37,15 +36,18 @@ class Cookbook < ActiveRecord::Base
 
 	public
 	def self.cb_create cb_name, cb_path
-		if !exists?(:name => cb_name)
-			if cb_path == nil or File.exists?(cb_path) # el or tiene cortocircuito
-				long_path = File.expand_path(cb_path)
-				create(:name => cb_name, :path => long_path, :recipes => get_recipes(cb_path))
-				if long_path != nil and long_path != CB_DIR
+		if cb_path == nil
+			cb_path = CB_DIR
+		end
 
+		if !exists?(:name => cb_name)
+			cb_path = File.expand_path(cb_path)
+			if File.exists?(cb_path)
+				dir_recipes = cb_path + '/' + cb_name
+				puts 'dir_recipes' + dir_recipes
+				create(:name => cb_name, :path => cb_path, :recipes => get_recipes(dir_recipes))
 					#TODO:Copiar al directorio por defecto recursivamente
 					#desde la dir que entra				
-				end
 			else
 				puts cb_path + ' is not a correct path'
 			end
@@ -61,11 +63,11 @@ class Cookbook < ActiveRecord::Base
 		recs = Dir.entries(r_path)
 		#puts recs
 		if recs.size > 2
-			recs = recs[1..-2]
 			recipe_names= Array.new
 			recs.each{|r|
-				# TODO:Hacer mejor esto con File
-				recipe_names << r.split('.')[0]
+				if File.extname(r) == ".rb"
+					recipe_names << File.basename(r,".rb")
+				end
 			}
 			return recipe_names
 		else
@@ -77,15 +79,6 @@ class Cookbook < ActiveRecord::Base
 	def update
 		recipes = get_recipes path
 	end
-
-
-=begin
-	public
-	def add_recipe name_recipe
-		recipes.push name_recipe
-		self.save
-	end
-=end
 
 end
 
@@ -111,6 +104,7 @@ class Role < ActiveRecord::Base
 			r_path = File.expand_path(r_path)
 			if File.exists?(r_path)
 				create(:name=> r_name, :path=> r_path)
+				#TODO Copiar rol en el directorio por defecto
 			else
 				puts r_path + ' is not a correct path'
 			end
