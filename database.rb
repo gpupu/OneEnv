@@ -10,6 +10,10 @@ require 'yaml'
 CONFIG_FILE = 'oneenv.cnf'
 CONFIG = YAML.load_file(CONFIG_FILE)
 
+# Cuidado con esto!! ¿mantiene valor si se cambia el archivo de configuración?
+CB_DIR = File.expand_path(CONFIG['default_cb_dir'])
+ROLE_DIR = File.expand_path(CONFIG['default_role_dir'])
+
 # get active record set up
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
 
@@ -27,14 +31,24 @@ class Cookbook < ActiveRecord::Base
 		s  = id.to_s + "\t"
 		s += name + "\t"
 		s += path + "\t"
-		s += place + "\t"
+		s += recipes.to_s + "\t"
 		s
 	end
 
 	public
-	def self.cb_create cb_name, cb_path, cb_repo
+	def self.cb_create cb_name, cb_path
 		if !exists?(:name => cb_name)
-			create(:name => cb_name, :path => cb_path, :recipes => get_recipes(cb_path))
+			if cb_path == nil or File.exists?(cb_path) # el or tiene cortocircuito
+				long_path = File.expand_path(cb_path)
+				create(:name => cb_name, :path => long_path, :recipes => get_recipes(cb_path))
+				if long_path != nil and long_path != CB_DIR
+
+					#TODO:Copiar al directorio por defecto recursivamente
+					#desde la dir que entra				
+				end
+			else
+				puts cb_path + ' is not a correct path'
+			end
 		else
 			puts cb_name + ' is yet on the database'
 		end
@@ -50,13 +64,18 @@ class Cookbook < ActiveRecord::Base
 			recs = recs[1..-2]
 			recipe_names= Array.new
 			recs.each{|r|
-				# TODO:Hacer mejor esto
+				# TODO:Hacer mejor esto con File
 				recipe_names << r.split('.')[0]
 			}
 			return recipe_names
 		else
 			return []
 		end
+	end
+
+	public 
+	def update
+		recipes = get_recipes path
 	end
 
 
@@ -135,22 +154,11 @@ class Enviroment < ActiveRecord::Base
 			puts 'Can\'t find the enviroment ' + id.to_s
 		end
 	end
+=end
 
-	public
-	def self.add_cookbook id, cb_name
-		cb = Cookbook.first(:conditions => {:name => cb_name})
-		if !cb.nil?
-			cb_list = find(id).cookbooks
-			if !cb_list.include?(cb)
-				find(id).cookbooks << cb
-			else
-				puts cb_name + ' is yet included'
-			end
-		else
-			puts 'Can\'t find the cookbook ' + cb_name
-		end
-	end
 
+
+=begin
 	public
 	def self.delete_cookbook id, cb_name
 		cb = Cookbook.first(:conditions => {:name => cb_name})
@@ -203,7 +211,7 @@ class CreateSchema < ActiveRecord::Migration
 if !table_exists?(:cookbooks)
     create_table(:cookbooks) do |t|
         t.column :name, :string, :null=>false, :unique=>true
-        t.column :path, :string, :default=>CONFIG['default_cb_dir']
+        t.column :path, :string, :default=>CB_DIR
         t.text :recipes
         t.column :enviroments, :enviroment
     end
@@ -212,7 +220,7 @@ end
 if !table_exists?(:roles)
 	create_table(:roles) do |t|
 		t.column :name, :string, :null=>false, :unique=>true
-        t.column :path, :string, :default=>CONFIG['default_role_dir']
+        t.column :path, :string, :default=>ROLE_DIR
         t.column :enviroments, :enviroment
 	end
 end
