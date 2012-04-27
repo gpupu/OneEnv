@@ -12,23 +12,12 @@ class OneEnv
 			raise ArgumentError if commands.length !=4 and commands.length !=5
 			# TODO: Comprobar que el template existe en opennebula
 			# TODO: Comprobar dependencias del NODE¿?
-			Enviroment.create(:name=> commands[1], :template=> commands[2], :node=> commands[3], :databags=> commands[4])
-			
-=begin
-			raise ArgumentError if commands.length != 2
-			cad2=commands[1]
-			#Aqui se comprueba si el fichero es valido. He puesto como que haya que meter obligatoriamente el fichero por parametro. El metodo 				validationYAML esta en validation.rb		
-			if validationYAML(cad2)
-				#converter es el metodo de parseYAML.rb
-				aux=converter(cad2)
-				aux.each do |f|
-					#Para cada elemento de la lista de entornos hacemos un add
-					Enviroment.add(f)
-				end
-			else 
-				'No se ha podido crear'
+			node_path = File.expand_path(commands[3])
+			if File.exists?(node_path)
+				Enviroment.create(:name=> commands[1], :template=> commands[2], :node=> node_path, :databags=> commands[4])
+			else
+				puts 'node path is not correct'
 			end
-=end
 
 		##USO:oneenv list
 		when 'list'
@@ -118,8 +107,15 @@ class OneEnv
 		when 'up'	#TODO
 			raise ArgumentError if commands.length != 2
 			if Enviroment.exists?(commands[1])
-				entorno= Enviroment.find(commands[1])
-				constructTemplate(entorno)
+				env = Enviroment.find(commands[1])
+				#node = env.node
+# 	TODO Pasar directorio databags
+				repo_dir = CB_DIR + ' ' + ROLE_DIR
+				#constructTemplate(env.template.to_i, repo_dir,env.node )
+				puts 'montando template...'
+				puts env.template
+				puts repo_dir
+				puts env.node
 			else 
 				puts 'There is not an environment with that id'
 			end
@@ -145,15 +141,12 @@ class OneEnv
 			else
 				puts 'This enviroment don\'t exists'
 			end
-
+=end
 		else
 			raise ArgumentError
 
 		end
 
-=end
-
-		end
 	end
 
 end
