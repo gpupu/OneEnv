@@ -6,14 +6,23 @@ require 'uri'
 class OneCook
 	def self.run commands
 		case
+
+		#USO onecook list
 		when commands[0] == 'list'
 			raise ArgumentError if commands.length != 1
 			#puts 'dentro de la lista'
-		    puts "ID\tNAME\tPATH\tPLACE"
+		    puts "ID\tNAME\tPATH\tRECIPES"
             Cookbook.find(:all).each do |cb|
                 puts cb.to_s
             end
 
+		#USO onecook create NAME [PATH]
+		when commands[0] == 'create'
+			#puts 'esto es una prueba sin repo'
+			raise ArgumentError if commands.length != 2 && commands.length != 3
+			Cookbook.cb_create(commands[1],commands[2])
+
+=begin
 		when commands[0] == 'create' && commands[1] != '--from-repo'
 			#puts 'esto es una prueba sin repo'
 			raise ArgumentError if commands.length != 2 && commands.length != 3
@@ -27,6 +36,8 @@ class OneCook
 			else 
 				puts "'#{commands[3]}' has not a valid URL format"
 			end
+
+
 		when commands[0] == 'update' && commands[1] != '--from-repo'			
 			raise ArgumentError if commands.length != 2 && commands.length != 3
 
@@ -48,12 +59,12 @@ class OneCook
 				end
 			else puts "'#{commands[3]}' has not a valid URL format"
 			end
+=end
 
+		#USO onecook delete NAME
 		when commands[0] == 'delete'
 			raise ArgumentError if commands.length != 2
 			if Cookbook.exists?(:name => commands[1])
-				#Enviroment.delete_allCB(commands[1])
-				#Cookbook.delete_all(:name => commands[1])
 				cb = Cookbook.first(:conditions => {:name => commands[1]})
 				cb.enviroments.clear
 				cb.delete

@@ -1,7 +1,7 @@
 require 'database.rb'
 require 'validation/validation'
 require 'parseYAML'
-require 'templates.rb'
+#require 'template.rb'
 
 class OneEnv
 	def self.run commands
