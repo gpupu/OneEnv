@@ -274,7 +274,7 @@ end
 
 end
 
-
+=begin
 env1=Enviroment.create(:template=>2, :node=>'/ruta/hacia/nodo1')
 env2=Enviroment.create(:template=>3, :node=>'/ruta/hacia/nodo2')
 env3=Enviroment.create(:template=>4, :node=>'/ruta/hacia/nodo3')
@@ -295,5 +295,5 @@ env1.roles << r1
 env2.cookbooks << cb1
 env2.cookbooks << cb3
 env2.roles << r2
-
+=end
 
