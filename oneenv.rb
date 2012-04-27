@@ -108,10 +108,14 @@ class OneEnv
 			raise ArgumentError if commands.length != 2
 			if Enviroment.exists?(commands[1])
 				env = Enviroment.find(commands[1])
-				node = env.node
+				#node = env.node
 # 	TODO Pasar directorio databags
 				repo_dir = CB_DIR + ' ' + ROLE_DIR
-				constructTemplate(commands[1].to_i, repo_dir,node )
+				#constructTemplate(env.template.to_i, repo_dir,env.node )
+				puts 'montando template...'
+				puts env.template
+				puts repo_dir
+				puts env.node
 			else 
 				puts 'There is not an environment with that id'
 			end

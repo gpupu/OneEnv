@@ -10,7 +10,7 @@ require 'yaml'
 CONFIG_FILE = 'oneenv.cnf'
 CONFIG = YAML.load_file(CONFIG_FILE)
 
-# Cuidado con esto!! ¿mantiene valor si se cambia el archivo de configuración?
+# TODO Cuidado con esto!! ¿mantiene valor si se cambia el archivo de configuración?
 CB_DIR = File.expand_path(CONFIG['default_cb_dir'])
 ROLE_DIR = File.expand_path(CONFIG['default_role_dir'])
 
