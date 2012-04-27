@@ -54,73 +54,34 @@ json = ARGV[3]
 
 num_template = ARGV[0]
 
+xml_s=""
 
-=begin
-#Comprueba si existe la template indicada
-begin
-	template_pool.each do |tmp|
-		if tmp['ID'] == num_template
-			puts tmp.template_xml
-
-		end
+template_pool.each do |tmp|
+	if tmp['ID'] == num_template
+		xml_s = tmp.to_xml
 	end
 end
-=end
 
-
-xml_s = "<VMTEMPLATE>
-  <ID>4</ID>
-  <UID>0</UID>
-  <GID>0</GID>
-  <UNAME>oneadmin</UNAME>
-  <GNAME>oneadmin</GNAME>
-  <NAME>my_vm</NAME>
-  <PUBLIC>1</PUBLIC>
-  <REGTIME>1321289327</REGTIME>
-  <TEMPLATE>
-    <CONTEXT>
-      <FILES><![CDATA[/var/lib/one/init.sh]]></FILES>
-      <TARGET><![CDATA[hdc]]></TARGET>
-    </CONTEXT>
-    <CPU><![CDATA[1]]></CPU>
-    <DISK>
-      <IMAGE_ID><![CDATA[27]]></IMAGE_ID>
-    </DISK>
-    <DISK>
-      <SIZE><![CDATA[1024]]></SIZE>
-      <TYPE><![CDATA[swap]]></TYPE>
-    </DISK>
-    <GRAPHICS>
-      <LISTEN><![CDATA[0.0.0.0]]></LISTEN>
-      <TYPE><![CDATA[vnc]]></TYPE>
-    </GRAPHICS>
-    <MEMORY><![CDATA[1024]]></MEMORY>
-    <NIC>
-      <NETWORK_ID><![CDATA[10]]></NETWORK_ID>
-    </NIC>
-    <TEMPLATE_ID><![CDATA[8]]></TEMPLATE_ID>
-  </TEMPLATE>
-</VMTEMPLATE>"
-
-
-
+if xml_s!=""
 xml =XMLElement.build_xml(xml_s, "VMTEMPLATE")
 puts xml.class
 
-template = Template.new(xml,client)
-xml_string = template.template_str
-puts xml_string
 
+template = Template.new(xml,client)
 ###EDITAR CONTEXTO
+xml_string = template.template_str
+
+
 
 vm = VirtualMachine.new(VirtualMachine.build_xml,client)
 rc = vm.allocate(xml_string)
-rc = vm.deploy(46)
+
+
 
 if OpenNebula.is_error?(rc)
           puts "#{rc.message}"   
 end
-
+end
 exit 0
 
 
