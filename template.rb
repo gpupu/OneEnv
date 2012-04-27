@@ -11,6 +11,7 @@
 # Environment Configuration
 ##############################################################################
 ONE_LOCATION=ENV["ONE_LOCATION"]
+SCRIPT_DIR = './arranque_vm/'
  
 if !ONE_LOCATION
     RUBY_LIB_LOCATION="/usr/lib/one/ruby"
@@ -67,9 +68,11 @@ class ConectorONE
 
 		xml =XMLElement.build_xml(xml_s, "VMTEMPLATE")
 		doc = Nokogiri::XML::Document.new
-	
-		files = path_repo + " " + path_json
-		target= "vdc"
+		
+		script_init= File.expand_path(SCRIPT_DIR) + '/init.sh'
+		script_chef= File.expand_path(SCRIPT_DIR) + '/chef.sh'
+		files = path_repo + " " + path_json + " " + script_init + " " + script_chef
+		target= "vdb"
 
 		###EDITAR CONTEXTO
 		if !xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").empty?

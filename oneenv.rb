@@ -1,7 +1,7 @@
 require 'database.rb'
 require 'validation/validation'
 require 'parseYAML'
-#require 'template.rb'
+require 'template.rb'
 
 class OneEnv
 	def self.run commands
@@ -111,7 +111,8 @@ class OneEnv
 				#node = env.node
 # 	TODO Pasar directorio databags
 				repo_dir = CB_DIR + ' ' + ROLE_DIR
-				#constructTemplate(env.template.to_i, repo_dir,env.node )
+				c= ConectorONE.new
+				c.crearTemplate(env.template.to_i, repo_dir,env.node )
 				puts 'montando template...'
 				puts env.template
 				puts repo_dir
