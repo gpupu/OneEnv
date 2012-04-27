@@ -1,4 +1,4 @@
 #COOKBOOKS
 #default_repository: git://github.com/opscode/cookbooks.git
-default_cb_dir: /home/david/pruebasChef/cookbooks
-default_role_dir: /home/david/pruebasChef/roles
+default_cb_dir: /srv/cloud/chef/cookbooks
+default_role_dir: /srv/cloud/chef/roles

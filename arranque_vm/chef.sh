@@ -36,7 +36,9 @@ echo "data_bag_path \"${DBPATH}\"" >> $CPATH
 echo "copiando elementos al disco"
 cp -rv $CBDISK $CBPATH
 cp -rv $RDISK $RPATH
-cp -rv $DBDISK $DBPATH
+if [ -f $DBDISK]; then
+	cp -rv $DBDISK $DBPATH
+fi
 
 cp -rv $DISK/node.json $CHPATH
 
