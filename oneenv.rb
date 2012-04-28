@@ -110,7 +110,7 @@ class OneEnv
 				env = Enviroment.find(commands[1])
 				#node = env.node
 # 	TODO Pasar directorio databags
-				repo_dir = CB_DIR + ' ' + ROLE_DIR
+				repo_dir = CB_DIR + " " + ROLE_DIR
 				c= ConectorONE.new
 				c.crearTemplate(env.template.to_i, repo_dir,env.node )
 				puts 'montando template...'

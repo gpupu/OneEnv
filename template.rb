@@ -4,12 +4,6 @@
 ##############################################################################
 # Required libraries
 ##############################################################################
-
-
-
-##############################################################################
-# Environment Configuration
-##############################################################################
 ONE_LOCATION=ENV["ONE_LOCATION"]
 SCRIPT_DIR = './arranque_vm/'
  
@@ -24,6 +18,11 @@ $: << RUBY_LIB_LOCATION
 require 'OpenNebula'
 include OpenNebula
 
+
+##############################################################################
+# Environment Configuration
+##############################################################################
+
 # OpenNebula credentials
 CREDENTIALS = "oneadmin:nebula"
 # XML_RPC endpoint where OpenNebula is listening
@@ -32,14 +31,9 @@ ENDPOINT    = "http://localhost:2633/RPC2"
 
 class ConectorONE
 
-:client
-
-		 
+:client		 
 	def initialize 
-
-		@client = Client.new(CREDENTIALS, ENDPOINT)
-	
-		
+		@client = Client.new(CREDENTIALS, ENDPOINT)		
 	end
 
 
@@ -60,11 +54,9 @@ class ConectorONE
 
 			end
 		end
-		
+
 
 	if xml_s!=""
-
-
 
 		xml =XMLElement.build_xml(xml_s, "VMTEMPLATE")
 		doc = Nokogiri::XML::Document.new
@@ -77,36 +69,36 @@ class ConectorONE
 		###EDITAR CONTEXTO
 		if !xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").empty?
 			if !xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT//FILES").empty?
+				##EXITE EL NODO FILES
 				puts "HAY FILES"
+				data_files_old=xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT//FILES").first
+				files = data_files_old.content + " " + files
+				data_files=Nokogiri::XML::CDATA.new(doc,files)
+				
+				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT//FILES").first.child.remove
+				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT//FILES").first <<  data_files
+
+				node_target=createNodeTarget doc, target
+				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_target
+				
+
 			else
-				puts "NO HAY FILES"		
-				node_files=Nokogiri::XML::Node.new("FILES", doc)
-				data_files=data=Nokogiri::XML::CDATA.new(doc,files)
-		
-				node_files << data_files
+				#NO EXISTE NODO FILES
+				node_files = createNodeFiles doc, files
+				node_target=createNodeTarget doc, target
 				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_files
+				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_target
 
 			end
-		else
-			puts "NO HAY CONTEXT"
-		
-			node_context=Nokogiri::XML::Node.new("CONTEXT", doc)
-			node_files=Nokogiri::XML::Node.new("FILES", doc)
-			node_target=Nokogiri::XML::Node.new("TARGET", doc)
+		else		
+			##NO EXISTE NODO CONTEXT
+			node_files= createNodeFiles doc, files
+			node_target=createNodeTarget doc, target
+			node_context=createNodeContext doc, node_files, node_target
+			xml.xpath("//VMTEMPLATE//TEMPLATE").first << node_context	
 
-			data_target=data=Nokogiri::XML::CDATA.new(doc,target)		
-			data_files=data=Nokogiri::XML::CDATA.new(doc,files)
-		
-			node_target << data_target
-			node_files << data_files
-
-			node_context << node_target
-			node_context << node_files
-			xml.xpath("//VMTEMPLATE//TEMPLATE").first << node_context
-
-		
 		end
-
+#=begin
 	
 	
 
@@ -125,14 +117,46 @@ class ConectorONE
 		end
 
 
-		end
 
+#=end
 
 	end
+
+
+
+end
+
+private
+def createNodeFiles doc,files
+	puts "NO HAY FILES"		
+	node_files=Nokogiri::XML::Node.new("FILES", doc)
+	data_files=data=Nokogiri::XML::CDATA.new(doc,files)
+	node_files << data_files
+	return node_files
+end
+
+private
+def createNodeContext doc, node_files, node_target
+	puts "NO HAY CONTEXT"
+	node_context=Nokogiri::XML::Node.new("CONTEXT", doc)
+	node_context << node_target
+	node_context << node_files
+	return node_context
+end
+
+private
+def createNodeTarget doc, target
+	node_target=Nokogiri::XML::Node.new("TARGET", doc)
+	data_target=data=Nokogiri::XML::CDATA.new(doc,target)		
+	node_target << data_target
+	return node_target
+end
+
 
 end
 =begin
 c= ConectorONE.new
 c.crearTemplate(10,"/var/lib/one/init.sh /home/david/solodemo/cookbooks","")
 =end
+
 
