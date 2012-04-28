@@ -16,7 +16,7 @@ class OneEnv
 			if File.exists?(node_path)
 				Enviroment.create(:name=> commands[1], :template=> commands[2], :node=> node_path, :databags=> commands[4])
 			else
-				puts 'node path is not correct'
+				puts 'node path is not correct' 
 			end
 
 		##USO:oneenv list

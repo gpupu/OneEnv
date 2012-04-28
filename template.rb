@@ -77,7 +77,7 @@ class ConectorONE
 		###EDITAR CONTEXTO
 		if !xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").empty?
 			if !xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT//FILES").empty?
-				puts xml.xpath("//VMTEMPLATE//CONTEXT//FILES")
+				puts "HAY FILES"
 			else
 				puts "NO HAY FILES"		
 				node_files=Nokogiri::XML::Node.new("FILES", doc)
@@ -85,7 +85,7 @@ class ConectorONE
 		
 				node_files << data_files
 				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_files
-				puts xml
+
 			end
 		else
 			puts "NO HAY CONTEXT"
@@ -103,7 +103,7 @@ class ConectorONE
 			node_context << node_target
 			node_context << node_files
 			xml.xpath("//VMTEMPLATE//TEMPLATE").first << node_context
-			puts xml
+
 		
 		end
 
