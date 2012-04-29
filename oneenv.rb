@@ -1,6 +1,6 @@
 require 'database.rb'
-require 'validation/validation'
-require 'parseYAML'
+#require 'validation/validation'
+#require 'parseYAML'
 require 'template.rb'
 
 class OneEnv
@@ -10,7 +10,6 @@ class OneEnv
 		##USO: oneenv create NAME ID_TEMPLATE NODE_PATH [DATABAG_PATH]
 		when 'create'
 			raise ArgumentError if commands.length !=4 and commands.length !=5
-			# TODO: Comprobar que el template existe en opennebula
 			# TODO: Comprobar dependencias del NODE¿?
 			node_path = File.expand_path(commands[3])
 			if File.exists?(node_path)
@@ -32,11 +31,21 @@ class OneEnv
 			raise ArgumentError if commands.length != 2
 			if Enviroment.exists?(commands[1])
            			env = Enviroment.find(commands[1])
-				puts Enviroment.view_enviroment env
+					puts Enviroment.view_enviroment env
 			else
 				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
 			end
 			
+		##USO:oneenv clone ID_Env
+		when 'clone'
+			raise ArgumentError if commands.length != 2
+			if Enviroment.exists?(commands[1])
+				#Enviroment.clone_env(commands[1])
+				Enviroment.find(commands[1]).clone
+			else
+				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
+			end
+
 		##USO:oneenv delete [ID_Env]
 		when 'delete'
 			raise ArgumentError if commands.length != 2
@@ -50,11 +59,14 @@ class OneEnv
 				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
 			end
 
-		##USO: oneenv update-node ID_ENV NODE_PATH
+		##USO: oneenv update-node ID_ENV [NODE_PATH]
 		when 'update-node'
-			raise ArgumentError if commands.length != 3
+			raise ArgumentError if commands.length != 2 and commands.length != 3
 			if Enviroment.exists?(commands[1])
-				env= Enviroment.find(commands[1])
+				#env= Enviroment.find(commands[1])
+				if commands[2] != nil
+					Enviroment.update(commands[1], {:node=> commands[2]})
+				end
 				# limpia lista de roles y cbs
 				#env.cookbooks.clear
 				#env.roles.clear
@@ -73,43 +85,13 @@ class OneEnv
 				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
 			end
 
-
-=begin
-		##USO:oneenv clone [ID_Env]
-		when 'clone'
-			raise ArgumentError if commands.length != 2
-			if Enviroment.exists?(commands[1])
-				Enviroment.clone_env(commands[1])
-			else
-				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
-			end
-
-		##USO:oneenv add-ssh [ID_entorno] [SSH_path]
-		when 'add-ssh'
-			raise ArgumentError if commands.length != 3
-			if validationSSH(commands[2])
-				Enviroment.addSSH(commands[1],commands[2])
-			else
-				puts "#{commands[2]} is not a valid SSH"
-			end
-		##USO:oneenv update-ssh [ID_entorno] [SSH_path]
-		when 'update-ssh'
-
-			raise ArgumentError if commands.length != 3
-			if validationSSH(commands[2])
-				Enviroment.addSSH(commands[1],commands[2])
-			else
-				puts "#{commands[2]} is not a valid SSH"
-			end
-=end
-
 		##USO:oneenv up [ID_entorno] 
 		when 'up'	#TODO
 			raise ArgumentError if commands.length != 2
 			if Enviroment.exists?(commands[1])
 				env = Enviroment.find(commands[1])
 				#node = env.node
-# 	TODO Pasar directorio databags
+				# 	TODO Pasar directorio databags
 				repo_dir = CB_DIR + " " + ROLE_DIR
 				c= ConectorONE.new
 				c.crearTemplate(env.template.to_i, repo_dir,env.node )
@@ -121,28 +103,51 @@ class OneEnv
 				puts 'There is not an environment with that id'
 			end
 
-=begin
-		##USO:oneenv add-cookbook [ID_entorno] [cb_name]
-		when 'add-cookbook'
-			raise ArgumentError if commands.length != 3
-			if Enviroment.exists?(commands[1])
-				Enviroment.add_cookbook(commands[1],commands[2])
+		##USO: oneenv add-role-dir PATH
+		when 'add-role-dir'	
+			raise ArgumentError if commands.length != 2
+			path = File.expand_path(commands[1])
+			if File.exists?(path)
+				roles = Dir.entries(path)
+				puts roles
+				roles.each do |r|
+					# Los roles pueden ser ruby o json
+					if File.extname(r) == ".rb"
+						rname = File.basename(r,".rb")
+						rpath = path + '/' + r
+						Role.role_create(rname,rpath) 
+					end
+					if File.extname(r) == ".json"
+						rname = File.basename(r,".json")
+						rpath = path + '/' + r
+						Role.role_create(rname,rpath) 
+					end
+
+				end
 			else
-				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
+				puts path + ' don\'t exists'
 			end
 
+		#USO oneenv list-roles
+		when 'list-roles'
+			raise ArgumentError if commands.length != 1
+			#puts 'dentro de la lista'
+		    puts "ID\tNAME\tPATH"
+            Role.find(:all).each{|r|
+                puts r.to_s
+            }
 
-		when 'update-cookbook'
-
-		##USO:oneenv delete-cookbook [ID_entorno] [cb_name]
-		when 'delete-cookbook'
-			raise ArgumentError if commands.length != 3
-			if Enviroment.exists?(commands[1])
-				Enviroment.delete_cookbook(commands[1],commands[2])
+		#USO oneenv delete-role NAME
+		when 'delete-role'
+			raise ArgumentError if commands.length != 2
+			if Role.exists?(:name => commands[1])
+				role = Role.first(:conditions => {:name => commands[1]})
+				role.enviroments.clear
+				role.delete
 			else
-				puts 'This enviroment don\'t exists'
+				puts 'This role don\'t exists in the database'
 			end
-=end
+
 		else
 			raise ArgumentError
 

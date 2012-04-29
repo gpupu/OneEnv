@@ -44,7 +44,7 @@ class Cookbook < ActiveRecord::Base
 			cb_path = File.expand_path(cb_path)
 			if File.exists?(cb_path)
 				dir_recipes = cb_path + '/' + cb_name
-				puts 'dir_recipes' + dir_recipes
+				#puts 'dir_recipes' + dir_recipes
 				create(:name => cb_name, :path => cb_path, :recipes => get_recipes(dir_recipes))
 					#TODO:Copiar al directorio por defecto recursivamente
 					#desde la dir que entra				
@@ -142,85 +142,38 @@ class Enviroment < ActiveRecord::Base
         s += roles.size.to_s
     end
 
-
-    
 	public
 	def self.view_enviroment id
 		env=first(:conditions => {:id => id})
 		if !env.nil?
-		s  = "ID: " + env.id.to_s + "\n"
-		s += "NAME: " + env.name + "\n"
-		s += "Template: " + env.template.to_s + "\n"
-		s += "CookBooks: " + "\n"
-		env.cookbooks.each{|cb| s += "-" + cb.name + " " + cb.path + "\n" }
+		s  = "ID:\t" + env.id.to_s + "\n"
+		s += "NAME:\t" + env.name + "\n"
+		s += "Template Base:\t" + env.template.to_s + "\n"
+		if env.databags != nil
+			s += "Databag Dir:\t" + env.databags + "\n" 
+		end
+		s += "CookBooks: " + "\t"
+		env.cookbooks.each{|cb| s += ", " + cb.name }
+		s += "\n"
+		s += "Roles:" + "\t"
+		env.roles.each{|r| s += ", " + r.name}
+		s += "\n"
 		else
 			s +='Can\'t find the enviroment ' + id.to_s
 		end
 		s
 	end
 
-=begin
 	public
-	def self.clone_env id
-		env = first(:conditions => {:id => id})
-		if !env.nil?
-			copy = self.find(id).clone
-			Enviroment.create(:description => copy.description)
-			# introduce los cookbooks de la copia en el nuevo registro
-			Enviroment.last.cookbooks << copy.cookbooks
-		else
-			puts 'Can\'t find the enviroment ' + id.to_s
-		end
+	def clone
+		envcopy = Enviroment.create(:template=> self.template, :node=> self.node, :databags=> self.databags)
+		self.cookbooks.each{|cb|
+			envcopy.cookbooks << cb
+		}
+		self.roles.each{|r|
+			envcopy.roles << r
+		}
 	end
-=end
-
-
-
-=begin
-	public
-	def self.delete_cookbook id, cb_name
-		cb = Cookbook.first(:conditions => {:name => cb_name})
-		if find(id).cookbooks.exists?(cb.object_id)
-			#puts 'existe el cb: ' + cb_id.to_s
-			find(id).cookbooks.delete(cb)
-		else
-			puts cb_name + ' is not a cookbook from the selected enviroment'
-		end
-	end
-
-	public
-	def self.add(f)
-        # Comprueba si hay un entorno con el mismo nombre y si asi es muestra un mensaje.
-		select = self.find{|k| k.name==f.name}
-        # si es distinto de nil es que ha encontrado un entorno que se llama igual
-		if select!=nil 
-			puts "Un entorno con el nombre #{f.name} ya existia"
-		else 
-			self.create(:name=>f.name, :description => f.description)
-			f.cookbooks.each{|cb|
-				self.add_cookbook Enviroment.last.id, cb
-			}
-		end
-	end
-
-	public 
-	def self.addSSH(id,ssh)
-		if self.exists?(id)
-			entorno= self.find(id)
-			desc = entorno.description
-			desc.ssh = ssh
-			self.update(entorno.id, {:description => desc})
-		else 
-			puts 'There is not an environment with that id'
-		end
-	end
-
-	public 
-	def add_role(role_name,path_role)
-		roles[role_name] = path_role
-		self.save
-	end
-=end
 
 end
 
@@ -293,4 +246,3 @@ env2.cookbooks << cb1
 env2.cookbooks << cb3
 env2.roles << r2
 =end
-
