@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'oneenv.rb'
 require 'onecook.rb'
-require 'onerole.rb'
+#require 'onerole.rb'
 
 class Shell
     def initialize()
@@ -56,11 +56,6 @@ class Shell
 	def onecook()
 		raise ArgumentError if @arguments.length == 0
 		OneCook.run(@arguments)
-	end
-
-	def onerole()
-		raise ArgumentError if @arguments.length == 0
-		OneRole.run(@arguments)
 	end
 
     def help()
