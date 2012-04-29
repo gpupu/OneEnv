@@ -1,7 +1,7 @@
 require 'rubygems'
 #require 'sqlite3'
 require 'active_record'
-require 'yaml'
+#require 'yaml'
 
 # connect to database.  This will create one if it doesn't exist
 #MY_DB_NAME = "oneenv.db"
@@ -75,10 +75,35 @@ class Cookbook < ActiveRecord::Base
 		end
 	end
 
+	public
+	def self.isCookbook? cb_dir
+		if File.directory?(cb_dir)
+			cont= Dir.entries cb_dir
+			# es cookbook si incluye un archivo metadata.rb
+			cont.include?('metadata.rb')
+		end
+	end
+
 	public 
 	def update
 		recipes = get_recipes path
 	end
+
+	public
+	def self.view cb_name
+		cb=first(:conditions => {:name => cb_name})
+		if !cb.nil?
+			s  = "NAME:\t" + cb.name + "\n"
+			s += "PATH:\t" + cb.path + "\n"
+			s += "RECIPES: " + "\t"
+				cb.recipes.each{|r| s += ", " + r }
+			s += "\n"
+		else
+			s +='Can\'t find the cookbook ' + cb_name
+		end
+		s
+	end
+
 
 end
 
@@ -146,18 +171,18 @@ class Enviroment < ActiveRecord::Base
 	def self.view_enviroment id
 		env=first(:conditions => {:id => id})
 		if !env.nil?
-		s  = "ID:\t" + env.id.to_s + "\n"
-		s += "NAME:\t" + env.name + "\n"
-		s += "Template Base:\t" + env.template.to_s + "\n"
-		if env.databags != nil
-			s += "Databag Dir:\t" + env.databags + "\n" 
-		end
-		s += "CookBooks: " + "\t"
-		env.cookbooks.each{|cb| s += ", " + cb.name }
-		s += "\n"
-		s += "Roles:" + "\t"
-		env.roles.each{|r| s += ", " + r.name}
-		s += "\n"
+			s  = "ID:\t" + env.id.to_s + "\n"
+			s += "NAME:\t" + env.name + "\n"
+			s += "BASE TEMPLATE:\t" + env.template.to_s + "\n"
+			if env.databags != nil
+				s += "DATABAG DIR:\t" + env.databags + "\n" 
+			end
+			s += "COOKBOOKS: " + "\t"
+			env.cookbooks.each{|cb| s += ", " + cb.name }
+			s += "\n"
+			s += "ROLES:" + "\t"
+			env.roles.each{|r| s += ", " + r.name}
+			s += "\n"
 		else
 			s +='Can\'t find the enviroment ' + id.to_s
 		end
