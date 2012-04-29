@@ -25,7 +25,7 @@ mkdir -pv $CHPATH
 
 
 # Crea el archivo solo.rb
-echo "creando archivo configuracion"
+echo "Creando archivo configuracion"
 echo "file_cache_path \"${CHPATH}\"" > $CPATH
 echo "cookbook_path \"${CBPATH}\"" >> $CPATH
 echo "role_path \"${RPATH}\"" >> $CPATH
@@ -36,7 +36,7 @@ echo "data_bag_path \"${DBPATH}\"" >> $CPATH
 echo "copiando elementos al disco"
 cp -rv $CBDISK $CBPATH
 cp -rv $RDISK $RPATH
-if [ -f $DBDISK]; then
+if [ -f $DBDISK ]; then
 	cp -rv $DBDISK $DBPATH
 fi
 

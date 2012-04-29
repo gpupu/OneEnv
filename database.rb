@@ -142,7 +142,7 @@ class Enviroment < ActiveRecord::Base
         s += roles.size.to_s
     end
 
-=begin
+
     
 	public
 	def self.view_enviroment id
@@ -150,10 +150,7 @@ class Enviroment < ActiveRecord::Base
 		if !env.nil?
 		s  = "ID: " + env.id.to_s + "\n"
 		s += "NAME: " + env.name + "\n"
-		s += "Descripcion: " + env.description.image.to_s + "\n"
-		s += "Tipo" + env.description.type + "\n"
-		s += "Clave" + env.description.ssh + "\n"
-		s += "Network" + env.description.network + "\n\n"
+		s += "Template: " + env.template.to_s + "\n"
 		s += "CookBooks: " + "\n"
 		env.cookbooks.each{|cb| s += "-" + cb.name + " " + cb.path + "\n" }
 		else
@@ -162,7 +159,7 @@ class Enviroment < ActiveRecord::Base
 		s
 	end
 
-
+=begin
 	public
 	def self.clone_env id
 		env = first(:conditions => {:id => id})
