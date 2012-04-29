@@ -10,7 +10,8 @@ class OneEnv
 		##USO: oneenv create NAME ID_TEMPLATE NODE_PATH [DATABAG_PATH]
 		when 'create'
 			raise ArgumentError if commands.length !=4 and commands.length !=5
-			# TODO: Comprobar que el template existe en opennebula
+			# TODO: Comprobar que el template existe en opennebula----->
+				## Esto se hace cuando levantemos el entorno, xq el usuario puede borrar la template
 			# TODO: Comprobar dependencias del NODE¿?
 			node_path = File.expand_path(commands[3])
 			if File.exists?(node_path)
@@ -23,7 +24,7 @@ class OneEnv
 		when 'list'
 			raise ArgumentError if commands.length != 1
 			puts "ID\tNAME\tTEMPLATE\tNODE\tDATA BAGS"
-           	Enviroment.find(:all).each do |e|
+           		Enviroment.find(:all).each do |e|
 				puts e.to_s
 			end
 
