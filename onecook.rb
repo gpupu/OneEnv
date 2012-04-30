@@ -1,7 +1,4 @@
 require 'database.rb'
-#require 'validation/validation'
-#require 'parseYAML'
-#require 'uri'
 
 class OneCook
 	def self.run commands
@@ -68,7 +65,8 @@ class OneCook
 		when commands[0] == 'update'
 			raise ArgumentError if commands.length != 2
 			if Cookbook.exists?(:name => commands[1])
-				Cookbook.update commands[1]
+				cb = Cookbook.first(:conditions=> {:name => commands[1]})
+				cb.update
 			else
 				puts 'Can\'t find the cookbook ' + "#{commands[1]}"
 			end

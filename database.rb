@@ -47,8 +47,6 @@ class Cookbook < ActiveRecord::Base
 				dir_recipes = cb_path + '/' + cb_name
 				#puts 'dir_recipes' + dir_recipes
 				iscopy = true
-				#TODO:Copiar al directorio por defecto recursivamente
-				#desde la dir que entra	
 				if cb_path != CB_DIR
 					cp_com = "cp -r #{dir_recipes} #{CB_DIR}" 
 					puts cp_com
@@ -141,7 +139,7 @@ class Role < ActiveRecord::Base
 			r_path = File.expand_path(r_path)
 			if File.exists?(r_path)
 				iscopy = true
-				#TODO Copiar rol en el directorio por defecto
+				# Copiar rol en el directorio por defecto
 				if r_path != ROLE_DIR
 					cp_com = "cp #{r_path} #{ROLE_DIR}"
 					puts cp_com
