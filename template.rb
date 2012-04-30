@@ -64,6 +64,7 @@ class ConectorONE
 		
 		script_init= File.expand_path(SCRIPT_DIR) + '/init.sh'
 		script_chef= File.expand_path(SCRIPT_DIR) + '/chef.sh'
+
 		files = path_repo + " " + path_json + " " + script_init + " " + script_chef
 		target= "vdb"
 
@@ -155,6 +156,7 @@ end
 
 
 end
+
 =begin
 c= ConectorONE.new
 c.crearTemplate(10,"/var/lib/one/init.sh /home/david/solodemo/cookbooks","")

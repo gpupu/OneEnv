@@ -18,7 +18,7 @@ ROLE_DIR = File.expand_path(CONFIG['default_role_dir'])
 # get active record set up
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
 
-#MY_DB_NAME)
+
 
 class Cookbook < ActiveRecord::Base
     validates_uniqueness_of :name
@@ -179,13 +179,14 @@ class Enviroment < ActiveRecord::Base
     end
 
     public
+
     def to_s
-		s  = id.to_s + "\t"
+	s  = id.to_s + "\t"
         s += name + "\t"
         s += template.to_s + "\t"
         s += node + "\t"
         s += databags.to_s + "\t"
-		s += cookbooks.size.to_s + "\t"
+	s += cookbooks.size.to_s + "\t"
         s += roles.size.to_s
     end
 
