@@ -2,6 +2,7 @@ require 'rubygems'
 #require 'sqlite3'
 require 'active_record'
 #require 'yaml'
+#require 'fileutils'
 
 # connect to database.  This will create one if it doesn't exist
 #MY_DB_NAME = "oneenv.db"
@@ -45,9 +46,18 @@ class Cookbook < ActiveRecord::Base
 			if File.exists?(cb_path)
 				dir_recipes = cb_path + '/' + cb_name
 				#puts 'dir_recipes' + dir_recipes
-				create(:name => cb_name, :path => cb_path, :recipes => get_recipes(dir_recipes))
-					#TODO:Copiar al directorio por defecto recursivamente
-					#desde la dir que entra				
+				iscopy = true
+				if cb_path != CB_DIR
+					cp_com = "cp -r #{dir_recipes} #{CB_DIR}" 
+					puts cp_com
+					iscopy = system(cp_com)
+					#FileUtils.cp_r(dir_recipes,CB_DIR)
+				end
+				if iscopy
+					create(:name => cb_name, :path => cb_path, :recipes => get_recipes(dir_recipes))
+				else
+					puts "copying cookbook #{cb_name} failed"
+				end
 			else
 				puts cb_path + ' is not a correct path'
 			end
@@ -128,8 +138,20 @@ class Role < ActiveRecord::Base
 		if !exists?(:name=>r_name)
 			r_path = File.expand_path(r_path)
 			if File.exists?(r_path)
-				create(:name=> r_name, :path=> r_path)
-				#TODO Copiar rol en el directorio por defecto
+				iscopy = true
+				# Copiar rol en el directorio por defecto
+				if r_path != ROLE_DIR
+					cp_com = "cp #{r_path} #{ROLE_DIR}"
+					puts cp_com
+					iscopy = system(cp_com)
+					#FileUtils.cp(r_path, ROLE_DIR)
+				end
+				if iscopy
+					create(:name=> r_name, :path=> r_path)
+				else
+					puts "copying role #{r_name} failed"
+				end
+
 			else
 				puts r_path + ' is not a correct path'
 			end

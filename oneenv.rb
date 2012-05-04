@@ -1,6 +1,4 @@
 require 'database.rb'
-#require 'validation/validation'
-#require 'parseYAML'
 require 'template.rb'
 
 class OneEnv
@@ -130,6 +128,26 @@ class OneEnv
 				end
 			else
 				puts path + ' don\'t exists'
+			end
+
+		##USO: oneenv update-role NAME
+		when 'update-role'	
+			raise ArgumentError if commands.length != 2
+			if Role.exists?(:name => commands[1])
+				role = Role.first(:conditions=> {:name => commands[1]})
+				path = File.expand_path(role.path)
+				if File.exists?(path)
+					puts path
+					# Copiar rol en el directorio por defecto
+					if path != ROLE_DIR
+						cp_com = "cp -f #{path} #{ROLE_DIR}"
+						system(cp_com)
+					end
+				else
+					puts path + ' don\'t exists'
+				end
+			else
+				puts 'This role don\'t exists'
 			end
 
 		#USO oneenv list-roles
