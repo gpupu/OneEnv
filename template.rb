@@ -5,7 +5,7 @@
 # Required libraries
 ##############################################################################
 ONE_LOCATION=ENV["ONE_LOCATION"]
-SCRIPT_DIR="./arranque_vm"
+SCRIPT_DIR="./start_vm"
  
 if !ONE_LOCATION
     RUBY_LIB_LOCATION="/usr/lib/one/ruby"
@@ -38,7 +38,7 @@ class ConectorONE
 	end
 
 
-	def crearTemplate(num_template,path_repo,path_json)
+	def crearTemplate(num_template,path_repo,path_json,path_bootstarp)
 
 		xml_s=""
 
@@ -64,8 +64,8 @@ class ConectorONE
 		
 		script_init= File.expand_path(SCRIPT_DIR) + '/init.sh'
 		script_chef= File.expand_path(SCRIPT_DIR) + '/chef.sh'
-
-		files = path_repo + " " + path_json + " " + script_init + " " + script_chef
+		
+		files = path_repo + " " + path_json + " " + script_init + " " + script_chef + " " + path_bootstarp
 		target= "vdb"
 
 		###EDITAR CONTEXTO
