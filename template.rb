@@ -5,7 +5,7 @@
 # Required libraries
 ##############################################################################
 ONE_LOCATION=ENV["ONE_LOCATION"]
-SCRIPT_DIR = '/srv/cloud/chef/'
+SCRIPT_DIR="./arranque_vm"
  
 if !ONE_LOCATION
     RUBY_LIB_LOCATION="/usr/lib/one/ruby"
@@ -25,7 +25,7 @@ include OpenNebula
 ##############################################################################
 
 # OpenNebula credentials
-CREDENTIALS = "oneadmin:nebulosa"
+CREDENTIALS = "oneadmin:nebula"
 # XML_RPC endpoint where OpenNebula is listening
 ENDPOINT    = "http://localhost:2633/RPC2"
 
