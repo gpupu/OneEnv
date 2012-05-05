@@ -17,13 +17,6 @@ readonly CPATH="${CHPATH}config.rb"
 mkdir -pv $CHPATH
 
 
-# Crea el archivo json
-#echo "{\"run_list\": [\"recipe[emacs]\"]}" > /etc/chef/node.json
-#echo -n "{\"run_list\": [\"recipe[" > $JPATH
-#echo -n $CHEF_RECIPE >> $JPATH
-#echo "]\"]}" >> $JPATH
-
-
 # Crea el archivo solo.rb
 echo "Creando archivo configuracion"
 echo "file_cache_path \"${CHPATH}\"" > $CPATH
@@ -40,7 +33,7 @@ if [ -f $DBDISK ]; then
 	cp -rv $DBDISK $DBPATH
 fi
 
-cp -rv $DISK/node.json $CHPATH
+cp -rv $DISK/$NODE_NAME $CHPATH
 
 # Ejecuta Chef-solo
 echo "Ejecuta chef-solo"

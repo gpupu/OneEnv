@@ -97,6 +97,8 @@ class OneEnv
 				if !File.exists?(bootstrap_path)
 					bootstrap_path=""
 				end
+			else 
+				bootstrap_path = ""
 			end
 
 

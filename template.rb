@@ -6,6 +6,7 @@
 ##############################################################################
 ONE_LOCATION=ENV["ONE_LOCATION"]
 SCRIPT_DIR="./start_vm"
+#SCRIPT_DIR="/srv/cloud/chef/"
  
 if !ONE_LOCATION
     RUBY_LIB_LOCATION="/usr/lib/one/ruby"
@@ -25,7 +26,7 @@ include OpenNebula
 ##############################################################################
 
 # OpenNebula credentials
-CREDENTIALS = "oneadmin:nebula"
+CREDENTIALS = "oneadmin:nebulosa"
 # XML_RPC endpoint where OpenNebula is listening
 ENDPOINT    = "http://localhost:2633/RPC2"
 
@@ -101,13 +102,18 @@ class ConectorONE
 
 		end
 #=begin
-	
-	
+#=begin	
+		# Introduce el nombre del node
+		name = File.basename(path_json)	# no nos importa quedarnos también con la extension
+		node_name = createNodeName doc, name
+		xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_name
+#=end
 
 		template = Template.new(xml,@client)
 		xml_string = template.template_str
 
-
+		puts xml_string
+#=begin
 
 		vm = VirtualMachine.new(VirtualMachine.build_xml,@client)
 		rc = vm.allocate(xml_string)
@@ -152,6 +158,14 @@ def createNodeTarget doc, target
 	data_target=data=Nokogiri::XML::CDATA.new(doc,target)		
 	node_target << data_target
 	return node_target
+end
+
+private
+def createNodeName doc, name
+	node_name = Nokogiri::XML::Node.new("NODE_NAME", doc)
+	data_name=data=Nokogiri::XML::CDATA.new(doc,name)		
+	node_name << data_name
+	return node_name
 end
 
 

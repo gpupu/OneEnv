@@ -1,8 +1,7 @@
 require 'rubygems'
 #require 'sqlite3'
 require 'active_record'
-#require 'yaml'
-#require 'fileutils'
+
 
 # connect to database.  This will create one if it doesn't exist
 #MY_DB_NAME = "oneenv.db"
