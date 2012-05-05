@@ -87,16 +87,26 @@ class OneEnv
 				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
 			end
 
-		##USO:oneenv up [ID_entorno] 
+		##USO:oneenv up [ID_entorno] [BOOTSTRAP]?
 		when 'up'	#TODO
-			raise ArgumentError if commands.length != 2
+			raise ArgumentError if commands.length != 2  and commands.length != 3
+
+
+			if commands.length == 3
+				bootstrap_path = File.expand_path(commands[2])
+				if !File.exists?(bootstrap_path)
+					bootstrap_path=""
+				end
+			end
+
+
 			if Enviroment.exists?(commands[1])
 				env = Enviroment.find(commands[1])
 				#node = env.node
 				# 	TODO Pasar directorio databags
 				repo_dir = CB_DIR + " " + ROLE_DIR
 				c= ConectorONE.new
-				c.crearTemplate(env.template.to_i, repo_dir,env.node )
+				c.crearTemplate(env.template.to_i, repo_dir,env.node,bootstrap_path)
 				puts 'montando template...'
 				puts env.template
 				puts repo_dir
