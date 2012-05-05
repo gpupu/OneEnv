@@ -56,6 +56,8 @@ class OneCook
 		when commands[0] == 'show'
 			raise ArgumentError if commands.length != 2
 			if Cookbook.exists?(:name => commands[1])
+				cb=Cookbook.first(:conditions=>{:name=>commands[1]})
+				cb.update
 				puts Cookbook.view commands[1]
 			else
 				puts 'Can\'t find the cookbook ' + "#{commands[1]}"
