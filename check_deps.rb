@@ -31,15 +31,18 @@ def deps_for(dir, nel)
   end
 end
 
-def to_dot(nel, name)
-  puts "digraph #{name} {"
-  nel.each do |n, deps|
-    deps.each do |d|
-      puts "    \"#{n}\" -> \"#{d}\";"
-    end
-  end
-  puts "}"
+def clean_deps(h_cbs)
+	h_cbs.delete_if do |n, deps|
+		deps.empty?
+	end
+	h_cbs
 end
 
-nel = find_deps(ARGV[0])
-to_dot(nel, "cookbook")
+def list_deps(cbs)
+	cbs.each do |n, deps|
+		deps.each do |d|
+			puts "#{n} -> #{d}"
+		end
+	end
+end
+

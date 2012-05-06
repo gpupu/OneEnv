@@ -1,4 +1,5 @@
 require 'database.rb'
+require 'check_deps.rb'
 
 class OneCook
 	def self.run commands
@@ -72,6 +73,14 @@ class OneCook
 			else
 				puts 'Can\'t find the cookbook ' + "#{commands[1]}"
 			end
+
+		#USO onecook check
+		when commands[0] == 'check'
+			raise ArgumentError if commands.length != 1
+			deps = find_deps(CB_DIR)
+			clean_deps(deps)
+			list_deps(deps)
+
 
 =begin
 		when commands[0] == 'load'
