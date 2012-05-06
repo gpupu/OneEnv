@@ -3,18 +3,18 @@
 readonly DISK="/mnt/"
 readonly CBDISK="${DISK}cookbooks/"
 readonly RDISK="${DISK}roles/"
-readonly DBDISK="${DISK}data_bags/"
+readonly DBDISK="${DISK}${CHEF_DATABAGS}/"
 
 readonly CHPATH="/tmp/chef/"
 readonly CBPATH="${CHPATH}cookbooks/"
 readonly RPATH="${CHPATH}roles/"
-readonly DBPATH="${CHPATH}data_bags/"
+readonly DBPATH="${CHPATH}data_bags"
 
 readonly JPATH="${CHPATH}node.json"
 readonly CPATH="${CHPATH}config.rb"
 
 # Crea el directorio
-mkdir -pv $CHPATH
+mkdir -v $CHPATH
 
 
 # Crea el archivo solo.rb
@@ -29,11 +29,11 @@ echo "data_bag_path \"${DBPATH}\"" >> $CPATH
 echo "copiando elementos al disco"
 cp -rv $CBDISK $CBPATH
 cp -rv $RDISK $RPATH
-if [ -f $DBDISK ]; then
+if [ -d $DBDISK ]; then
 	cp -rv $DBDISK $DBPATH
 fi
 
-cp -rv $DISK/$NODE_NAME $CHPATH
+cp -rv $DISK/$CHEF_NODE $CHPATH
 
 # Ejecuta Chef-solo
 echo "Ejecuta chef-solo"

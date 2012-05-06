@@ -39,7 +39,7 @@ class ConectorONE
 	end
 
 
-	def crearTemplate(num_template,path_repo,path_json,path_bootstarp)
+	def crearTemplate(num_template,path_repo,path_json,path_databags,path_bootstarp)
 
 		xml_s=""
 
@@ -101,12 +101,19 @@ class ConectorONE
 			xml.xpath("//VMTEMPLATE//TEMPLATE").first << node_context	
 
 		end
-#=begin
+
 #=begin	
 		# Introduce el nombre del node
 		name = File.basename(path_json)	# no nos importa quedarnos también con la extension
-		node_name = createNodeName doc, name
+		node_name = createContextVariable doc, "CHEF_NODE", name
 		xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_name
+
+		if path_databags != nil
+			# Introduce el nombre del directorio databags
+			#dir_db = File.basename(path_databags)	
+			dir_db = createContextVariable doc, "CHEF_DATABAGS", File.basename(path_databags)
+			xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << dir_db
+		end
 #=end
 
 		template = Template.new(xml,@client)
@@ -161,9 +168,9 @@ def createNodeTarget doc, target
 end
 
 private
-def createNodeName doc, name
-	node_name = Nokogiri::XML::Node.new("NODE_NAME", doc)
-	data_name=data=Nokogiri::XML::CDATA.new(doc,name)		
+def createContextVariable doc, name, value
+	node_name = Nokogiri::XML::Node.new(name, doc)
+	data_name=data=Nokogiri::XML::CDATA.new(doc,value)		
 	node_name << data_name
 	return node_name
 end

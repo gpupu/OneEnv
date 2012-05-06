@@ -9,16 +9,24 @@ class OneEnv
 		when 'create'
 			raise ArgumentError if commands.length !=4 and commands.length !=5
 
-			# TODO: Comprobar que el template existe en opennebula----->
-				## Esto se hace cuando levantemos el entorno, xq el usuario puede borrar la template
-
-			# TODO: Comprobar dependencias del NODE¿?
-			node_path = File.expand_path(commands[3])
-			if File.exists?(node_path)
-				Enviroment.create(:name=> commands[1], :template=> commands[2], :node=> node_path, :databags=> commands[4])
-			else
+			if File.exists?(commands[3])
+				node_path = File.expand_path(commands[3])
+			else 
 				puts 'node path is not correct' 
 			end
+
+			if commands.length == 5 
+				if File.exists?(commands[4])
+					datab_path = File.expand_path(commands[4])
+				else 
+					puts 'databag path is not correct'
+				end
+			else
+				datab_path = nil
+			end
+			
+			Enviroment.create(:name=> commands[1], :template=> commands[2], :node=> node_path, :databags=> datab_path)
+			
 
 		##USO:oneenv list
 		when 'list'
@@ -88,7 +96,7 @@ class OneEnv
 			end
 
 		##USO:oneenv up [ID_entorno] [BOOTSTRAP]?
-		when 'up'	#TODO
+		when 'up'
 			raise ArgumentError if commands.length != 2  and commands.length != 3
 
 
@@ -104,11 +112,15 @@ class OneEnv
 
 			if Enviroment.exists?(commands[1])
 				env = Enviroment.find(commands[1])
-				#node = env.node
-				# 	TODO Pasar directorio databags
+
 				repo_dir = CB_DIR + " " + ROLE_DIR
+				# Si existen añadimos databags
+				if env.databags != nil
+					repo_dir << " " + env.databags
+				end
+
 				c= ConectorONE.new
-				c.crearTemplate(env.template.to_i, repo_dir,env.node,bootstrap_path)
+				c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,bootstrap_path)
 				puts 'montando template...'
 				puts env.template
 				puts repo_dir
