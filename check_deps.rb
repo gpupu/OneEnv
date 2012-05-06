@@ -39,10 +39,22 @@ def clean_deps(h_cbs)
 end
 
 def list_deps(cbs)
-	cbs.each do |n, deps|
-		deps.each do |d|
-			puts "#{n} -> #{d}"
+	if cbs.empty?
+		puts "All recipes depencies are provided"
+	else
+		cb_deps = Array.new
+		cbs.each do |n, deps|
+			deps.each do |d|
+				puts "#{n} -> #{d}"
+				cb_ar = d.split("::")
+				if !cb_deps.include?(cb_ar[0])
+					cb_deps.push(cb_ar[0])
+				end
+			end
 		end
+		puts "\nThese cookbooks may be needed: "
+		puts "\t" +  cb_deps.join(", ")
 	end
+
 end
 
