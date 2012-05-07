@@ -1,15 +1,25 @@
 #!/bin/bash
 
-echo "Ejecutando Context"
-. /mnt/context.sh >/var/log/cheflog 2>&1
 
-if [ -f /mnt/bootstrap.sh ]; then
-	echo "Ejecutando Bootstrap..."
-	. /mnt/bootstrap.sh >>/var/log/cheflog 2>&1
+
+if [ -f /mnt/context.sh ]; then
+	echo "Ejecutando Context"
+	. /mnt/context.sh  > /var/log/context 2>&1
 fi
 
+echo "BOOTSTRAP "$CHEF_BOOTSTRAP
+
+if [ -f /mnt/$CHEF_BOOTSTRAP ]; then
+	echo "Ejecutando Bootstrap..."
+	. /mnt/$CHEF_BOOTSTRAP > /var/log/cheflog 2>&1
+fi
+
+if [ -f /mnt/chef.sh ]; then
 echo "Ejecutando Chef..."
-. /mnt/chef.sh >>/var/log/cheflog 2>&1
+	. /mnt/chef.sh >>/var/log/cheflog 2>&1
+fi
+
+
 
 
 

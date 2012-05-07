@@ -26,7 +26,7 @@ include OpenNebula
 ##############################################################################
 
 # OpenNebula credentials
-CREDENTIALS = "oneadmin:nebulosa"
+CREDENTIALS = "oneadmin:nebula"
 # XML_RPC endpoint where OpenNebula is listening
 ENDPOINT    = "http://localhost:2633/RPC2"
 
@@ -107,7 +107,13 @@ class ConectorONE
 		name = File.basename(path_json)	# no nos importa quedarnos también con la extension
 		node_name = createContextVariable doc, "CHEF_NODE", name
 		xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_name
+#=begin
+		# Introduce el nombre del bootstrap
+		name = File.basename(path_bootstarp)	
+		node_name = createContextVariable doc, "CHEF_BOOTSTRAP", name
+		xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_name
 
+#=end
 		if path_databags != nil
 			# Introduce el nombre del directorio databags
 			#dir_db = File.basename(path_databags)	
@@ -115,6 +121,8 @@ class ConectorONE
 			xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << dir_db
 		end
 #=end
+
+
 
 		template = Template.new(xml,@client)
 		xml_string = template.template_str
