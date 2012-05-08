@@ -100,12 +100,14 @@ class OneEnv
 			raise ArgumentError if commands.length != 2  and commands.length != 3
 
 			if commands.length == 3
-				bootstrap_path = File.expand_path(commands[2])
-				if !File.exists?(bootstrap_path)
-					bootstrap_path=""
+				
+				if File.exists?(commands[2])
+					bootstrap_path = File.expand_path(commands[2])
+				else
+					bootstrap_path=nil			
 				end
 			else 
-				bootstrap_path = ""
+				bootstrap_path = nil
 			end
 
 

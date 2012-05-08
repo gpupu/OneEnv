@@ -5,8 +5,11 @@
 # Required libraries
 ##############################################################################
 ONE_LOCATION=ENV["ONE_LOCATION"]
+FILE_CREDENTIALS=ENV["ONE_AUTH"]
+
+puts FILE_CREDENTIALS
 SCRIPT_DIR="./start_vm"
-#SCRIPT_DIR="/srv/cloud/chef/"
+
  
 if !ONE_LOCATION
     RUBY_LIB_LOCATION="/usr/lib/one/ruby"
@@ -26,16 +29,21 @@ include OpenNebula
 ##############################################################################
 
 # OpenNebula credentials
-CREDENTIALS = "oneadmin:nebula"
+#CREDENTIALS = "oneadmin:nebula"
 # XML_RPC endpoint where OpenNebula is listening
 ENDPOINT    = "http://localhost:2633/RPC2"
 
+if File.exists?(FILE_CREDENTIALS)
+	File.open( FILE_CREDENTIALS, "r" )do |infile|
+		auth = infile.gets
+	end	
+end
 
 class ConectorONE
 
 :client		 
 	def initialize 
-		@client = Client.new(CREDENTIALS, ENDPOINT)		
+		@client = Client.new(ENDPOINT,auth)		
 	end
 
 
@@ -65,8 +73,12 @@ class ConectorONE
 		
 		script_init= File.expand_path(SCRIPT_DIR) + '/init.sh'
 		script_chef= File.expand_path(SCRIPT_DIR) + '/chef.sh'
-		
-		files = path_repo + " " + path_json + " " + script_init + " " + script_chef + " " + path_bootstarp
+
+		if path_bootstarp!=nil
+			files = path_repo + " " + path_json + " " + script_init + " " + script_chef + " " + path_bootstarp
+		else
+			files = path_repo + " " + path_json + " " + script_init + " " + script_chef
+		end
 		target= "vdb"
 
 		###EDITAR CONTEXTO
@@ -102,22 +114,22 @@ class ConectorONE
 
 		end
 
-#=begin	
 		# Introduce el nombre del node
 		name = File.basename(path_json)	# no nos importa quedarnos también con la extension
 		node_name = createContextVariable doc, "CHEF_NODE", name
 		xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_name
-#=begin
+
 		# Introduce el nombre del bootstrap
-		name = File.basename(path_bootstarp)	
-		node_name = createContextVariable doc, "CHEF_BOOTSTRAP", name
-		xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_name
+		if path_bootstarp != nil
+			name = File.basename(path_bootstarp)	
+			bootstarp_name = createContextVariable doc, "CHEF_BOOTSTRAP", name
+			xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << bootstarp_name
+		end
 
 		# Introduce el path de la ruta chef	
 		dir_chef = createContextVariable doc, "CHEF_DIR", path_chef
 		xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << dir_chef
 
-#=end
 		if path_databags != nil
 			# Introduce el nombre del directorio databags
 			#dir_db = File.basename(path_databags)	
@@ -126,7 +138,7 @@ class ConectorONE
 		end
 #=end
 
-
+		puts xml
 
 		template = Template.new(xml,@client)
 		xml_string = template.template_str
