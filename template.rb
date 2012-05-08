@@ -39,7 +39,7 @@ class ConectorONE
 	end
 
 
-	def crearTemplate(num_template,path_repo,path_json,path_databags,path_bootstarp)
+	def crearTemplate(num_template,path_repo,path_json,path_databags,path_bootstarp,path_chef)
 
 		xml_s=""
 
@@ -112,6 +112,10 @@ class ConectorONE
 		name = File.basename(path_bootstarp)	
 		node_name = createContextVariable doc, "CHEF_BOOTSTRAP", name
 		xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_name
+
+		# Introduce el path de la ruta chef	
+		dir_chef = createContextVariable doc, "CHEF_DIR", path_chef
+		xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << dir_chef
 
 #=end
 		if path_databags != nil

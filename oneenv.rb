@@ -95,10 +95,9 @@ class OneEnv
 				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
 			end
 
-		##USO:oneenv up [ID_entorno] [BOOTSTRAP]?
+		##USO:oneenv up ID_entorno [CHEF_PATH]
 		when 'up'
 			raise ArgumentError if commands.length != 2  and commands.length != 3
-
 
 			if commands.length == 3
 				bootstrap_path = File.expand_path(commands[2])
@@ -110,6 +109,12 @@ class OneEnv
 			end
 
 
+			if commands.length == 3
+				chef_dir = commands[2]
+			else 
+				chef_dir = CONFIG['default_solo_path'] 
+			end
+
 			if Enviroment.exists?(commands[1])
 				env = Enviroment.find(commands[1])
 
@@ -120,7 +125,7 @@ class OneEnv
 				end
 
 				c= ConectorONE.new
-				c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,bootstrap_path)
+				c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,bootstrap_path,chef_dir)
 				puts 'montando template...'
 				puts env.template
 				puts repo_dir
