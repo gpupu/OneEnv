@@ -161,8 +161,7 @@ then
     version=$release_version
 fi
 
-if [ $use_shell = 1 ];
-then
+if [ $use_shell = 1 ];then
   shell_filename
 else
   case $platform in

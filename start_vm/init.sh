@@ -11,7 +11,7 @@ echo "BOOTSTRAP "$CHEF_BOOTSTRAP
 
 if [ -f /mnt/$CHEF_BOOTSTRAP ]; then
 	echo "Ejecutando Bootstrap..."
-	. /mnt/$CHEF_BOOTSTRAP > /var/log/cheflog 2>&1
+	. /mnt/$CHEF_BOOTSTRAP 
 fi
 
 if [ -f /mnt/chef.sh ]; then
