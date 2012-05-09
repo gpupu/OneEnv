@@ -58,3 +58,93 @@ def list_deps(cbs)
 
 end
 
+$deps
+
+def expand_node(node_path)
+	$deps = deps_list.new
+	node_ar = get_json_runl(node_path)
+
+end
+
+private
+def expand_sons(rl_array)
+	rl_array.each do |r|
+		if r.start_with?('recipe')
+			#es una recipe
+			if !$deps.exists_cb?(r)
+				rec = r[7..-2]
+				$deps.add_cb(rec)
+				#TODO leer sus dependencias de la base de datos
+				# con el array resultado volvemos a llamar a expand_sons
+				expand_sons(cb_deps)
+			else
+				#si ya existe no lo añade y corta para evitar ciclos
+			end
+
+		else if r.start_with?('role')
+			#es un rol
+			if !deps.exists_role?(r)
+				role = r[5..-2]
+				$deps.add_role(role)
+				#TODO leer sus dependencias de la base de datos
+				# con el array resultado volvemos a llamar a expand_sons
+				expand_sons(r_deps)
+			else
+				#si ya existe no lo añade y corta para evitar ciclos
+			end
+		end
+	end
+end
+
+#devuelve array dependencias de un json
+def get_json_runl(path)
+	jfile = File.read(path)
+	runl = JSON.parse(jfile, :create_additions=>false)
+	runl = runl['run_list']
+
+	return runl
+end
+
+#devuelve array dependencias de un rb
+def get_ruby_runl(path)
+	regex = /.*run_list +(("|')([^"]+)("|'),)*(("|')([^"]+)("|'))/
+
+	open(path) do |f|
+    	f.each do |line|
+        	m = line.match(regex)
+        	if m
+            	rl = line.split("\"")
+            	rl.delete_if {|x|
+                	x.include?("run_list") or
+                	x.include?(",")
+            	}
+				return rl
+        	end
+    	end
+	end
+end
+
+def get_recipe_deps(recipe_name, cb_path)
+	regex = /.*include_recipe +("|')([^"]+)("|')/
+	#dir = cb_path.sub(/\/$/, "")
+	cb_path = File.expand_path(cb_path)
+	if File.exists? "#{cb_path}/#{recipe_name}.rb"
+		r_deps = []
+		item = File.basename(cb_path) + "::" + recipe_name
+		open("#{cb_path}/#{recipe_name}.rb") do |f|
+			f.each do |line|
+       			m = line.match(regex)
+        		if m
+          			if !m[2].match(/::/)
+            			r_deps << (m[2] + "::default")
+          			else
+            			r_deps << m[2]
+          			end
+        		end
+      		end
+    	end
+    	return r_deps
+  	else
+		puts "This recipe not exists"
+	end
+end
