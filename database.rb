@@ -15,6 +15,7 @@ CONFIG = YAML.load_file(CONFIG_FILE)
 # TODO Cuidado con esto!! ¿mantiene valor si se cambia el archivo de configuración?
 CB_DIR = File.expand_path(CONFIG['default_cb_dir'])
 ROLE_DIR = File.expand_path(CONFIG['default_role_dir'])
+#SOLO_DIR = CONFIG['default_solo_path']
 
 # get active record set up
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
@@ -250,6 +251,7 @@ if !table_exists?(:enviroments)
         t.column :name, :string, :default=> nil,:unique=>true
 		t.column :template, :integer, :null=> false
 		t.column :node, :string, :null=> false
+		#t.column :solo_path, :string, :default=>SOLO_DIR
 		t.column :databags, :string, :default=> nil
 		t.column :roles, :role
 		t.column :cookbooks, :cookbook
