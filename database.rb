@@ -1,13 +1,9 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-#require 'sqlite3'
 require 'active_record'
 
 
-# connect to database.  This will create one if it doesn't exist
-#MY_DB_NAME = "oneenv.db"
-#MY_DB = SQLite3::Database.new(MY_DB_NAME)
 
 CONFIG_FILE = 'oneenv.cnf'
 
@@ -16,9 +12,13 @@ begin
 	# TODO Cuidado con esto!! ¿mantiene valor si se cambia el archivo de configuración?
 	CB_DIR = File.expand_path(CONFIG['default_cb_dir'])
 	ROLE_DIR = File.expand_path(CONFIG['default_role_dir'])
-rescue => err
+rescue Errno::ENOENT => notfound
 	puts "Not Found oneenv.cnf"
+	exit
+rescue  => badargument
+	puts "Bad argument in oneenv.conf"
 	exit 
+
 end
 
 
@@ -325,25 +325,3 @@ end
 
 end
 
-=begin
-env1=Enviroment.create(:template=>2, :node=>'/ruta/hacia/nodo1')
-env2=Enviroment.create(:template=>3, :node=>'/ruta/hacia/nodo2')
-env3=Enviroment.create(:template=>4, :node=>'/ruta/hacia/nodo3')
-env4=Enviroment.create(:template=>5, :node=>'/ruta/hacia/nodo4')
-
-cb1=Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
-cb2=Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
-cb3=Cookbook.create(:name=>'nginx')
-
-r1= Role.create(:name=>"dev", :path=>'/ruta/hacia/roldev')
-r2= Role.create(:name=>"admin", :path=>'/ruta/hacia/roladmin')
-r3= Role.create(:name=>'otro_rol')
-
-env1.cookbooks << cb1
-env1.roles << r2
-env1.roles << r1
-
-env2.cookbooks << cb1
-env2.cookbooks << cb3
-env2.roles << r2
-=end

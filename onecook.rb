@@ -89,9 +89,6 @@ class OneCook
 			end
 
 
-			
-			
-
 		#USO onecook check ID_CB
 		when commands[0] == 'check'
 			raise ArgumentError if commands.length != 2
