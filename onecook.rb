@@ -11,8 +11,8 @@ class OneCook
 			#puts 'dentro de la lista'
 			puts "ID\tNAME\t\t\tRECIPES"
 			Cookbook.find(:all).each do |cb|
-			puts cb.to_s
-            end
+				puts cb.to_s
+            		end
 =begin
 		#USO onecook add-dir PATH
 		when commands[0] == 'add-dir'
@@ -47,7 +47,7 @@ class OneCook
 		when commands[0] == 'delete'
 			raise ArgumentError if commands.length != 2
 			
-			cb=Cookbook.getCookbook(commands[1])
+			cb=Cookbook.getCookbookById(commands[1])
 			if cb!=nil
 				cb.enviroments.clear
 				cb.delete
@@ -57,7 +57,7 @@ class OneCook
 		when commands[0] == 'show'
 			raise ArgumentError if commands.length != 2
 			
-			cb=Cookbook.getCookbook(commands[1])
+			cb=Cookbook.getCookbookById(commands[1])
 			if cb!=nil
 				puts Cookbook.view cb
 			end
@@ -65,15 +65,17 @@ class OneCook
 		#USO onecook update ID_CB
 		when commands[0] == 'update'
 			raise ArgumentError if commands.length != 2
-			cb=Cookbook.getCookbook(commands[1])
+			cb=Cookbook.getCookbookById(commands[1])
 			if cb!=nil
 				Cookbook.update cb
 			end
+	
+			
 
 		#USO onecook check ID_CB
 		when commands[0] == 'check'
 			raise ArgumentError if commands.length != 2
-			cb=Cookbook.getCookbook(commands[1])
+			cb=Cookbook.getCookbookById(commands[1])
 			if cb!=nil
 				cb_name = cb.name
 				deps = find_deps(CB_DIR + '/' + cb_name )

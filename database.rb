@@ -65,10 +65,11 @@ class Cookbook < ActiveRecord::Base
                                 end
 				
                                 if iscopy
+					puts "copying cookbook: #{cb_name}"
 					source = CB_DIR + '/' + cb_name
                                         create(:name => cb_name, :path => source, :recipes => get_recipes(source))
                                 else
-                                        puts "copying cookbook #{cb_name} failed"
+                                        puts "copying cookbook: #{cb_name} failed"
                                 end
                         else
                                 puts source + ' is not a correct path'
@@ -99,20 +100,34 @@ class Cookbook < ActiveRecord::Base
 
 	public
 	def self.isCookbook? cb_dir
+		iscoobook=false
 		if File.directory?(cb_dir)
 			cont= Dir.entries cb_dir
+			#puts cont
 			# es cookbook si incluye un archivo metadata.rb
-			cont.include?('metadata.rb')
+			iscoobook=cont.include?('metadata.rb')
 		end
+		return iscoobook
 	end
 	
 	public
-	def self.getCookbook cb_id
+	def self.getCookbookById cb_id
 		if Cookbook.exists?(:id => cb_id)
 			cb=Cookbook.first(:conditions=>{:id=>cb_id})
 			return cb					
 		else
 			puts 'Can\'t find the cookbook: ' + cb_id
+			return nil
+		end
+	end
+
+	public
+	def self.getCookbookByName cb_name
+		if Cookbook.exists?(:name => cb_name)
+			cb=Cookbook.first(:conditions=>{:name=>cb_name})
+			return cb					
+		else
+			puts 'Can\'t find the cookbook: ' + cb_name
 			return nil
 		end
 	end
@@ -232,10 +247,10 @@ class Enviroment < ActiveRecord::Base
 				s += "DATABAG DIR:\t" + env.databags + "\n" 
 			end
 			s += "COOKBOOKS: " + "\t"
-			env.cookbooks.each{|cb| s += ", " + cb.name }
+				env.cookbooks.each{|cb| s += ", " + cb.name }
 			s += "\n"
 			s += "ROLES:" + "\t"
-			env.roles.each{|r| s += ", " + r.name}
+				env.roles.each{|r| s += ", " + r.name}
 			s += "\n"
 		else
 			s +='Can\'t find the enviroment ' + id.to_s
