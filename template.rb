@@ -33,17 +33,12 @@ include OpenNebula
 # XML_RPC endpoint where OpenNebula is listening
 ENDPOINT    = "http://localhost:2633/RPC2"
 
-if File.exists?(FILE_CREDENTIALS)
-	File.open( FILE_CREDENTIALS, "r" )do |infile|
-		auth = infile.gets
-	end	
-end
 
 class ConectorONE
 
 :client		 
 	def initialize 
-		@client = Client.new(ENDPOINT,auth)		
+		@client = Client.new(nil,ENDPOINT)		
 	end
 
 
@@ -138,12 +133,13 @@ class ConectorONE
 		end
 #=end
 
-		puts xml
+
 
 		template = Template.new(xml,@client)
 		xml_string = template.template_str
 
-		puts xml_string
+
+
 #=begin
 
 		vm = VirtualMachine.new(VirtualMachine.build_xml,@client)
