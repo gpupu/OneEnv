@@ -28,49 +28,59 @@ class Cookbook < ActiveRecord::Base
     serialize :recipes, Array
 
 
+
 	public
 	def to_s
 		s  = id.to_s + "\t"
-		s += name + "\t"
-		s += path + "\t"
-		s += recipes.to_s + "\t"
+		s += name + "\t\t\t"
+		#s += path + "\t"
+		s += recipes.length.to_s + "\t"
 		s
 	end
 
 	public
-	def self.cb_create cb_name, cb_path
-		if cb_path == nil
-			cb_path = CB_DIR
-		end
+        def self.cb_create cb_name , cb_path
 
-		if !exists?(:name => cb_name)
-			cb_path = File.expand_path(cb_path)
-			if File.exists?(cb_path)
-				dir_recipes = cb_path + '/' + cb_name
-				#puts 'dir_recipes' + dir_recipes
-				iscopy = true
-				if cb_path != CB_DIR
-					cp_com = "cp -r #{dir_recipes} #{CB_DIR}" 
-					puts cp_com
-					iscopy = system(cp_com)
-					#FileUtils.cp_r(dir_recipes,CB_DIR)
-				end
-				if iscopy
-					create(:name => cb_name, :path => cb_path, :recipes => get_recipes(dir_recipes))
-				else
-					puts "copying cookbook #{cb_name} failed"
-				end
-			else
-				puts cb_path + ' is not a correct path'
-			end
+                if cb_path == nil
+			isextern = false
+			source=CB_DIR + '/' + cb_name
+			dest=CB_DIR
 		else
-			puts cb_name + ' is yet on the database'
-		end
-	end
+			isextern=true
+			source=cb_path + '/' + cb_name
+			dest=CB_DIR
+                end
 
-	private
-	def self.get_recipes cb_path
-		r_path = cb_path + '/recipes'
+		
+
+                if !exists?(:name => cb_name)
+
+                        if File.exists?(source)
+                               
+				iscopy=true
+                                if isextern
+                                        cp_com = "cp -r #{source} #{dest}" 
+                                        puts cp_com
+                                        iscopy = system(cp_com)
+                                end
+				
+                                if iscopy
+					source = CB_DIR + '/' + cb_name
+                                        create(:name => cb_name, :path => source, :recipes => get_recipes(source))
+                                else
+                                        puts "copying cookbook #{cb_name} failed"
+                                end
+                        else
+                                puts source + ' is not a correct path'
+                        end
+                else
+                        puts cb_name + ' is yet on the database'
+                end
+        end
+
+	public
+	def self.get_recipes path
+		r_path = path   + '/recipes'
 		#puts r_path
 		recs = Dir.entries(r_path)
 		#puts recs
@@ -95,21 +105,37 @@ class Cookbook < ActiveRecord::Base
 			cont.include?('metadata.rb')
 		end
 	end
-
-	public 
-	def update
-		recipes = get_recipes path
+	
+	public
+	def self.getCookbook cb_id
+		if Cookbook.exists?(:id => cb_id)
+			cb=Cookbook.first(:conditions=>{:id=>cb_id})
+			return cb					
+		else
+			puts 'Can\'t find the cookbook: ' + cb_id
+			return nil
+		end
 	end
 
+	public 
+	def self.update cb
+		cb.recipes = Cookbook.get_recipes(cb.path)
+		cb.save
+	end
+		
 	public
-	def self.view cb_name
-		cb=first(:conditions => {:name => cb_name})
+	def self.view cb
 		if !cb.nil?
 			s  = "NAME:\t" + cb.name + "\n"
 			s += "PATH:\t" + cb.path + "\n"
-			s += "RECIPES: " + "\t"
-				cb.recipes.each{|r| s += ", " + r }
+			s += "RECIPES:\t" 
+			  cb.recipes.each{|r| s += "\n " + r }
 			s += "\n"
+			s += "\nDEPENDENCIES:\t"
+				cb_name = cb.name
+				deps = find_deps(CB_DIR + '/' + cb_name )
+				clean_deps(deps)
+			s += list_deps(deps)
 		else
 			s +='Can\'t find the cookbook ' + cb_name
 		end
@@ -118,6 +144,9 @@ class Cookbook < ActiveRecord::Base
 
 
 end
+
+
+
 
 class Role < ActiveRecord::Base
     validates_uniqueness_of :name

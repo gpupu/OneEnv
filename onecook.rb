@@ -9,11 +9,11 @@ class OneCook
 		when commands[0] == 'list'
 			raise ArgumentError if commands.length != 1
 			#puts 'dentro de la lista'
-		    puts "ID\tNAME\tPATH\tRECIPES"
-            Cookbook.find(:all).each do |cb|
-                puts cb.to_s
+			puts "ID\tNAME\t\t\tRECIPES"
+			Cookbook.find(:all).each do |cb|
+			puts cb.to_s
             end
-
+=begin
 		#USO onecook add-dir PATH
 		when commands[0] == 'add-dir'
 			#puts 'esto es una prueba sin repo'
@@ -34,64 +34,54 @@ class OneCook
 			else
 				puts path + ' don\'t exists'
 			end
+=end
 
 		#USO onecook create NAME [PATH]
-		when commands[0] == 'create'
-			#puts 'esto es una prueba sin repo'
-			raise ArgumentError if commands.length != 2 && commands.length != 3
-			Cookbook.cb_create(commands[1],commands[2])
+                when commands[0] == 'create'
+                        #puts 'esto es una prueba sin repo'
+                        raise ArgumentError if commands.length != 2 && commands.length != 3
+                        Cookbook.cb_create(commands[1],commands[2])
 
 
-		#USO onecook delete NAME
+		#USO onecook delete ID_CB
 		when commands[0] == 'delete'
 			raise ArgumentError if commands.length != 2
-			if Cookbook.exists?(:name => commands[1])
-				cb = Cookbook.first(:conditions => {:name => commands[1]})
+			
+			cb=Cookbook.getCookbook(commands[1])
+			if cb!=nil
 				cb.enviroments.clear
 				cb.delete
-			else
-				puts 'This cookbook don\'t exists'
 			end
 
-		#USO onecook show NAME
+		#USO onecook show ID_CB
 		when commands[0] == 'show'
 			raise ArgumentError if commands.length != 2
-			if Cookbook.exists?(:name => commands[1])
-				cb=Cookbook.first(:conditions=>{:name=>commands[1]})
-				cb.update
-				puts Cookbook.view commands[1]
-			else
-				puts 'Can\'t find the cookbook ' + "#{commands[1]}"
+			
+			cb=Cookbook.getCookbook(commands[1])
+			if cb!=nil
+				puts Cookbook.view cb
 			end
 
-		#USO onecook update NAME
+		#USO onecook update ID_CB
 		when commands[0] == 'update'
 			raise ArgumentError if commands.length != 2
-			if Cookbook.exists?(:name => commands[1])
-				cb = Cookbook.first(:conditions=> {:name => commands[1]})
-				cb.update
-			else
-				puts 'Can\'t find the cookbook ' + "#{commands[1]}"
+			cb=Cookbook.getCookbook(commands[1])
+			if cb!=nil
+				Cookbook.update cb
 			end
 
-		#USO onecook check
+		#USO onecook check ID_CB
 		when commands[0] == 'check'
-			raise ArgumentError if commands.length != 1
-			deps = find_deps(CB_DIR)
-			clean_deps(deps)
-			list_deps(deps)
-
-
-=begin
-		when commands[0] == 'load'
-			raise ArgumentError if commands.length != 1
-			Cookbook.create(:name=>'APACHE', :path=>'/ruta/hacia/emacs')
-			Cookbook.create(:name=>'MYSQL', :path=>'/ruta/hacia/vim')
-			Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
-			Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
-			Cookbook.create(:name=>'nginx', :place=>'R')
-
-=end
+			raise ArgumentError if commands.length != 2
+			cb=Cookbook.getCookbook(commands[1])
+			if cb!=nil
+				cb_name = cb.name
+				deps = find_deps(CB_DIR + '/' + cb_name )
+				clean_deps(deps)
+				dep_str = list_deps(deps)
+				puts dep_str
+			end
+			
  
 		else
 			raise ArgumentError
