@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require 'deps_list.rb'
+
 def find_deps(cookbook_dir)
   nel = Hash.new { |h, k| h[k] = [] }
   Dir.glob("#{cookbook_dir}/*/").each do |r|
@@ -7,6 +9,36 @@ def find_deps(cookbook_dir)
   end
   nel
 end
+
+def find_deps2(cookbook_dir)
+  nel = Hash.new { |h, k| h[k] = [] }
+  
+  Dir.glob("#{cookbook_dir}/recipes/*.rb").each do |r|
+	#puts cookbook_dir
+	cb_name = File.basename(cookbook_dir)
+	#puts cb_name
+	rec = File.basename(r, ".rb")
+	#puts "Estoy dentro de findeps2 y viendo a #{r}"
+	#puts rec
+	rdeps=get_recipe_deps(rec, cookbook_dir) 
+	if rdeps != []
+    	nel["#{rec}"] = rdeps
+	end
+  end
+  nel
+end
+
+#TODO No muestra bien los nombres
+def show_deps_list(hlist)
+	s = ""
+	hlist.each do |r,d|
+		s += "#{r}: "
+		d.each{|deps| s += ", #{deps}"}
+
+	end
+	s
+end
+
 
 def deps_for(dir, nel)
   regex = /.*include_recipe +("|')([^"]+)("|')/
@@ -66,7 +98,7 @@ def expand_node(node_path)
 
 end
 
-private
+
 def expand_sons(rl_array)
 	rl_array.each do |r|
 		if r.start_with?('recipe')
@@ -80,8 +112,8 @@ def expand_sons(rl_array)
 			else
 				#si ya existe no lo añade y corta para evitar ciclos
 			end
-
-		else if r.start_with?('role')
+		end
+		if r.start_with?('role')
 			#es un rol
 			if !deps.exists_role?(r)
 				role = r[5..-2]
@@ -112,12 +144,15 @@ def get_ruby_runl(path)
 	open(path) do |f|
     	f.each do |line|
         	m = line.match(regex)
+			rl = line.split("\"")
         	if m
+				puts 'entra dentro'
             	rl = line.split("\"")
             	rl.delete_if {|x|
                 	x.include?("run_list") or
                 	x.include?(",")
             	}
+				puts rl
 				return rl
         	end
     	end
@@ -128,23 +163,27 @@ def get_recipe_deps(recipe_name, cb_path)
 	regex = /.*include_recipe +("|')([^"]+)("|')/
 	#dir = cb_path.sub(/\/$/, "")
 	cb_path = File.expand_path(cb_path)
-	if File.exists? "#{cb_path}/#{recipe_name}.rb"
+	if File.exists? "#{cb_path}/recipes/#{recipe_name}.rb"
 		r_deps = []
 		item = File.basename(cb_path) + "::" + recipe_name
-		open("#{cb_path}/#{recipe_name}.rb") do |f|
+		open("#{cb_path}/recipes/#{recipe_name}.rb") do |f|
 			f.each do |line|
        			m = line.match(regex)
         		if m
           			if !m[2].match(/::/)
             			r_deps << (m[2] + "::default")
+						puts r_deps
           			else
             			r_deps << m[2]
+						puts r_deps
           			end
         		end
       		end
     	end
     	return r_deps
   	else
-		puts "This recipe not exists"
+		puts "This recipe not exists #{cb_path}/recipes/#{recipe_name}.rb"
+
 	end
 end
+

@@ -1,6 +1,7 @@
 require 'rubygems'
 #require 'sqlite3'
 require 'active_record'
+require 'check_deps.rb'
 
 
 # connect to database.  This will create one if it doesn't exist
@@ -24,6 +25,7 @@ class Cookbook < ActiveRecord::Base
     validates_uniqueness_of :name
     has_and_belongs_to_many :enviroments, :uniq => true
     serialize :recipes, Array
+	serialize :recipes_deps, Hash
 
 
 	public
@@ -32,7 +34,7 @@ class Cookbook < ActiveRecord::Base
 		s += name + "\t"
 		s += path + "\t"
 		s += recipes.to_s + "\t"
-		s
+		s += show_deps_list(recipes_deps) + "\t"
 	end
 
 	public
@@ -45,7 +47,7 @@ class Cookbook < ActiveRecord::Base
 			cb_path = File.expand_path(cb_path)
 			if File.exists?(cb_path)
 				dir_recipes = cb_path + '/' + cb_name
-				#puts 'dir_recipes' + dir_recipes
+				puts 'dir_recipes' + dir_recipes
 				iscopy = true
 				if cb_path != CB_DIR
 					cp_com = "cp -r #{dir_recipes} #{CB_DIR}" 
@@ -54,7 +56,7 @@ class Cookbook < ActiveRecord::Base
 					#FileUtils.cp_r(dir_recipes,CB_DIR)
 				end
 				if iscopy
-					create(:name => cb_name, :path => cb_path, :recipes => get_recipes(dir_recipes))
+					create(:name => cb_name, :path => cb_path, :recipes => get_recipes(dir_recipes), :recipes_deps=>find_deps2(dir_recipes))
 				else
 					puts "copying cookbook #{cb_name} failed"
 				end
@@ -85,6 +87,30 @@ class Cookbook < ActiveRecord::Base
 		end
 	end
 
+=begin
+	private
+	def self.get_recipes cb_path
+		r_path = cb_path + '/recipes'
+		#puts r_path
+		recs = Dir.entries(r_path)
+		#puts recs
+		if recs.size > 2
+			cb_deps= Hash.new
+			
+
+			recs.each{|r|
+				if File.extname(r) == ".rb"
+					#recipe_names << File.basename(r,".rb")
+					cb_deps.
+				end
+			}
+			return recipe_names
+		else
+			return []
+		end
+	end
+=end
+
 	public
 	def self.isCookbook? cb_dir
 		if File.directory?(cb_dir)
@@ -107,6 +133,9 @@ class Cookbook < ActiveRecord::Base
 			s += "PATH:\t" + cb.path + "\n"
 			s += "RECIPES: " + "\t"
 				cb.recipes.each{|r| s += ", " + r }
+			s += "DEPS: " + "\t"
+				cb.deps.each{|r| s += ", " + r }
+
 			s += "\n"
 		else
 			s +='Can\'t find the cookbook ' + cb_name
@@ -120,13 +149,16 @@ end
 class Role < ActiveRecord::Base
     validates_uniqueness_of :name
     has_and_belongs_to_many :enviroments, :uniq => true
+	serialize :deps_roles, Array
+	serialize :deps_recs, Array
 
 	public
 	def to_s
 		s  = id.to_s + "\t"
 		s += name + "\t"
 		s += path + "\t"
-		s
+		s += deps_roles.to_s + "\t"
+		s += deps_recs.to_s + "\t"
 	end
 
 	public
@@ -147,7 +179,27 @@ class Role < ActiveRecord::Base
 					#FileUtils.cp(r_path, ROLE_DIR)
 				end
 				if iscopy
-					create(:name=> r_name, :path=> r_path)
+					if File.extname(r_path) == ".rb"
+						rdeps = get_ruby_runl(r_path)
+					end
+					if File.extname(r_path) == ".json"
+						rdeps = get_json_runl(r_path)
+					end
+					puts rdeps
+					
+					#dividimos en recetas y roles
+					roles_list = []
+					recs_list = []
+					rdeps.each do |d|
+						if d.start_with?('role')
+							roles_list.push d
+						end
+						if d.start_with?('recipe')
+							recs_list.push d
+						end
+					end
+
+					create(:name=> r_name, :path=> r_path, :deps_roles=>roles_list, :deps_recs=>recs_list )
 				else
 					puts "copying role #{r_name} failed"
 				end
@@ -181,12 +233,12 @@ class Enviroment < ActiveRecord::Base
     public
 
     def to_s
-	s  = id.to_s + "\t"
+		s  = id.to_s + "\t"
         s += name + "\t"
         s += template.to_s + "\t"
         s += node + "\t"
         s += databags.to_s + "\t"
-	s += cookbooks.size.to_s + "\t"
+		s += cookbooks.size.to_s + "\t"
         s += roles.size.to_s
     end
 
@@ -215,12 +267,6 @@ class Enviroment < ActiveRecord::Base
 	public
 	def clone
 		envcopy = Enviroment.create(:template=> self.template, :node=> self.node, :databags=> self.databags)
-		self.cookbooks.each{|cb|
-			envcopy.cookbooks << cb
-		}
-		self.roles.each{|r|
-			envcopy.roles << r
-		}
 	end
 
 end
@@ -232,7 +278,8 @@ if !table_exists?(:cookbooks)
         t.column :name, :string, :null=>false, :unique=>true
         t.column :path, :string, :default=>CB_DIR
         t.text :recipes
-        t.column :enviroments, :enviroment
+		t.text :recipes_deps
+        #t.column :enviroments, :enviroment
     end
 end
 
@@ -240,7 +287,9 @@ if !table_exists?(:roles)
 	create_table(:roles) do |t|
 		t.column :name, :string, :null=>false, :unique=>true
         t.column :path, :string, :default=>ROLE_DIR
-        t.column :enviroments, :enviroment
+		t.text :deps_roles
+		t.text :deps_recs
+        #t.column :enviroments, :enviroment
 	end
 end
 
@@ -251,25 +300,10 @@ if !table_exists?(:enviroments)
 		t.column :node, :string, :null=> false
 		#t.column :solo_path, :string, :default=>SOLO_DIR
 		t.column :databags, :string, :default=> nil
-		t.column :roles, :role
-		t.column :cookbooks, :cookbook
+		#t.column :roles, :role
+		#t.column :cookbooks, :cookbook
     end
 end
-
-if !table_exists?(:cookbooks_enviroments)
-    create_table(:cookbooks_enviroments, :id=>false) do |t|
-        t.references :cookbook
-        t.references :enviroment
-    end
-end
-
-if !table_exists?(:enviroments_roles)
-    create_table(:enviroments_roles, :id=>false) do |t|
-        t.references :enviroment
-		t.references :role
-    end
-end
-
 
 end
 

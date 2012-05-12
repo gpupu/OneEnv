@@ -1,5 +1,5 @@
 require 'database.rb'
-require 'template.rb'
+#require 'template.rb'
 
 class OneEnv
 	def self.run commands
@@ -70,23 +70,19 @@ class OneEnv
 			end
 
 		##USO: oneenv update-node ID_ENV [NODE_PATH]
-		when 'update-node'
+		when 'set-node'
 			raise ArgumentError if commands.length != 2 and commands.length != 3
 			if Enviroment.exists?(commands[1])
 				#env= Enviroment.find(commands[1])
 				if commands[2] != nil
 					Enviroment.update(commands[1], {:node=> commands[2]})
 				end
-				# limpia lista de roles y cbs
-				#env.cookbooks.clear
-				#env.roles.clear
-				# recorre el arbol marcando contenidos
 			else
 				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
 			end
 
 		##USO oneenv update-databags ID_ENV [DB_PATH]
-		when 'update-databag'
+		when 'set-databag'
 			raise ArgumentError if commands.length != 2 and commands.length != 3
 			if Enviroment.exists?(commands[1])
 				env= Enviroment.find(commands[1])
@@ -195,7 +191,6 @@ class OneEnv
 			raise ArgumentError if commands.length != 2
 			if Role.exists?(:name => commands[1])
 				role = Role.first(:conditions => {:name => commands[1]})
-				role.enviroments.clear
 				role.delete
 			else
 				puts 'This role don\'t exists in the database'
