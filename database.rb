@@ -10,12 +10,18 @@ require 'active_record'
 #MY_DB = SQLite3::Database.new(MY_DB_NAME)
 
 CONFIG_FILE = 'oneenv.cnf'
-CONFIG = YAML.load_file(CONFIG_FILE)
 
-# TODO Cuidado con esto!! ¿mantiene valor si se cambia el archivo de configuración?
-CB_DIR = File.expand_path(CONFIG['default_cb_dir'])
-ROLE_DIR = File.expand_path(CONFIG['default_role_dir'])
-#SOLO_DIR = CONFIG['default_solo_path']
+begin
+	CONFIG = YAML.load_file(CONFIG_FILE)
+	# TODO Cuidado con esto!! ¿mantiene valor si se cambia el archivo de configuración?
+	CB_DIR = File.expand_path(CONFIG['default_cb_dir'])
+	ROLE_DIR = File.expand_path(CONFIG['default_role_dir'])
+rescue => err
+	puts "Not Found oneenv.cnf"
+	exit 
+end
+
+
 
 # get active record set up
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
@@ -65,7 +71,7 @@ class Cookbook < ActiveRecord::Base
                                 end
 				
                                 if iscopy
-					puts "copying cookbook: #{cb_name}"
+					puts "adding cookbook: #{cb_name}"
 					source = CB_DIR + '/' + cb_name
                                         create(:name => cb_name, :path => source, :recipes => get_recipes(source))
                                 else

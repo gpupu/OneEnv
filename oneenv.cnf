@@ -1,6 +1,6 @@
 
 
-default_cb_dir: /home/david/solodemo/cookbooks
+default_cb_dir: /home/david/Escritorio/opscode-cookbooks-99bf222
 default_role_dir: /home/david/solodemo/roles
 
 default_solo_path: /tmp/chef

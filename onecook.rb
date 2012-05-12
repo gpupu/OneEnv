@@ -13,6 +13,24 @@ class OneCook
 			Cookbook.find(:all).each do |cb|
 				puts cb.to_s
             		end
+
+		#USO onecook update-repo 
+		when commands[0] == 'import-repo'
+			raise ArgumentError if commands.length != 1
+			repo_path=CB_DIR
+			Cookbook.find(:all).each do |cb|
+				cb.enviroments.clear
+				cb.delete
+            		end
+
+			Dir.entries(repo_path).each do |cb_entry|
+			cb_path = CB_DIR + '/' + cb_entry
+			
+				if(Cookbook.isCookbook? cb_path)
+					Cookbook.cb_create(cb_entry,nil)
+				end
+		end
+
 =begin
 		#USO onecook add-dir PATH
 		when commands[0] == 'add-dir'
@@ -63,13 +81,15 @@ class OneCook
 			end
 
 		#USO onecook update ID_CB
-		when commands[0] == 'update'
+		when commands[0] == 'update-cb'
 			raise ArgumentError if commands.length != 2
 			cb=Cookbook.getCookbookById(commands[1])
 			if cb!=nil
 				Cookbook.update cb
 			end
-	
+
+
+			
 			
 
 		#USO onecook check ID_CB
