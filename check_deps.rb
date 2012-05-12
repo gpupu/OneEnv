@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
 require 'deps_list.rb'
+require 'json'
+require 'database.rb'
 
 def find_deps(cookbook_dir)
   nel = Hash.new { |h, k| h[k] = [] }
@@ -93,8 +95,15 @@ end
 $deps
 
 def expand_node(node_path)
-	$deps = deps_list.new
+	$deps = Deps_List.new
 	node_ar = get_json_runl(node_path)
+	puts node_ar
+	expand_sons(node_ar)
+
+	puts 'recipes list'
+	puts $deps.cookbooks_list
+	puts 'roles list'
+	puts $deps.role_list
 
 end
 
@@ -102,30 +111,75 @@ end
 def expand_sons(rl_array)
 	rl_array.each do |r|
 		if r.start_with?('recipe')
-			#es una recipe
-			if !$deps.exists_cb?(r)
-				rec = r[7..-2]
-				$deps.add_cb(rec)
-				#TODO leer sus dependencias de la base de datos
-				# con el array resultado volvemos a llamar a expand_sons
-				expand_sons(cb_deps)
-			else
-				#si ya existe no lo añade y corta para evitar ciclos
-			end
+			puts "#{r} es una recipe"
+			r = r[7..-2]	#toma solo el interior
+			expand_recipe(r)
 		end
 		if r.start_with?('role')
-			#es un rol
-			if !deps.exists_role?(r)
-				role = r[5..-2]
-				$deps.add_role(role)
-				#TODO leer sus dependencias de la base de datos
-				# con el array resultado volvemos a llamar a expand_sons
-				expand_sons(r_deps)
-			else
-				#si ya existe no lo añade y corta para evitar ciclos
-			end
+			puts "#{r} es un rol"
+			r = r[5..-2]	#toma solo el interior
+			expand_role(r)
 		end
 	end
+end
+
+def expand_roles(roles_ar)
+	roles_ar.each do |r|
+		expand_role(r)
+	end
+end
+
+def expand_role(r)
+	if !$deps.exists_role?(r)
+		$deps.add_role(r)
+
+		#puts r
+		if Role.exists?(:name => r.to_s)
+			role = Role.first(:conditions=>{:name=>r})
+			# expandimos cookbooks
+			expand_cookbooks(role.deps_recs)
+			# expandimos roles
+			expand_roles(role.deps_roles)
+		else
+			puts "Dependencies incompleted: #{r}"
+		end
+	else
+		#si ya existe no lo añade y corta para evitar ciclos
+	end
+end
+
+def expand_cookbooks(cb_ar)
+	cb_ar.each do |r|
+		expand_recipe(r)
+	end
+end
+
+def expand_recipe(rec_comp)
+	if !$deps.exists_cb?(rec_comp)
+		if !rec_comp.include?("::")
+			rec_comp += "::default"
+		end
+		$deps.add_cb(rec_comp)
+		#TODO leer sus dependencias de la base de datos
+		# con el array resultado volvemos a llamar a expand_sons
+		# Comprobamos que existe en la base de datos la dependencia (el hijo)
+		cb_name = rec_comp.split("::")[0]
+		if Cookbook.exists?(:name => cb_name)
+			cb = Cookbook.first(:conditions=>{:name=>cb_name})
+			# cogemos el nombre de la receta de la que depende
+			rec = rec_comp.split("::")[1]
+			puts rec
+			# cogemos el array de las dependencias de esa receta en concreto
+			cb_deps = cb.recipes_deps[rec]
+			puts cb_deps
+			expand_cookbooks(cb_deps)
+		else
+			puts "Dependencies incompleted: #{cb_name}"
+		end
+	else
+		#si ya existe no lo añade y corta para evitar ciclos
+	end
+
 end
 
 #devuelve array dependencias de un json

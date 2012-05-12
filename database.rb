@@ -87,30 +87,6 @@ class Cookbook < ActiveRecord::Base
 		end
 	end
 
-=begin
-	private
-	def self.get_recipes cb_path
-		r_path = cb_path + '/recipes'
-		#puts r_path
-		recs = Dir.entries(r_path)
-		#puts recs
-		if recs.size > 2
-			cb_deps= Hash.new
-			
-
-			recs.each{|r|
-				if File.extname(r) == ".rb"
-					#recipe_names << File.basename(r,".rb")
-					cb_deps.
-				end
-			}
-			return recipe_names
-		else
-			return []
-		end
-	end
-=end
-
 	public
 	def self.isCookbook? cb_dir
 		if File.directory?(cb_dir)
@@ -192,14 +168,16 @@ class Role < ActiveRecord::Base
 					recs_list = []
 					rdeps.each do |d|
 						if d.start_with?('role')
+							d = d[5..-2]	#toma solo el interior
 							roles_list.push d
 						end
 						if d.start_with?('recipe')
+							d = d[7..-2]	#toma solo el interior
 							recs_list.push d
 						end
 					end
 
-					create(:name=> r_name, :path=> r_path, :deps_roles=>roles_list, :deps_recs=>recs_list )
+					create(:name=> r_name.to_s, :path=> r_path, :deps_roles=>roles_list, :deps_recs=>recs_list )
 				else
 					puts "copying role #{r_name} failed"
 				end
@@ -208,7 +186,7 @@ class Role < ActiveRecord::Base
 				puts r_path + ' is not a correct path'
 			end
 		else
-			puts r_name + 'is yet on the database'
+			puts r_name + ' is yet on the database'
 		end
 	end
 
