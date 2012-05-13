@@ -102,14 +102,15 @@ $deps
 def expand_node(node_path)
 	$deps = Deps_List.new
 	node_ar = get_json_runl(node_path)
-	puts node_ar
 	comp = expand_sons(node_ar)
 
+=begin
 	puts "\nrecipes list"
 	puts $deps.cookbooks_list
 	puts "\nroles list"
 	puts $deps.role_list
-	puts comp
+=end
+	#puts comp
 	comp
 end
 
@@ -118,31 +119,27 @@ def expand_sons(rl_array)
 	comp = true
 	rl_array.each do |r|
 		if r.start_with?('recipe')
-			puts "#{r} es una recipe"
+			#puts "#{r} es una recipe"
 			r = r[7..-2]	#toma solo el interior
-			comp = expand_recipe(r) and comp
-			puts = "(expandsons)#{r}: #{comp}"
-			#return comp
+			comp = expand_recipe(r) && comp
 		end
 		if r.start_with?('role')
-			puts "#{r} es un rol"
+			#puts "#{r} es un rol"
 			r = r[5..-2]	#toma solo el interior
-			comp = expand_role(r) and comp
-			puts = "(expandsons)#{r}: #{comp}"
-			#return comp
+			comp = expand_role(r) && comp
 		end
 	end
-	puts comp
-	return comp
+	#puts comp
+	comp
 end
 
 def expand_roles(roles_ar)
 	comp = true
 	roles_ar.each do |r|
-		comp = expand_role(r) and comp
+		comp = expand_role(r) && comp
 	end
-	puts comp
-	return comp
+	#puts comp
+	comp
 end
 
 def expand_role(r)
@@ -156,7 +153,7 @@ def expand_role(r)
 			# expandimos cookbooks
 			comp = expand_cookbooks(role.deps_recs)
 			# expandimos roles
-			comp = expand_roles(role.deps_roles) and comp
+			comp = expand_roles(role.deps_roles) && comp
 			return comp
 		else
 			puts "Dependencies incompleted: #{r}"
@@ -165,18 +162,16 @@ def expand_role(r)
 	else
 		#si ya existe no lo añade y corta para evitar ciclos
 	end
-	puts comp
-	return comp
+	#puts comp
+	comp
 end
 
 def expand_cookbooks(cb_ar)
 	comp = true
 	cb_ar.each do |r|
-		# No se porque pero si se cambia el orden siempre devuelve true
-		comp = expand_recipe(r) and comp
+		comp = expand_recipe(r) && comp
 	end
-	puts comp
-	return comp
+	comp
 end
 
 def expand_recipe(rec_comp)
@@ -205,8 +200,8 @@ def expand_recipe(rec_comp)
 	else
 		#si ya existe no lo añade y corta para evitar ciclos
 	end
-	puts comp
-	return comp
+	#puts comp
+	comp
 end
 
 ###########################################################################
