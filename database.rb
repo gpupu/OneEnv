@@ -1,20 +1,28 @@
+#!/usr/bin/env ruby
+
 require 'rubygems'
-#require 'sqlite3'
 require 'active_record'
 require 'check_deps.rb'
 
 
-# connect to database.  This will create one if it doesn't exist
-#MY_DB_NAME = "oneenv.db"
-#MY_DB = SQLite3::Database.new(MY_DB_NAME)
 
 CONFIG_FILE = 'oneenv.cnf'
-CONFIG = YAML.load_file(CONFIG_FILE)
 
-# TODO Cuidado con esto!! ¿mantiene valor si se cambia el archivo de configuración?
-CB_DIR = File.expand_path(CONFIG['default_cb_dir'])
-ROLE_DIR = File.expand_path(CONFIG['default_role_dir'])
-#SOLO_DIR = CONFIG['default_solo_path']
+begin
+	CONFIG = YAML.load_file(CONFIG_FILE)
+	# TODO Cuidado con esto!! ¿mantiene valor si se cambia el archivo de configuración?
+	CB_DIR = File.expand_path(CONFIG['default_cb_dir'])
+	ROLE_DIR = File.expand_path(CONFIG['default_role_dir'])
+rescue Errno::ENOENT => notfound
+	puts "Not Found oneenv.cnf"
+	exit
+rescue  => badargument
+	puts "Bad argument in oneenv.conf"
+	exit 
+
+end
+
+
 
 # get active record set up
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
@@ -28,49 +36,56 @@ class Cookbook < ActiveRecord::Base
 	serialize :recipes_deps, Hash
 
 
+
 	public
 	def to_s
 		s  = id.to_s + "\t"
-		s += name + "\t"
-		s += path + "\t"
-		s += recipes.to_s + "\t"
-		s += show_deps_list(recipes_deps) + "\t"
+		s += name + "\t\t\t"
+		#s += path + "\t"
+		s += recipes.length.to_s + "\t"
+		s += recipes_deps.length.to_s
+		s
 	end
 
 	public
-	def self.cb_create cb_name, cb_path
-		if cb_path == nil
-			cb_path = CB_DIR
-		end
+    def self.cb_create cb_name , cb_path
+        if cb_path == nil
+			isextern = false
+			source=CB_DIR + '/' + cb_name
+			dest=CB_DIR
+		else
+			isextern=true
+			source=cb_path + '/' + cb_name
+			dest=CB_DIR
+        end
 
-		if !exists?(:name => cb_name)
-			cb_path = File.expand_path(cb_path)
-			if File.exists?(cb_path)
-				dir_recipes = cb_path + '/' + cb_name
-				puts 'dir_recipes' + dir_recipes
-				iscopy = true
-				if cb_path != CB_DIR
-					cp_com = "cp -r #{dir_recipes} #{CB_DIR}" 
+        if !exists?(:name => cb_name)
+			if File.exists?(source)
+				iscopy=true
+				if isextern
+					cp_com = "cp -r #{source} #{dest}" 
 					puts cp_com
-					iscopy = system(cp_com)
-					#FileUtils.cp_r(dir_recipes,CB_DIR)
+                    iscopy = system(cp_com)
 				end
-				if iscopy
-					create(:name => cb_name, :path => cb_path, :recipes => get_recipes(dir_recipes), :recipes_deps=>find_deps2(dir_recipes))
-				else
-					puts "copying cookbook #{cb_name} failed"
-				end
+				
+                if iscopy
+					puts "adding cookbook: #{cb_name}"
+					source = CB_DIR + '/' + cb_name
+					create(:name => cb_name, :path => cb_path, :recipes => get_recipes(source), :recipes_deps=>find_deps2(source))
+                else
+					puts "copying cookbook: #{cb_name} failed"
+                end
 			else
-				puts cb_path + ' is not a correct path'
+				puts source + ' is not a correct path'
 			end
 		else
 			puts cb_name + ' is yet on the database'
 		end
 	end
 
-	private
-	def self.get_recipes cb_path
-		r_path = cb_path + '/recipes'
+	public
+	def self.get_recipes path
+		r_path = path   + '/recipes'
 		#puts r_path
 		recs = Dir.entries(r_path)
 		#puts recs
@@ -89,29 +104,54 @@ class Cookbook < ActiveRecord::Base
 
 	public
 	def self.isCookbook? cb_dir
+		iscoobook=false
 		if File.directory?(cb_dir)
 			cont= Dir.entries cb_dir
+			#puts cont
 			# es cookbook si incluye un archivo metadata.rb
-			cont.include?('metadata.rb')
+			iscoobook=cont.include?('metadata.rb')
+		end
+		return iscoobook
+	end
+	
+	public
+	def self.getCookbookById cb_id
+		if Cookbook.exists?(:id => cb_id)
+			cb=Cookbook.first(:conditions=>{:id=>cb_id})
+			return cb					
+		else
+			puts 'Can\'t find the cookbook: ' + cb_id
+			return nil
+		end
+	end
+
+	public
+	def self.getCookbookByName cb_name
+		if Cookbook.exists?(:name => cb_name)
+			cb=Cookbook.first(:conditions=>{:name=>cb_name})
+			return cb					
+		else
+			puts 'Can\'t find the cookbook: ' + cb_name
+			return nil
 		end
 	end
 
 	public 
-	def update
-		recipes = get_recipes path
+	def self.update cb
+		cb.recipes = Cookbook.get_recipes(cb.path)
+		cb.save
 	end
-
+		
 	public
-	def self.view cb_name
-		cb=first(:conditions => {:name => cb_name})
+	def self.view cb
 		if !cb.nil?
 			s  = "NAME:\t" + cb.name + "\n"
 			s += "PATH:\t" + cb.path + "\n"
-			s += "RECIPES: " + "\t"
-				cb.recipes.each{|r| s += ", " + r }
-			s += "DEPS: " + "\t"
-				cb.deps.each{|r| s += ", " + r }
 
+			s += "RECIPES:\t" 
+				cb.recipes.each{|r| s += "\n " + r }
+			s += "DEPENDENCIES:\t" 
+				cb.deps.each{|r| s += "\n " + r }
 			s += "\n"
 		else
 			s +='Can\'t find the cookbook ' + cb_name
@@ -121,6 +161,9 @@ class Cookbook < ActiveRecord::Base
 
 
 end
+
+
+
 
 class Role < ActiveRecord::Base
     validates_uniqueness_of :name
@@ -229,10 +272,10 @@ class Enviroment < ActiveRecord::Base
 				s += "DATABAG DIR:\t" + env.databags + "\n" 
 			end
 			s += "COOKBOOKS: " + "\t"
-			env.cookbooks.each{|cb| s += ", " + cb.name }
+				env.cookbooks.each{|cb| s += ", " + cb.name }
 			s += "\n"
 			s += "ROLES:" + "\t"
-			env.roles.each{|r| s += ", " + r.name}
+				env.roles.each{|r| s += ", " + r.name}
 			s += "\n"
 		else
 			s +='Can\'t find the enviroment ' + id.to_s
@@ -283,25 +326,3 @@ end
 
 end
 
-=begin
-env1=Enviroment.create(:template=>2, :node=>'/ruta/hacia/nodo1')
-env2=Enviroment.create(:template=>3, :node=>'/ruta/hacia/nodo2')
-env3=Enviroment.create(:template=>4, :node=>'/ruta/hacia/nodo3')
-env4=Enviroment.create(:template=>5, :node=>'/ruta/hacia/nodo4')
-
-cb1=Cookbook.create(:name=>'emacs', :path=>'/ruta/hacia/emacs')
-cb2=Cookbook.create(:name=>'vim', :path=>'/ruta/hacia/vim')
-cb3=Cookbook.create(:name=>'nginx')
-
-r1= Role.create(:name=>"dev", :path=>'/ruta/hacia/roldev')
-r2= Role.create(:name=>"admin", :path=>'/ruta/hacia/roladmin')
-r3= Role.create(:name=>'otro_rol')
-
-env1.cookbooks << cb1
-env1.roles << r2
-env1.roles << r1
-
-env2.cookbooks << cb1
-env2.cookbooks << cb3
-env2.roles << r2
-=end

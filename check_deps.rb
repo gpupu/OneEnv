@@ -8,7 +8,7 @@ require 'json'
 
 def find_deps(cookbook_dir)
   nel = Hash.new { |h, k| h[k] = [] }
-  Dir.glob("#{cookbook_dir}/*/").each do |r|
+  Dir.glob("#{cookbook_dir}/").each do |r|
     deps_for(r, nel)
   end
   nel
@@ -76,22 +76,23 @@ end
 
 def list_deps(cbs)
 	if cbs.empty?
-		puts "All recipes depencies are provided"
+		s = "All recipes depencies are provided"
 	else
+		s = ""
 		cb_deps = Array.new
 		cbs.each do |n, deps|
 			deps.each do |d|
-				puts "#{n} -> #{d}"
+				s += "\n#{n} -> #{d}"
 				cb_ar = d.split("::")
 				if !cb_deps.include?(cb_ar[0])
 					cb_deps.push(cb_ar[0])
 				end
 			end
 		end
-		puts "\nThese cookbooks may be needed: "
-		puts "\t" +  cb_deps.join(", ")
+		#s += "\n\nThese cookbooks may be needed: "
+		#s += "\t" +  cb_deps.join(", ")
 	end
-
+	return s
 end
 
 ###########################################################################
