@@ -5,8 +5,6 @@
 # Required libraries
 ##############################################################################
 ONE_LOCATION=ENV["ONE_LOCATION"]
-FILE_CREDENTIALS=ENV["ONE_AUTH"]
-
 
 SCRIPT_DIR="./start_vm"
 
