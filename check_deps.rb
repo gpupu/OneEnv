@@ -2,7 +2,9 @@
 
 require 'deps_list.rb'
 require 'json'
-require 'database.rb'
+#require 'database.rb'
+
+#TODO Limpiar código, hay cosas que no se usan
 
 def find_deps(cookbook_dir)
   nel = Hash.new { |h, k| h[k] = [] }
@@ -23,9 +25,9 @@ def find_deps2(cookbook_dir)
 	#puts "Estoy dentro de findeps2 y viendo a #{r}"
 	#puts rec
 	rdeps=get_recipe_deps(rec, cookbook_dir) 
-	if rdeps != []
-    	nel["#{rec}"] = rdeps
-	end
+	#if rdeps != []
+    nel["#{rec}"] = rdeps
+	#end
   end
   nel
 end
@@ -92,44 +94,58 @@ def list_deps(cbs)
 
 end
 
+###########################################################################
+
 $deps
 
 def expand_node(node_path)
 	$deps = Deps_List.new
 	node_ar = get_json_runl(node_path)
 	puts node_ar
-	expand_sons(node_ar)
+	comp = expand_sons(node_ar)
 
-	puts 'recipes list'
+	puts "\nrecipes list"
 	puts $deps.cookbooks_list
-	puts 'roles list'
+	puts "\nroles list"
 	puts $deps.role_list
-
+	puts comp
+	comp
 end
 
 
 def expand_sons(rl_array)
+	comp = true
 	rl_array.each do |r|
 		if r.start_with?('recipe')
 			puts "#{r} es una recipe"
 			r = r[7..-2]	#toma solo el interior
-			expand_recipe(r)
+			comp = expand_recipe(r) and comp
+			puts = "(expandsons)#{r}: #{comp}"
+			#return comp
 		end
 		if r.start_with?('role')
 			puts "#{r} es un rol"
 			r = r[5..-2]	#toma solo el interior
-			expand_role(r)
+			comp = expand_role(r) and comp
+			puts = "(expandsons)#{r}: #{comp}"
+			#return comp
 		end
 	end
+	puts comp
+	return comp
 end
 
 def expand_roles(roles_ar)
+	comp = true
 	roles_ar.each do |r|
-		expand_role(r)
+		comp = expand_role(r) and comp
 	end
+	puts comp
+	return comp
 end
 
 def expand_role(r)
+	comp = true
 	if !$deps.exists_role?(r)
 		$deps.add_role(r)
 
@@ -137,50 +153,62 @@ def expand_role(r)
 		if Role.exists?(:name => r.to_s)
 			role = Role.first(:conditions=>{:name=>r})
 			# expandimos cookbooks
-			expand_cookbooks(role.deps_recs)
+			comp = expand_cookbooks(role.deps_recs)
 			# expandimos roles
-			expand_roles(role.deps_roles)
+			comp = expand_roles(role.deps_roles) and comp
+			return comp
 		else
 			puts "Dependencies incompleted: #{r}"
+			return false
 		end
 	else
 		#si ya existe no lo añade y corta para evitar ciclos
 	end
+	puts comp
+	return comp
 end
 
 def expand_cookbooks(cb_ar)
+	comp = true
 	cb_ar.each do |r|
-		expand_recipe(r)
+		# No se porque pero si se cambia el orden siempre devuelve true
+		comp = expand_recipe(r) and comp
 	end
+	puts comp
+	return comp
 end
 
 def expand_recipe(rec_comp)
+	comp = true
 	if !$deps.exists_cb?(rec_comp)
 		if !rec_comp.include?("::")
 			rec_comp += "::default"
 		end
 		$deps.add_cb(rec_comp)
-		#TODO leer sus dependencias de la base de datos
-		# con el array resultado volvemos a llamar a expand_sons
 		# Comprobamos que existe en la base de datos la dependencia (el hijo)
 		cb_name = rec_comp.split("::")[0]
 		if Cookbook.exists?(:name => cb_name)
 			cb = Cookbook.first(:conditions=>{:name=>cb_name})
 			# cogemos el nombre de la receta de la que depende
 			rec = rec_comp.split("::")[1]
-			puts rec
+			#puts rec
 			# cogemos el array de las dependencias de esa receta en concreto
 			cb_deps = cb.recipes_deps[rec]
-			puts cb_deps
-			expand_cookbooks(cb_deps)
+			#puts cb_deps
+			comp = expand_cookbooks(cb_deps)
+			return comp
 		else
 			puts "Dependencies incompleted: #{cb_name}"
+			return false
 		end
 	else
 		#si ya existe no lo añade y corta para evitar ciclos
 	end
-
+	puts comp
+	return comp
 end
+
+###########################################################################
 
 #devuelve array dependencias de un json
 def get_json_runl(path)
@@ -212,6 +240,8 @@ def get_ruby_runl(path)
     	end
 	end
 end
+
+################################################################
 
 def get_recipe_deps(recipe_name, cb_path)
 	regex = /.*include_recipe +("|')([^"]+)("|')/

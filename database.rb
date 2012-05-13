@@ -216,8 +216,6 @@ class Enviroment < ActiveRecord::Base
         s += template.to_s + "\t"
         s += node + "\t"
         s += databags.to_s + "\t"
-		s += cookbooks.size.to_s + "\t"
-        s += roles.size.to_s
     end
 
 	public
