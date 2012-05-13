@@ -91,31 +91,20 @@ class OneEnv
 				puts 'Can\'t find the enviroment ' + "#{commands[1]}"
 			end
 
-		##USO:oneenv up ID_entorno [CHEF_PATH]
+		##USO:oneenv up ID_entorno HOST [CHEF_PATH]
 		when 'up'
-			raise ArgumentError if commands.length != 2  and commands.length != 3
+			raise ArgumentError if commands.length != 3  and commands.length != 4
 
-			if commands.length == 3
-				
-				if File.exists?(commands[2])
-					bootstrap_path = File.expand_path(commands[2])
-				else
-					bootstrap_path=nil			
-				end
-			else 
-				bootstrap_path = nil
-			end
-
-
-			if commands.length == 3
-				chef_dir = commands[2]
+			if commands.length == 4
+				chef_dir = commands[3]
 			else 
 				chef_dir = CONFIG['default_solo_path'] 
 			end
 
 			if Enviroment.exists?(commands[1])
 				env = Enviroment.find(commands[1])
-
+				idHost=commands[2]
+				puts idHost
 				repo_dir = CB_DIR + " " + ROLE_DIR
 				# Si existen añadimos databags
 				if env.databags != nil
@@ -123,8 +112,8 @@ class OneEnv
 				end
 
 				c= ConectorONE.new
-				idVM=c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,bootstrap_path,chef_dir)
-				c.deployMV(idVM,1)
+				idVM=c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,chef_dir)
+				c.deployMV(idVM,idHost)
 
 
 			else 

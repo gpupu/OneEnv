@@ -40,7 +40,7 @@ class ConectorONE
 	end
 
 
-	def crearTemplate(num_template,path_repo,path_json,path_databags,path_bootstarp,path_chef)
+	def crearTemplate(num_template,path_repo,path_json,path_databags,path_chef)
 
 		xml_s=""
 
@@ -54,12 +54,14 @@ class ConectorONE
 		template_pool.each do |tmp|	
 			if tmp['ID'] == num_template.to_s
 				xml_s = tmp.to_xml
-
 			end
 		end
 
 
-		if xml_s!=""
+		if xml_s==""
+			puts "Template: " + num_template.to_s + " don\'t exists"
+			exit -1
+		end
 
 			xml =XMLElement.build_xml(xml_s, "VMTEMPLATE")
 			doc = Nokogiri::XML::Document.new
@@ -67,11 +69,10 @@ class ConectorONE
 			script_init= File.expand_path(SCRIPT_DIR) + '/init.sh'
 			script_chef= File.expand_path(SCRIPT_DIR) + '/chef.sh'
 
-			if path_bootstarp!=nil
-				files = path_repo + " " + path_json + " " + script_init + " " + script_chef + " " + path_bootstarp
-			else
+			
+
 				files = path_repo + " " + path_json + " " + script_init + " " + script_chef
-			end
+
 			target= "vdb"
 
 			###EDITAR CONTEXTO
@@ -112,12 +113,7 @@ class ConectorONE
 			node_name = createContextVariable doc, "CHEF_NODE", name
 			xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_name
 
-			# Introduce el nombre del bootstrap
-			if path_bootstarp != nil
-				name = File.basename(path_bootstarp)	
-				bootstarp_name = createContextVariable doc, "CHEF_BOOTSTRAP", name
-				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << bootstarp_name
-			end
+
 
 			# Introduce el path de la ruta chef	
 			dir_chef = createContextVariable doc, "CHEF_DIR", path_chef
@@ -144,7 +140,7 @@ class ConectorONE
 			return vm.id
 
 
-		end
+		
 
 	end
 
