@@ -1,4 +1,5 @@
 require 'database.rb'
+
 require 'template.rb'
 
 class OneEnv
@@ -101,6 +102,10 @@ class OneEnv
 				chef_dir = CONFIG['default_solo_path'] 
 			end
 
+			# TODO dejo esto provisional aqui hasta que lo pongamos como opcion ('-f'?), si esta a true no se evaluan dependencias
+			# a false si se evaluan y se lanza la maquina o no dependiendo del resultado
+			not_dep = true
+
 			if Enviroment.exists?(commands[1])
 				env = Enviroment.find(commands[1])
 				idHost=commands[2]
@@ -111,10 +116,19 @@ class OneEnv
 					repo_dir << " " + env.databags
 				end
 
-				c= ConectorONE.new
-				idVM=c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,chef_dir)
-				c.deployMV(idVM,idHost)
-
+				
+				# La or tiene cortocircuito, si not_dep es true no se llega a evaluar expand_node
+				if not_dep || expand_node(env.node)
+					c= ConectorONE.new
+					idVM=c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,chef_dir)
+					c.deployMV(idVM,idHost)
+					puts 'montando template...'
+					puts env.template
+					puts repo_dir
+					puts env.node
+				else
+					puts 'Incomplete dependencies, review that are correct or use -f option'
+				end
 
 			else 
 				puts 'There is not an environment with that id'
