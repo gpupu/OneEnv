@@ -1,5 +1,4 @@
 require 'database.rb'
-require 'check_deps.rb'
 
 class OneCook
 	def self.run commands
@@ -44,6 +43,7 @@ class OneCook
 					cb_dir = path + '/' + cb
 					puts cb_dir
 					if Cookbook.isCookbook? cb_dir
+						puts 'es cookbook'
 						Cookbook.cb_create(cb,path)
 					end
 

@@ -2,6 +2,7 @@
 
 require 'rubygems'
 require 'active_record'
+require 'check_deps.rb'
 
 
 
@@ -32,6 +33,7 @@ class Cookbook < ActiveRecord::Base
     validates_uniqueness_of :name
     has_and_belongs_to_many :enviroments, :uniq => true
     serialize :recipes, Array
+	serialize :recipes_deps, Hash
 
 
 
@@ -41,13 +43,13 @@ class Cookbook < ActiveRecord::Base
 		s += name + "\t\t\t"
 		#s += path + "\t"
 		s += recipes.length.to_s + "\t"
+		s += recipes_deps.length.to_s
 		s
 	end
 
 	public
-        def self.cb_create cb_name , cb_path
-
-                if cb_path == nil
+    def self.cb_create cb_name , cb_path
+        if cb_path == nil
 			isextern = false
 			source=CB_DIR + '/' + cb_name
 			dest=CB_DIR
@@ -55,35 +57,31 @@ class Cookbook < ActiveRecord::Base
 			isextern=true
 			source=cb_path + '/' + cb_name
 			dest=CB_DIR
-                end
+        end
 
-		
-
-                if !exists?(:name => cb_name)
-
-                        if File.exists?(source)
-                               
+        if !exists?(:name => cb_name)
+			if File.exists?(source)
 				iscopy=true
-                                if isextern
-                                        cp_com = "cp -r #{source} #{dest}" 
-                                        puts cp_com
-                                        iscopy = system(cp_com)
-                                end
+				if isextern
+					cp_com = "cp -r #{source} #{dest}" 
+					puts cp_com
+                    iscopy = system(cp_com)
+				end
 				
-                                if iscopy
+                if iscopy
 					puts "adding cookbook: #{cb_name}"
 					source = CB_DIR + '/' + cb_name
-                                        create(:name => cb_name, :path => source, :recipes => get_recipes(source))
-                                else
-                                        puts "copying cookbook: #{cb_name} failed"
-                                end
-                        else
-                                puts source + ' is not a correct path'
-                        end
+					create(:name => cb_name, :path => cb_path, :recipes => get_recipes(source), :recipes_deps=>find_deps2(source))
                 else
-                        puts cb_name + ' is yet on the database'
+					puts "copying cookbook: #{cb_name} failed"
                 end
-        end
+			else
+				puts source + ' is not a correct path'
+			end
+		else
+			puts cb_name + ' is yet on the database'
+		end
+	end
 
 	public
 	def self.get_recipes path
@@ -149,14 +147,12 @@ class Cookbook < ActiveRecord::Base
 		if !cb.nil?
 			s  = "NAME:\t" + cb.name + "\n"
 			s += "PATH:\t" + cb.path + "\n"
+
 			s += "RECIPES:\t" 
-			  cb.recipes.each{|r| s += "\n " + r }
+				cb.recipes.each{|r| s += "\n " + r }
+			s += "DEPENDENCIES:\t" 
+				cb.deps.each{|r| s += "\n " + r }
 			s += "\n"
-			s += "\nDEPENDENCIES:\t"
-				cb_name = cb.name
-				deps = find_deps(CB_DIR + '/' + cb_name )
-				clean_deps(deps)
-			s += list_deps(deps)
 		else
 			s +='Can\'t find the cookbook ' + cb_name
 		end
@@ -172,13 +168,16 @@ end
 class Role < ActiveRecord::Base
     validates_uniqueness_of :name
     has_and_belongs_to_many :enviroments, :uniq => true
+	serialize :deps_roles, Array
+	serialize :deps_recs, Array
 
 	public
 	def to_s
 		s  = id.to_s + "\t"
 		s += name + "\t"
 		s += path + "\t"
-		s
+		s += deps_roles.to_s + "\t"
+		s += deps_recs.to_s + "\t"
 	end
 
 	public
@@ -199,7 +198,29 @@ class Role < ActiveRecord::Base
 					#FileUtils.cp(r_path, ROLE_DIR)
 				end
 				if iscopy
-					create(:name=> r_name, :path=> r_path)
+					if File.extname(r_path) == ".rb"
+						rdeps = get_ruby_runl(r_path)
+					end
+					if File.extname(r_path) == ".json"
+						rdeps = get_json_runl(r_path)
+					end
+					puts rdeps
+					
+					#dividimos en recetas y roles
+					roles_list = []
+					recs_list = []
+					rdeps.each do |d|
+						if d.start_with?('role')
+							d = d[5..-2]	#toma solo el interior
+							roles_list.push d
+						end
+						if d.start_with?('recipe')
+							d = d[7..-2]	#toma solo el interior
+							recs_list.push d
+						end
+					end
+
+					create(:name=> r_name.to_s, :path=> r_path, :deps_roles=>roles_list, :deps_recs=>recs_list )
 				else
 					puts "copying role #{r_name} failed"
 				end
@@ -208,7 +229,7 @@ class Role < ActiveRecord::Base
 				puts r_path + ' is not a correct path'
 			end
 		else
-			puts r_name + 'is yet on the database'
+			puts r_name + ' is yet on the database'
 		end
 	end
 
@@ -233,13 +254,11 @@ class Enviroment < ActiveRecord::Base
     public
 
     def to_s
-	s  = id.to_s + "\t"
+		s  = id.to_s + "\t"
         s += name + "\t"
         s += template.to_s + "\t"
         s += node + "\t"
         s += databags.to_s + "\t"
-	s += cookbooks.size.to_s + "\t"
-        s += roles.size.to_s
     end
 
 	public
@@ -267,12 +286,6 @@ class Enviroment < ActiveRecord::Base
 	public
 	def clone
 		envcopy = Enviroment.create(:template=> self.template, :node=> self.node, :databags=> self.databags)
-		self.cookbooks.each{|cb|
-			envcopy.cookbooks << cb
-		}
-		self.roles.each{|r|
-			envcopy.roles << r
-		}
 	end
 
 end
@@ -284,7 +297,8 @@ if !table_exists?(:cookbooks)
         t.column :name, :string, :null=>false, :unique=>true
         t.column :path, :string, :default=>CB_DIR
         t.text :recipes
-        t.column :enviroments, :enviroment
+		t.text :recipes_deps
+        #t.column :enviroments, :enviroment
     end
 end
 
@@ -292,7 +306,9 @@ if !table_exists?(:roles)
 	create_table(:roles) do |t|
 		t.column :name, :string, :null=>false, :unique=>true
         t.column :path, :string, :default=>ROLE_DIR
-        t.column :enviroments, :enviroment
+		t.text :deps_roles
+		t.text :deps_recs
+        #t.column :enviroments, :enviroment
 	end
 end
 
@@ -303,25 +319,10 @@ if !table_exists?(:enviroments)
 		t.column :node, :string, :null=> false
 		#t.column :solo_path, :string, :default=>SOLO_DIR
 		t.column :databags, :string, :default=> nil
-		t.column :roles, :role
-		t.column :cookbooks, :cookbook
+		#t.column :roles, :role
+		#t.column :cookbooks, :cookbook
     end
 end
-
-if !table_exists?(:cookbooks_enviroments)
-    create_table(:cookbooks_enviroments, :id=>false) do |t|
-        t.references :cookbook
-        t.references :enviroment
-    end
-end
-
-if !table_exists?(:enviroments_roles)
-    create_table(:enviroments_roles, :id=>false) do |t|
-        t.references :enviroment
-		t.references :role
-    end
-end
-
 
 end
 

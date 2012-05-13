@@ -1,5 +1,11 @@
 #!/usr/bin/env ruby
 
+require 'deps_list.rb'
+require 'json'
+#require 'database.rb'
+
+#TODO Limpiar código, hay cosas que no se usan
+
 def find_deps(cookbook_dir)
   nel = Hash.new { |h, k| h[k] = [] }
   Dir.glob("#{cookbook_dir}/").each do |r|
@@ -7,6 +13,36 @@ def find_deps(cookbook_dir)
   end
   nel
 end
+
+def find_deps2(cookbook_dir)
+  nel = Hash.new { |h, k| h[k] = [] }
+  
+  Dir.glob("#{cookbook_dir}/recipes/*.rb").each do |r|
+	#puts cookbook_dir
+	cb_name = File.basename(cookbook_dir)
+	#puts cb_name
+	rec = File.basename(r, ".rb")
+	#puts "Estoy dentro de findeps2 y viendo a #{r}"
+	#puts rec
+	rdeps=get_recipe_deps(rec, cookbook_dir) 
+	#if rdeps != []
+    nel["#{rec}"] = rdeps
+	#end
+  end
+  nel
+end
+
+#TODO No muestra bien los nombres
+def show_deps_list(hlist)
+	s = ""
+	hlist.each do |r,d|
+		s += "#{r}: "
+		d.each{|deps| s += ", #{deps}"}
+
+	end
+	s
+end
+
 
 def deps_for(dir, nel)
   regex = /.*include_recipe +("|')([^"]+)("|')/
@@ -57,5 +93,182 @@ def list_deps(cbs)
 		#s += "\t" +  cb_deps.join(", ")
 	end
 	return s
+end
+
+###########################################################################
+
+$deps
+
+def expand_node(node_path)
+	$deps = Deps_List.new
+	node_ar = get_json_runl(node_path)
+	puts node_ar
+	comp = expand_sons(node_ar)
+
+	puts "\nrecipes list"
+	puts $deps.cookbooks_list
+	puts "\nroles list"
+	puts $deps.role_list
+	puts comp
+	comp
+end
+
+
+def expand_sons(rl_array)
+	comp = true
+	rl_array.each do |r|
+		if r.start_with?('recipe')
+			puts "#{r} es una recipe"
+			r = r[7..-2]	#toma solo el interior
+			comp = expand_recipe(r) and comp
+			puts = "(expandsons)#{r}: #{comp}"
+			#return comp
+		end
+		if r.start_with?('role')
+			puts "#{r} es un rol"
+			r = r[5..-2]	#toma solo el interior
+			comp = expand_role(r) and comp
+			puts = "(expandsons)#{r}: #{comp}"
+			#return comp
+		end
+	end
+	puts comp
+	return comp
+end
+
+def expand_roles(roles_ar)
+	comp = true
+	roles_ar.each do |r|
+		comp = expand_role(r) and comp
+	end
+	puts comp
+	return comp
+end
+
+def expand_role(r)
+	comp = true
+	if !$deps.exists_role?(r)
+		$deps.add_role(r)
+
+		#puts r
+		if Role.exists?(:name => r.to_s)
+			role = Role.first(:conditions=>{:name=>r})
+			# expandimos cookbooks
+			comp = expand_cookbooks(role.deps_recs)
+			# expandimos roles
+			comp = expand_roles(role.deps_roles) and comp
+			return comp
+		else
+			puts "Dependencies incompleted: #{r}"
+			return false
+		end
+	else
+		#si ya existe no lo añade y corta para evitar ciclos
+	end
+	puts comp
+	return comp
+end
+
+def expand_cookbooks(cb_ar)
+	comp = true
+	cb_ar.each do |r|
+		# No se porque pero si se cambia el orden siempre devuelve true
+		comp = expand_recipe(r) and comp
+	end
+	puts comp
+	return comp
+end
+
+def expand_recipe(rec_comp)
+	comp = true
+	if !$deps.exists_cb?(rec_comp)
+		if !rec_comp.include?("::")
+			rec_comp += "::default"
+		end
+		$deps.add_cb(rec_comp)
+		# Comprobamos que existe en la base de datos la dependencia (el hijo)
+		cb_name = rec_comp.split("::")[0]
+		if Cookbook.exists?(:name => cb_name)
+			cb = Cookbook.first(:conditions=>{:name=>cb_name})
+			# cogemos el nombre de la receta de la que depende
+			rec = rec_comp.split("::")[1]
+			#puts rec
+			# cogemos el array de las dependencias de esa receta en concreto
+			cb_deps = cb.recipes_deps[rec]
+			#puts cb_deps
+			comp = expand_cookbooks(cb_deps)
+			return comp
+		else
+			puts "Dependencies incompleted: #{cb_name}"
+			return false
+		end
+	else
+		#si ya existe no lo añade y corta para evitar ciclos
+	end
+	puts comp
+	return comp
+end
+
+###########################################################################
+
+#devuelve array dependencias de un json
+def get_json_runl(path)
+	jfile = File.read(path)
+	runl = JSON.parse(jfile, :create_additions=>false)
+	runl = runl['run_list']
+
+	return runl
+end
+
+#devuelve array dependencias de un rb
+def get_ruby_runl(path)
+	regex = /.*run_list +(("|')([^"]+)("|'),)*(("|')([^"]+)("|'))/
+
+	open(path) do |f|
+    	f.each do |line|
+        	m = line.match(regex)
+			rl = line.split("\"")
+        	if m
+				puts 'entra dentro'
+            	rl = line.split("\"")
+            	rl.delete_if {|x|
+                	x.include?("run_list") or
+                	x.include?(",")
+            	}
+				puts rl
+				return rl
+        	end
+    	end
+	end
+end
+
+################################################################
+
+def get_recipe_deps(recipe_name, cb_path)
+	regex = /.*include_recipe +("|')([^"]+)("|')/
+	#dir = cb_path.sub(/\/$/, "")
+	cb_path = File.expand_path(cb_path)
+	if File.exists? "#{cb_path}/recipes/#{recipe_name}.rb"
+		r_deps = []
+		item = File.basename(cb_path) + "::" + recipe_name
+		open("#{cb_path}/recipes/#{recipe_name}.rb") do |f|
+			f.each do |line|
+       			m = line.match(regex)
+        		if m
+          			if !m[2].match(/::/)
+            			r_deps << (m[2] + "::default")
+						puts r_deps
+          			else
+            			r_deps << m[2]
+						puts r_deps
+          			end
+        		end
+      		end
+    	end
+    	return r_deps
+  	else
+		puts "This recipe not exists #{cb_path}/recipes/#{recipe_name}.rb"
+
+	end
 end
 
