@@ -1,5 +1,5 @@
 require 'database.rb'
-#require 'template.rb'
+require 'template.rb'
 
 class OneEnv
 	def self.run commands
@@ -123,11 +123,10 @@ class OneEnv
 				end
 
 				c= ConectorONE.new
-				c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,bootstrap_path,chef_dir)
-				puts 'montando template...'
-				puts env.template
-				puts repo_dir
-				puts env.node
+				idVM=c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,bootstrap_path,chef_dir)
+				c.deployMV(idVM,1)
+
+
 			else 
 				puts 'There is not an environment with that id'
 			end
