@@ -1,5 +1,4 @@
 require 'database.rb'
-
 require 'template.rb'
 
 class OneEnv
@@ -142,17 +141,7 @@ class OneEnv
 				roles = Dir.entries(path)
 				puts roles
 				roles.each do |r|
-					# Los roles pueden ser ruby o json
-					if File.extname(r) == ".rb"
-						rname = File.basename(r,".rb")
-						rpath = path + '/' + r
-						Role.role_create(rname,rpath) 
-					end
-					if File.extname(r) == ".json"
-						rname = File.basename(r,".json")
-						rpath = path + '/' + r
-						Role.role_create(rname,rpath) 
-					end
+					Role.role_create(r,path) if File.extname(r) == ".rb" || File.extname(r) == ".json"
 
 				end
 			else
