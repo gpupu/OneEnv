@@ -1,14 +1,14 @@
 #!/bin/bash
 
 readonly DISK="/mnt/"
-readonly CBDISK="${DISK}cookbooks/"
-readonly RDISK="${DISK}roles/"
+readonly CBDISK="${DISK}/cookbooks/"
+readonly RDISK="${DISK}/roles/"
 readonly DBDISK="${DISK}${CHEF_DATABAGS}/"
 
 # CHEF_DIR se carga en el context
-readonly CBPATH="${CHEF_DIR}cookbooks/"
-readonly RPATH="${CHEF_DIR}roles/"
-readonly DBPATH="${CHEF_DIR}data_bags"
+readonly CBPATH="${CHEF_DIR}/cookbooks/"
+readonly RPATH="${CHEF_DIR}/roles/"
+readonly DBPATH="${CHEF_DIR}/data_bags/"
 
 readonly JPATH="${CHEF_DIR}node.json"
 readonly CPATH="${CHEF_DIR}config.rb"
@@ -28,19 +28,44 @@ echo "data_bag_path \"${DBPATH}\"" >> $CPATH
 # Copia todo al disco
 echo "copiando elementos al disco"
 
-for i in "${CHEFCB[@]}" do
-	cp -rv "${DISK}/${i}" "${CBPATH}/${i}"
-done
 
-for i in "${CHEFR[@]}" do
-	cp -rv "${DISK}/${i}" "${RPATH}/${i}"
-done
+# Copia Cookbooks
+if [ $CHEFCB='' ]; then
+	#oIFS=$IFS
+	export IFS=";"
+
+	for cookbook in $CHEFCB 
+	do
+		cp -rv "${DISK}/$cookbook" "${CBPATH}/$cookbook"
+	done
+	unset IFS
+	#IFS=$oIFS
+
+else
+	cp -rv $CBDISK $CBPATH
+fi
 
 
+# Copia Roles
+if [ $CHEFR='' ]; then
+	export IFS=";"
+
+	for role in $CHEFR 
+	do
+		cp -rv "${DISK}/$role" "${CBPATH}/$role"
+	done
+	unset IFS
+
+else
+	cp -rv $CBDISK $CBPATH
+fi
+
+# Copia Databags
 if [ -d $DBDISK ]; then
 	cp -rv $DBDISK $DBPATH
 fi
 
+# Copia node
 cp -rv $DISK/$CHEF_NODE $CHEF_DIR
 
 # Ejecuta Chef-solo
