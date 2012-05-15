@@ -27,8 +27,16 @@ echo "data_bag_path \"${DBPATH}\"" >> $CPATH
 
 # Copia todo al disco
 echo "copiando elementos al disco"
-cp -rv $CBDISK $CBPATH
-cp -rv $RDISK $RPATH
+
+for i in "${CHEFCB[@]}" do
+	cp -rv "${DISK}/${i}" "${CBPATH}/${i}"
+done
+
+for i in "${CHEFR[@]}" do
+	cp -rv "${DISK}/${i}" "${RPATH}/${i}"
+done
+
+
 if [ -d $DBDISK ]; then
 	cp -rv $DBDISK $DBPATH
 fi

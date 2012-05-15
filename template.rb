@@ -40,7 +40,7 @@ class ConectorONE
 	end
 
 
-	def crearTemplate(num_template,path_repo,path_json,path_databags,path_chef)
+	def crearTemplate(num_template,path_repo,path_json,path_databags,path_chef,all)
 
 		xml_s=""
 
@@ -71,7 +71,7 @@ class ConectorONE
 
 			
 
-				files = path_repo + " " + path_json + " " + script_init + " " + script_chef
+			files = path_repo + " " + path_json + " " + script_init + " " + script_chef
 
 			target= "vdb"
 
@@ -113,7 +113,17 @@ class ConectorONE
 			node_name = createContextVariable doc, "CHEF_NODE", name
 			xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_name
 
+			# Introducimos nombres de las cookbooks y de los roles
+			if !all 
+				cb_list = $deps.get_sh_cb_list
+				cb_names = createContextVariable doc, "CHEFCB", cb_list
+				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << cb_names
 
+				roles_list = $deps.get_sh_role_list
+				r_names = createContextVariable doc, "CHEFR", roles_list
+				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << r_names
+
+			end
 
 			# Introduce el path de la ruta chef	
 			dir_chef = createContextVariable doc, "CHEF_DIR", path_chef
@@ -138,9 +148,6 @@ class ConectorONE
 				  puts "#{rc.message}"   
 			end
 			return vm.id
-
-
-		
 
 	end
 
