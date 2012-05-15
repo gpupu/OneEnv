@@ -29,7 +29,8 @@ end
 def get_sh_role_list
 	s  = ''
 	role_list.each do |r|
-		s += "#{r};"
+		rfile = Role.get_filename r
+		s += "#{rfile};"
 	end
 	s = s[0..-2]
 	s

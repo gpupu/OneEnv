@@ -30,7 +30,7 @@ class OneCook
 				end
 		end
 
-=begin
+#=begin
 		#USO onecook add-dir PATH
 		when commands[0] == 'add-dir'
 			#puts 'esto es una prueba sin repo'
@@ -52,7 +52,7 @@ class OneCook
 			else
 				puts path + ' don\'t exists'
 			end
-=end
+#=end
 
 		#USO onecook create NAME [PATH]
                 when commands[0] == 'create'

@@ -10,8 +10,8 @@ readonly CBPATH="${CHEF_DIR}/cookbooks/"
 readonly RPATH="${CHEF_DIR}/roles/"
 readonly DBPATH="${CHEF_DIR}/data_bags/"
 
-readonly JPATH="${CHEF_DIR}node.json"
-readonly CPATH="${CHEF_DIR}config.rb"
+readonly JPATH="${CHEF_DIR}/${CHEF_NODE}"
+readonly CPATH="${CHEF_DIR}/config.rb"
 
 # Crea el directorio (no hace nada si ya existe)
 mkdir -vp $CHEF_DIR
@@ -27,11 +27,10 @@ echo "data_bag_path \"${DBPATH}\"" >> $CPATH
 
 # Copia todo al disco
 echo "copiando elementos al disco"
-
-
 # Copia Cookbooks
 if [ $CHEFCB='' ]; then
 	#oIFS=$IFS
+	mkdir -v $CBPATH
 	export IFS=";"
 
 	for cookbook in $CHEFCB 
@@ -48,11 +47,12 @@ fi
 
 # Copia Roles
 if [ $CHEFR='' ]; then
+	mkdir -v $RPATH
 	export IFS=";"
 
 	for role in $CHEFR 
 	do
-		cp -rv "${DISK}/$role" "${CBPATH}/$role"
+		cp -rv "${DISK}/$role" "${RPATH}/$role"
 	done
 	unset IFS
 

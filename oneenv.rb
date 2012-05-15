@@ -93,23 +93,25 @@ class OneEnv
 
 		##USO:oneenv up ID_entorno HOST [CHEF_PATH]
 		when 'up'
-			raise ArgumentError if commands.length != 3  and commands.length != 4
+			raise ArgumentError if commands.length != 2  and commands.length != 3
 
-			if commands.length == 4
-				chef_dir = commands[3]
+			if commands.length == 3
+				chef_dir = commands[2]
 			else 
 				chef_dir = CONFIG['default_solo_path'] 
 			end
 
 			# TODO dejo esto provisional aqui hasta que lo pongamos como opcion ('-f'?), si esta a true no se evaluan dependencias
 			# a false si se evaluan y se lanza la maquina o no dependiendo del resultado
-			not_dep = true
+			not_dep = false
 
 			if Enviroment.exists?(commands[1])
 				env = Enviroment.find(commands[1])
-				idHost=commands[2]
-				puts idHost
-				repo_dir = CB_DIR + " " + ROLE_DIR
+				#idHost=commands[2]
+				#puts idHost
+				#repo_dir = CB_DIR + " " + ROLE_DIR
+				repo_dir = ""
+
 				# Si existen añadimos databags
 				if env.databags != nil
 					repo_dir << " " + env.databags
@@ -118,9 +120,27 @@ class OneEnv
 				
 				# La or tiene cortocircuito, si not_dep es true no se llega a evaluar expand_node
 				if not_dep || expand_node(env.node)
+
+					if !not_dep
+						# añadimos cookbooks
+						$deps.get_cb_list.each do |cb|
+							repo_dir += "#{CB_DIR}/#{cb} "
+						end
+						# añadimos roles
+						$deps.get_role_list.each do |r|
+							rfile = Role.get_filename(r)
+							repo_dir += "#{ROLE_DIR}/#{rfile} "
+						end
+
+					else
+						# añadimos todo
+						repo_dir = CB_DIR + " " + ROLE_DIR
+					end
+					puts repo_dir
+
 					c= ConectorONE.new
-					idVM=c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,chef_dir)
-					c.deployMV(idVM,idHost)
+					c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,chef_dir,not_dep)
+					#c.deployMV(idVM,idHost)
 					puts 'montando template...'
 					puts env.template
 					puts repo_dir

@@ -205,12 +205,15 @@ class Role < ActiveRecord::Base
 				end
 
 				if iscopy
+					r_path +="/#{r_name}"
 					# leemos el run_list
 					if File.extname(r_name) == ".rb"
-						rdeps = get_ruby_runl("#{r_path}/#{r_name}")
+						rdeps = get_ruby_runl(r_path)
+						r_name = File.basename(r_name, ".rb")
 					end
 					if File.extname(r_name) == ".json"
-						rdeps = get_json_runl("#{r_path}/#{r_name}")
+						rdeps = get_json_runl(r_path)
+						r_name = File.basename(r_name, ".json")
 					end
 					puts rdeps
 					
@@ -239,6 +242,12 @@ class Role < ActiveRecord::Base
 		else
 			puts r_name + ' is yet on the database'
 		end
+	end
+
+	def self.get_filename rname
+		rfile = first(:conditions=>{:name=>rname}).path
+		rfile = File.basename(rfile)
+		rfile
 	end
 
 end
