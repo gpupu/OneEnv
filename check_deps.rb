@@ -5,7 +5,7 @@ require 'json'
 #require 'database.rb'
 
 #TODO Limpiar código, hay cosas que no se usan
-
+=begin
 def find_deps(cookbook_dir)
   nel = Hash.new { |h, k| h[k] = [] }
   Dir.glob("#{cookbook_dir}/").each do |r|
@@ -13,7 +13,8 @@ def find_deps(cookbook_dir)
   end
   nel
 end
-
+=end
+#nombre receta => [COOBOOK::recipe,..]
 def find_deps2(cookbook_dir)
   nel = Hash.new { |h, k| h[k] = [] }
   
@@ -33,6 +34,7 @@ def find_deps2(cookbook_dir)
 end
 
 #TODO No muestra bien los nombres
+=begin
 def show_deps_list(hlist)
 	s = ""
 	hlist.each do |r,d|
@@ -42,7 +44,7 @@ def show_deps_list(hlist)
 	end
 	s
 end
-
+=end
 
 def deps_for(dir, nel)
   regex = /.*include_recipe +("|')([^"]+)("|')/

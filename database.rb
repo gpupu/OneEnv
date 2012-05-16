@@ -43,17 +43,17 @@ class Cookbook < ActiveRecord::Base
 		s += name + "\t\t\t"
 		#s += path + "\t"
 		s += recipes.length.to_s + "\t"
-		s += recipes_deps.length.to_s
+		#s += recipes_deps.length
 		s
 	end
 
 	public
     def self.cb_create cb_name , cb_path
-        if cb_path == nil
+        if (cb_path == nil) || (cb_path==CB_DIR)
 			isextern = false
 			source=CB_DIR + '/' + cb_name
 			dest=CB_DIR
-		else
+	else
 			isextern=true
 			source=cb_path + '/' + cb_name
 			dest=CB_DIR
@@ -65,7 +65,7 @@ class Cookbook < ActiveRecord::Base
 				if isextern
 					cp_com = "cp -r #{source} #{dest}" 
 					puts cp_com
-                    iscopy = system(cp_com)
+                  			iscopy = system(cp_com)
 				end
 				
                 if iscopy
@@ -147,11 +147,17 @@ class Cookbook < ActiveRecord::Base
 		if !cb.nil?
 			s  = "NAME:\t" + cb.name + "\n"
 			s += "PATH:\t" + cb.path + "\n"
-
 			s += "RECIPES:\t" 
 				cb.recipes.each{|r| s += "\n " + r }
-			s += "DEPENDENCIES:\t" 
-				cb.deps.each{|r| s += "\n " + r }
+			s += "\nDEPENDENCIES:\t" 
+
+
+				cb.recipes_deps.each do|r,w|
+					s += "\n " + r
+					w.map { |i| s +="'" + i.to_s + "'" }.join(",")
+				end
+
+		
 			s += "\n"
 		else
 			s +='Can\'t find the cookbook ' + cb_name
@@ -297,7 +303,7 @@ if !table_exists?(:cookbooks)
         t.column :name, :string, :null=>false, :unique=>true
         t.column :path, :string, :default=>CB_DIR
         t.text :recipes
-		t.text :recipes_deps
+	t.text :recipes_deps
         #t.column :enviroments, :enviroment
     end
 end

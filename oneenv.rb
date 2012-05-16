@@ -62,8 +62,8 @@ class OneEnv
 			raise ArgumentError if commands.length != 2
 			if Enviroment.exists?(commands[1])
 				env = Enviroment.find(commands[1])
-				env.cookbooks.clear
-				env.roles.clear
+				#env.cookbooks.clear
+				#env.roles.clear
 				env.delete
 				#Enviroment.delete(commands[1])
 			else
