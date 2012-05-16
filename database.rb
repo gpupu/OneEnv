@@ -188,27 +188,38 @@ class Role < ActiveRecord::Base
 
 	public
 	def self.role_create r_name, r_path
-		if r_path == nil 
-			r_path = ROLE_DIR
-		end
+
+        if r_path == nil
+			isextern = false
+			source=ROLE_DIR + '/' + r_name
+			dest=ROLE_DIR
+		else
+			isextern=true
+			source = r_path + '/' + r_name
+			dest=ROLE_DIR
+        end
 
 		if !exists?(:name=>r_name)
 			r_path = File.expand_path(r_path)
 			if File.exists?(r_path)
-				iscopy = true
-				# Copiar rol en el directorio por defecto
-				if r_path != ROLE_DIR
-					cp_com = "cp #{r_path} #{ROLE_DIR}"
+				
+				iscopy=true
+				if isextern
+					cp_com = "cp -r #{source} #{dest}" 
 					puts cp_com
-					iscopy = system(cp_com)
-					#FileUtils.cp(r_path, ROLE_DIR)
+                    iscopy = system(cp_com)
 				end
+
 				if iscopy
-					if File.extname(r_path) == ".rb"
+					r_path +="/#{r_name}"
+					# leemos el run_list
+					if File.extname(r_name) == ".rb"
 						rdeps = get_ruby_runl(r_path)
+						r_name = File.basename(r_name, ".rb")
 					end
-					if File.extname(r_path) == ".json"
+					if File.extname(r_name) == ".json"
 						rdeps = get_json_runl(r_path)
+						r_name = File.basename(r_name, ".json")
 					end
 					puts rdeps
 					
@@ -226,7 +237,7 @@ class Role < ActiveRecord::Base
 						end
 					end
 
-					create(:name=> r_name.to_s, :path=> r_path, :deps_roles=>roles_list, :deps_recs=>recs_list )
+					create(:name=> r_name, :path=> r_path, :deps_roles=>roles_list, :deps_recs=>recs_list )
 				else
 					puts "copying role #{r_name} failed"
 				end
@@ -237,6 +248,12 @@ class Role < ActiveRecord::Base
 		else
 			puts r_name + ' is yet on the database'
 		end
+	end
+
+	def self.get_filename rname
+		rfile = first(:conditions=>{:name=>rname}).path
+		rfile = File.basename(rfile)
+		rfile
 	end
 
 end

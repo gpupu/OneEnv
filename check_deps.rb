@@ -149,7 +149,7 @@ def expand_role(r)
 	if !$deps.exists_role?(r)
 		$deps.add_role(r)
 
-		#puts r
+		puts r
 		if Role.exists?(:name => r.to_s)
 			role = Role.first(:conditions=>{:name=>r})
 			# expandimos cookbooks
