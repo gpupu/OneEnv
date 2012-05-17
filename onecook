@@ -1,0 +1,80 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'onecookHelper'
+options = {}
+
+opt_parser = OptionParser.new do |opt|
+  opt.banner = "Usage: onecook COMMAND [OPTIONS]"
+  opt.separator  ""
+  opt.separator  "Commands"
+  opt.separator  "     add: add a new a cookbok to the repo"
+  opt.separator  "     list: list all cookbooks"
+  opt.separator  "     import-repo: import all the cookbooks to the repo"
+  opt.separator  "     delete: delete a cookbook"
+  opt.separator  "     show: prints the information of the cookbook"
+  opt.separator  "     update-cb: stop server"
+  opt.separator  "     check: check the cookbook's dependencies"
+  opt.separator  ""
+  opt.separator  "Options"
+
+  opt.on("-p","--path REPO","where is the cookbook") do |environment|
+    options[:repo] = repo
+  end
+  
+  options[:path] = nil
+  opt.on("-n","--name","runing on daemon mode?") do |name|
+    options[:path] = name
+  end
+
+  opt.on("-h","--help","help") do
+    puts opt_parser
+  end
+
+
+
+
+end
+
+opt_parser.parse!
+
+
+case ARGV[0]
+
+	#onecook add NAME [-p PATH]
+	when "add"
+		NAME=ARGV[1]
+		OneCookHelper.add(NAME,options[:repo])
+
+	#onecook list
+	when "list"
+	 puts "Logging to file #{options[:path]}" if options[:path]
+		OneCookHelper.list
+
+	#onecook add-dir PATH
+	when "import-repo"
+		PATH=ARGV[1]
+		OneCookHelper.import_repo(PATH)
+	#onecook show ID_CB
+	when "show"
+		IDCB=ARGV[1]
+
+		OneCookHelper.show(IDCB)
+	#onecook delete ID_CB
+	when "delete"
+		IDCB=ARGV[1]
+		OneCookHelper.delete(IDCB)
+	#onecook update ID_CB
+	when "update-cb"
+		IDCB=ARGV[1]
+		OneCookHelper.update_cb(IDCB)
+	#onecook check ID_CB
+	when "check"
+		IDCB=ARGV[1]
+		OneCookHelper.check(IDCB)
+	else
+	  puts opt_parser
+	end
+
+
+
