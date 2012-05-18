@@ -277,7 +277,7 @@ class Enviroment < ActiveRecord::Base
     public
 
     def to_s
-		s  = id.to_s + "\t"
+	s  = id.to_s + "\t"
         s += name + "\t"
         s += template.to_s + "\t"
         s += node + "\t"
@@ -305,6 +305,30 @@ class Enviroment < ActiveRecord::Base
 		end
 		s
 	end
+
+
+	public
+	def self.getEnvById env_id
+		if Enviroment.exists?(:id => env_id)
+			cb=Enviroment.first(:conditions=>{:id=>env_id})
+			return cb					
+		else
+			puts 'Can\'t find the enviroment with id: ' + env_id
+			return nil
+		end
+	end
+
+	public
+	def self.getEnvByName env_name
+		if Enviroment.exists?(:name => cb_name)
+			cb=Enviroment.first(:conditions=>{:name=>cb_name})
+			return cb					
+		else
+			puts 'Can\'t find the enviroment with name: ' + cb_name
+			return nil
+		end
+	end
+
 
 	public
 	def clone

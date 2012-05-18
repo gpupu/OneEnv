@@ -5,7 +5,9 @@ require 'onecookHelper'
 options = {}
 
 optparse = OptionParser.new do|opt|
-  opt.banner = "Usage: onecook COMMAND [OPTIONS]"
+  opt.banner = "Usage: onecook [ show | delete | update-cb | check] [-n Name]|[-i Name]\n"
+  opt.banner += "Usage: onecook add NAME [-p PATH]\n"
+  opt.banner += "Usage: onecook list"
   opt.separator  ""
   opt.separator  "Commands"
   opt.separator  "     add: add a new a cookbok to the repo"
@@ -19,18 +21,18 @@ optparse = OptionParser.new do|opt|
   opt.separator  "Options"
 
   options[:repo] = nil
-  opt.on("-p","--path REPO","where is the cookbook") do |repo|
+  opt.on("-p","--path REPO","Where is the cookbook") do |repo|
     options[:repo] = repo
   end
  
 
    options[:name_cb] = nil
-   opt.on( '-n', '--name NAME_CB', 'Write log to FILE' ) do |name_cb|
+   opt.on( '-n', '--name NAME_CB', 'References cookbook by Name' ) do |name_cb|
      options[:name_cb] = name_cb
    end
 
    options[:id_cb] = nil
-   opt.on( '-i', '--id ID_CB', 'Write log to FILE' ) do |id_cb|
+   opt.on( '-i', '--id ID_CB', 'References cookbook by Id' ) do |id_cb|
      options[:id_cb] = id_cb
 
    end
