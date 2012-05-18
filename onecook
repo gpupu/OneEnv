@@ -18,7 +18,8 @@ optparse = OptionParser.new do|opt|
   opt.separator  ""
   opt.separator  "Options"
 
-  opt.on("-p","--path REPO","where is the cookbook") do |environment|
+  options[:repo] = nil
+  opt.on("-p","--path REPO","where is the cookbook") do |repo|
     options[:repo] = repo
   end
  
@@ -46,13 +47,13 @@ begin
 optparse.parse!
 NAMECB=options[:name_cb]		
 IDCB=options[:id_cb]
-
+REPO=options[:repo]
 case ARGV[0]
 
 	#onecook add NAME [-p PATH]
 	when "add"
-		NAME=ARGV[1]
-		OneCookHelper.add(NAME,options[:repo])
+		raise ArgumentError if ARGV.length != 2
+		OneCookHelper.add(ARGV[1],REPO)
 
 	#onecook list
 	when "list"
@@ -61,7 +62,7 @@ case ARGV[0]
 
 	#onecook add-dir PATH
 	when "import-repo"
-		raise ArgumentError if ARGV.length != 1
+		raise ArgumentError if ARGV.length != 2
 		PATH=ARGV[1]
 		OneCookHelper.import_repo(PATH)
 	#onecook show [-i ID_CB] [-n NAME]
@@ -81,13 +82,12 @@ case ARGV[0]
 		raise ArgumentError if ARGV.length != 1
 		OneCookHelper.check(IDCB,NAMECB)
 	else
-	  puts opt_parser
+	  puts optparse
 	end
 
 rescue OptionParser::InvalidOption, OptionParser::MissingArgument,ArgumentError
 		puts optparse
 		exit
-
 end
 
 

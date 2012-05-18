@@ -48,7 +48,7 @@ class Cookbook < ActiveRecord::Base
 	end
 
 	public
-    def self.cb_create cb_name , cb_path
+    	def self.cb_create cb_name , cb_path
         if (cb_path == nil) || (cb_path==CB_DIR)
 			isextern = false
 			source=CB_DIR + '/' + cb_name
@@ -71,7 +71,7 @@ class Cookbook < ActiveRecord::Base
                 if iscopy
 					puts "adding cookbook: #{cb_name}"
 					source = CB_DIR + '/' + cb_name
-					create(:name => cb_name, :path => cb_path, :recipes => get_recipes(source), :recipes_deps=>find_deps2(source))
+					create(:name => cb_name, :path => source, :recipes => get_recipes(source), :recipes_deps=>find_deps2(source))
                 else
 					puts "copying cookbook: #{cb_name} failed"
                 end
@@ -120,7 +120,7 @@ class Cookbook < ActiveRecord::Base
 			cb=Cookbook.first(:conditions=>{:id=>cb_id})
 			return cb					
 		else
-			puts 'Can\'t find the id: ' + cb_id
+			puts 'Can\'t find the cookbook with id: ' + cb_id
 			return nil
 		end
 	end
@@ -131,7 +131,7 @@ class Cookbook < ActiveRecord::Base
 			cb=Cookbook.first(:conditions=>{:name=>cb_name})
 			return cb					
 		else
-			puts 'Can\'t find the cookbook: ' + cb_name
+			puts 'Can\'t find the cookbook with name: ' + cb_name
 			return nil
 		end
 	end
@@ -315,8 +315,8 @@ end
 
 class CreateSchema < ActiveRecord::Migration
 
-if !table_exists?(:cookbooks)
-    create_table(:cookbooks) do |t|
+if !ActiveRecord::Base.connection.table_exists?'cookbooks'
+    ActiveRecord::Base.connection.create_table(:cookbooks) do |t|
         t.column :name, :string, :null=>false, :unique=>true
         t.column :path, :string, :default=>CB_DIR
         t.text :recipes
@@ -325,18 +325,18 @@ if !table_exists?(:cookbooks)
     end
 end
 
-if !table_exists?(:roles)
-	create_table(:roles) do |t|
+if !ActiveRecord::Base.connection.table_exists?'roles'
+	ActiveRecord::Base.connection.create_table(:roles) do |t|
 		t.column :name, :string, :null=>false, :unique=>true
-        t.column :path, :string, :default=>ROLE_DIR
+       		t.column :path, :string, :default=>ROLE_DIR
 		t.text :deps_roles
 		t.text :deps_recs
         #t.column :enviroments, :enviroment
 	end
 end
 
-if !table_exists?(:enviroments)
-    create_table(:enviroments) do |t|
+if !ActiveRecord::Base.connection.table_exists?'enviroments'
+    ActiveRecord::Base.connection.create_table(:enviroments) do |t|
         t.column :name, :string, :default=> nil,:unique=>true
 		t.column :template, :integer, :null=> false
 		t.column :node, :string, :null=> false
