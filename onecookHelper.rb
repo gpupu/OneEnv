@@ -35,8 +35,12 @@ class OneCookHelper
 	 Cookbook.cb_create(name,path)
 	end
 
-	def self.delete(idCB)
-		cb=Cookbook.getCookbookById(idCB)
+	def self.delete(idCB,nameCB)
+		if(idCB.nil?)
+			cb=Cookbook.getCookbookByName(nameCB)
+		else	
+			cb=Cookbook.getCookbookById(idCB)
+		end
 		if cb!=nil
 			cb.delete
 			return 0
@@ -45,19 +49,26 @@ class OneCookHelper
 		end
 	end
 
-	def self.show(idCB)
-		cb=Cookbook.getCookbookById(idCB)
+	def self.show(idCB,nameCB)
+		if(idCB.nil?)
+			cb=Cookbook.getCookbookByName(nameCB)
+		else	
+			cb=Cookbook.getCookbookById(idCB)
+		end
 		if cb!=nil
 			puts Cookbook.view cb
 			return 0
 		else
 			return 1
 		end
-
 	end
 
-	def self.update_cb(idCB)
-		cb=Cookbook.getCookbookById(idCB)
+	def self.update_cb(idCB,nameCB)
+		if(idCB.nil?)
+			cb=Cookbook.getCookbookByName(nameCB)
+		else	
+			cb=Cookbook.getCookbookById(idCB)
+		end
 		if cb!=nil
 			Cookbook.update cb
 			return 0
@@ -66,8 +77,12 @@ class OneCookHelper
 		end
 	end
 
-	def self.check(idCB)
-		cb=Cookbook.getCookbookById(idCB)
+	def self.check(idCB,nameCB)
+		if(idCB.nil?)
+			cb=Cookbook.getCookbookByName(nameCB)
+		else	
+			cb=Cookbook.getCookbookById(idCB)
+		end
 		if cb!=nil
 			cb_name = cb.name
 			deps = find_deps2(CB_DIR + '/' + cb_name )
@@ -80,13 +95,7 @@ class OneCookHelper
 		end
 	end
 
-	def self.isId(id)
-            return 0, id if name.match(/^[0123456789]+$/)
-        end
 
-        def self.to_id_desc
-            "OpenNebula name or id"
-        end
 
 end
 

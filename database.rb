@@ -120,7 +120,7 @@ class Cookbook < ActiveRecord::Base
 			cb=Cookbook.first(:conditions=>{:id=>cb_id})
 			return cb					
 		else
-			puts 'Can\'t find the cookbook: ' + cb_id
+			puts 'Can\'t find the id: ' + cb_id
 			return nil
 		end
 	end
