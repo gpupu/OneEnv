@@ -1,14 +1,22 @@
 require 'database.rb'
+require 'format_cli'
 
 class OneCookHelper
 
 	def self.list
-		puts "ID\tNAME\t\t\tRECIPES"
+=begin
+		str_h1="%3s %20s %10s"
+		str=["ID","NAME,NUM RECIPES"]
+        	Format_cli.print_header(str_h1,str,false)
 		Cookbook.find(:all).each do |cb|
-			puts cb.to_s
+			#puts cb.to_s
+			Format_cli.print_cb_line(cb)
 		end
 		return 0
+=end
 	end
+
+	
 
 	def self.import_repo(path)
 		path = File.expand_path(path)
@@ -57,6 +65,7 @@ class OneCookHelper
 		end
 		if cb!=nil
 			puts Cookbook.view cb
+
 			return 0
 		else
 			return 1

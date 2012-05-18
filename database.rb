@@ -30,9 +30,9 @@ ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "one
 
 
 class Cookbook < ActiveRecord::Base
-    validates_uniqueness_of :name
-    has_and_belongs_to_many :enviroments, :uniq => true
-    serialize :recipes, Array
+	validates_uniqueness_of :name
+	has_and_belongs_to_many :enviroments, :uniq => true
+	serialize :recipes, Array
 	serialize :recipes_deps, Hash
 
 
@@ -41,7 +41,6 @@ class Cookbook < ActiveRecord::Base
 	def to_s
 		s  = id.to_s + "\t"
 		s += name + "\t\t\t"
-		#s += path + "\t"
 		s += recipes.length.to_s + "\t"
 		#s += recipes_deps.length
 		s
@@ -150,19 +149,14 @@ class Cookbook < ActiveRecord::Base
 			s += "RECIPES:\t" 
 				cb.recipes.each{|r| s += "\n " + r }
 			s += "\nDEPENDENCIES:\t" 
-
-
 				cb.recipes_deps.each do|r,w|
 					s += "\n " + r
 					w.map { |i| s +="'" + i.to_s + "'" }.join(",")
 				end
 
-		
 			s += "\n"
-		else
-			s +='Can\'t find the cookbook ' + cb_name
 		end
-		s
+		return s
 	end
 
 
@@ -306,28 +300,6 @@ class Enviroment < ActiveRecord::Base
 		s
 	end
 
-
-	public
-	def self.getEnvById env_id
-		if Enviroment.exists?(:id => env_id)
-			cb=Enviroment.first(:conditions=>{:id=>env_id})
-			return cb					
-		else
-			puts 'Can\'t find the enviroment with id: ' + env_id
-			return nil
-		end
-	end
-
-	public
-	def self.getEnvByName env_name
-		if Enviroment.exists?(:name => cb_name)
-			cb=Enviroment.first(:conditions=>{:name=>cb_name})
-			return cb					
-		else
-			puts 'Can\'t find the enviroment with name: ' + cb_name
-			return nil
-		end
-	end
 
 
 	public
