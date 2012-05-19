@@ -8,20 +8,27 @@ options = {}
 optparse = OptionParser.new do|opt|
   opt.banner = "Usage: oneenv COMMAND [OPTIONS]"
   opt.separator  ""
-  opt.separator  "Commands"
-  opt.separator  "     add: add a new a cookbok to the repo"
-  opt.separator  "     list: list all cookbooks"
-  opt.separator  "     import-repo: import all the cookbooks to the repo"
-  opt.separator  "     delete: delete a cookbook"
-  opt.separator  "     show: prints the information of the cookbook"
-  opt.separator  "     update-cb: stop server"
-  opt.separator  "     check: check the cookbook's dependencies"
+  opt.separator  "COMMANDS"
+  opt.separator  "     * create <NAME> <ID_TEMPLATE> <NODE_PATH> [-p <DATABAG_PATH>]\n\tCreates a new Enviroment."
+  opt.separator  "     * list\n\tLists all Enviroments."
+  opt.separator  "     * clone <ID_Env>\n\tClones an existing Enviroment"
+  opt.separator  "     * show <ID_Env>\n\tPrints the information of an existing Enviroment"
+  opt.separator  "     * delete <ID_Env>\n\tDeletes an existing Enviroment"
+  opt.separator  "     * update-node <ID_ENV> [-p <NODE_PATH>]\n\tChanges the path of the Enviroment's node"
+  opt.separator  "     * set-databags <ID_ENV> <DB_PATH>\n\tSets a Databag path to an existing Enviroment"
+  opt.separator  "     * up <ID_entorno> [-p <CHEF_PATH>]\n\t"
+  opt.separator  "     * add-role-dir <PATH>\n\tAdds a Role path"
+  opt.separator  "     * update-role <NAME>\n\tUpdates the given Role"
+  opt.separator  "     * list-roles\n\tLists the Roles"
+  opt.separator  "     * delete-role <NAME>\n\tDeletes a given Role"
   opt.separator  ""
   opt.separator  "Options"
+
 
    options[:path] = nil
    opt.on( '-s', '--path PATH', 'This is the databag,chef or node path' ) do |path|
      options[:path] = path
+
    end
 
    options[:name_env] = nil
@@ -54,7 +61,6 @@ ID_ENV=options[:id_env]
 
 case ARGV[0]
 
-	##USO: oneenv create NAME ID_TEMPLATE NODE_PATH [DATABAG_PATH]
 	when 'create'
 		raise ArgumentError if ARGV.length !=4 
 		NAME=ARGV[1]
@@ -88,7 +94,6 @@ case ARGV[0]
 		NODE_PATH=ARGV[1]
 		OneEnvHelper.updateNode(ID_ENV,NAME_ENV,NODE_PATH)
 
-	##USO oneenv set-databags [-i ID_CB]|[-n NAME] [DB_PATH]
 	when "set-databags"
 		#DB_PATH creo que es un argumento obligatorio
 		raise ArgumentError if ARGV.length != 2  		
@@ -106,6 +111,7 @@ case ARGV[0]
 		PATH=ARGV[1]
 		OneEnvHelper.addRoleDir(PATH)
 
+
 	##USO: oneenv update-role NAME
 	when "update-role"
 		raise ArgumentError if ARGV.length != 2 
@@ -116,6 +122,7 @@ case ARGV[0]
 	when "list-roles"
 		raise ArgumentError if ARGV.length != 1 
 		OneEnvHelper.listRoles()
+
 
 	#USO oneenv delete-role NAME
 	when "delete-role"
