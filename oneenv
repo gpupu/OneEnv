@@ -8,24 +8,24 @@ options = {}
 optparse = OptionParser.new do|opt|
   opt.banner = "Usage: oneenv COMMAND [OPTIONS]"
   opt.separator  ""
-  opt.separator  "Commands"
-  opt.separator  "     create: Creates a new Enviroment."#create NAME ID_TEMPLATE NODE_PATH [-p DATABAG_PATH]
-  opt.separator  "     list: Lists all Enviroments." # list
-  opt.separator  "     clone: Clones an existing Enviroment" #clone ID_Env
-  opt.separator  "     show: Prints the information of an existing Enviroment" #show ID_Env
-  opt.separator  "     delete : Deletes an existing Enviroment" #delete ID_Env
-  opt.separator  "     update-node : Changes the path of the Enviroment's node" #update-node ID_ENV [NODE_PATH]
-  opt.separator  "     set-databags: Sets a Databag path to an existing Enviroment" #set-databags ID_ENV [DB_PATH]
-  opt.separator  "     up: " #up ID_entorno [CHEF_PATH]
-  opt.separator  "     add-role-dir: Adds a Role path" #add-role-dir PATH
-  opt.separator  "     update-role: Updates the given Role" #update-role NAME
-  opt.separator  "     list-roles: Lists the Roles" #list-roles
-  opt.separator  "     delete-role: Deletes a given Role" #delete-role NAME
+  opt.separator  "COMMANDS"
+  opt.separator  "     * create <NAME> <ID_TEMPLATE> <NODE_PATH> [-p <DATABAG_PATH>]\n\tCreates a new Enviroment."
+  opt.separator  "     * list\n\tLists all Enviroments."
+  opt.separator  "     * clone <ID_Env>\n\tClones an existing Enviroment"
+  opt.separator  "     * show <ID_Env>\n\tPrints the information of an existing Enviroment"
+  opt.separator  "     * delete <ID_Env>\n\tDeletes an existing Enviroment"
+  opt.separator  "     * update-node <ID_ENV> [-p <NODE_PATH>]\n\tChanges the path of the Enviroment's node"
+  opt.separator  "     * set-databags <ID_ENV> <DB_PATH>\n\tSets a Databag path to an existing Enviroment"
+  opt.separator  "     * up <ID_entorno> [-p <CHEF_PATH>]\n\t"
+  opt.separator  "     * add-role-dir <PATH>\n\tAdds a Role path"
+  opt.separator  "     * update-role <NAME>\n\tUpdates the given Role"
+  opt.separator  "     * list-roles\n\tLists the Roles"
+  opt.separator  "     * delete-role <NAME>\n\tDeletes a given Role"
   opt.separator  ""
   opt.separator  "Options"
 
    options[:aux_path] = nil
-   opt.on( '-p', '--path PATH', 'This is the databag,chef or node path' ) do |path|
+   opt.on( '-p', '--path PATH', 'Databag,Chef or Node path' ) do |path|
      options[:aux_path] = path
    end
 
