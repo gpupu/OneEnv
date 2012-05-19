@@ -1,0 +1,114 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'oneenvHelper'
+
+options = {}
+
+optparse = OptionParser.new do|opt|
+  opt.banner = "Usage: oneenv COMMAND [OPTIONS]"
+  opt.separator  ""
+  opt.separator  "Commands"
+  opt.separator  "     add: add a new a cookbok to the repo"
+  opt.separator  "     list: list all cookbooks"
+  opt.separator  "     import-repo: import all the cookbooks to the repo"
+  opt.separator  "     delete: delete a cookbook"
+  opt.separator  "     show: prints the information of the cookbook"
+  opt.separator  "     update-cb: stop server"
+  opt.separator  "     check: check the cookbook's dependencies"
+  opt.separator  ""
+  opt.separator  "Options"
+
+   options[:aux_path] = nil
+   opt.on( '-p', '--path PATH', 'This is the databag,chef or node path' ) do |path|
+     options[:aux_path] = path
+   end
+
+  opt.on("-h","--help","help") do
+    puts opt_parser
+  end
+
+
+end
+
+
+begin 
+optparse.parse!
+
+PATH_AUX=options[:aux_path]		
+
+case ARGV[0]
+
+	##USO: oneenv create NAME ID_TEMPLATE NODE_PATH [DATABAG_PATH]
+	when 'create'
+		raise ArgumentError if ARGV.length !=4 
+		NAME=ARGV[1]
+		ID=ARGV[2]
+		N_PATH=ARGV[3]
+		OneEnvHelper.create(NAME,ID,N_PATH,PATH_AUX)		
+	##USO:oneenv list
+	when "list"
+		raise ArgumentError if ARGV.length != 1
+		OneEnvHelper.list()
+	##USO:oneenv clone ID_Env
+	when "clone"
+		raise ArgumentError if ARGV.length != 2
+		ID=ARGV[1]
+		OneEnvHelper.clone(ID)
+	##USO:oneenv show ID_Env
+	when "show"
+		raise ArgumentError if ARGV.length != 2
+		ID=ARGV[1]
+		OneEnvHelper.show(ID)
+	##USO:oneenv delete ID_Env
+	when "delete"
+		raise ArgumentError if ARGV.length != 2
+		ID=ARGV[1]
+		OneEnvHelper.delete(ID)
+	##USO: oneenv update-node ID_ENV [NODE_PATH]
+	when "update-node"
+		raise ArgumentError if ARGV.length != 2
+		ID=ARGV[1]
+		OneEnvHelper.updateNode(ID,PATH_AUX)
+	##USO oneenv set-databags ID_ENV [DB_PATH]
+	when "set-databags"
+		#DB_PATH creo que es un argumento obligatorio
+		raise ArgumentError if ARGV.length != 3  		
+		ID=ARGV[1]
+		DB_PATH=ARGV[2]
+		OneEnvHelper.setDatabag(ID,DB_PATH)
+	##USO:oneenv up ID_entorno [CHEF_PATH]
+	when "up"
+		raise ArgumentError if ARGV.length != 2
+		ID=ARGV[1]
+		OneEnvHelper.up(ID, PATH_AUX)
+	##USO: oneenv add-role-dir PATH
+	when "add-role-dir"
+		raise ArgumentError if ARGV.length != 2 
+		PATH=ARGV[1]
+		OneEnvHelper.addRoleDir(PATH)
+	##USO: oneenv update-role NAME
+	when "update-role"
+		raise ArgumentError if ARGV.length != 2 
+		NAME=ARGV[1]
+		OneEnvHelper.updateRole(NAME)
+	#USO oneenv list-roles
+	when "list-roles"
+		raise ArgumentError if ARGV.length != 1 
+		OneEnvHelper.listRoles()
+	#USO oneenv delete-role NAME
+	when "delete-role"
+		raise ArgumentError if ARGV.length != 2 
+		NAME=ARGV[1]
+		OneEnvHelper.deleteRole(NAME)
+
+	else
+	  puts optparse
+	end
+
+rescue OptionParser::InvalidOption, OptionParser::MissingArgument,ArgumentError
+		puts optparse
+		exit
+
+end
+
