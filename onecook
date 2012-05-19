@@ -61,7 +61,7 @@ case ARGV[0]
 	when "list"
 		raise ArgumentError if ARGV.length != 1
 		OneCookHelper.list
-	#onecook add-dir PATH
+	#onecook import-repo PATH
 	when "import-repo"
 		raise ArgumentError if ARGV.length != 2
 		PATH=ARGV[1]

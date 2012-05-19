@@ -4,16 +4,15 @@ require 'format_cli'
 class OneCookHelper
 
 	def self.list
-=begin
-		str_h1="%3s %20s %10s"
-		str=["ID","NAME,NUM RECIPES"]
-        	Format_cli.print_header(str_h1,str,false)
+
+		#str_h1="%3s %20s %10s"
+		#str=["ID","NAME,NUM RECIPES"]
+        	#Format_cli.print_header(str_h1,str,false)
 		Cookbook.find(:all).each do |cb|
 			#puts cb.to_s
 			Format_cli.print_cb_line(cb)
 		end
 		return 0
-=end
 	end
 
 	
@@ -64,7 +63,7 @@ class OneCookHelper
 			cb=Cookbook.getCookbookById(idCB)
 		end
 		if cb!=nil
-			puts Cookbook.view cb
+			puts cb.view_cookbook
 
 			return 0
 		else
@@ -79,7 +78,7 @@ class OneCookHelper
 			cb=Cookbook.getCookbookById(idCB)
 		end
 		if cb!=nil
-			Cookbook.update cb
+			cb.update_cb
 			return 0
 		else
 			return 1

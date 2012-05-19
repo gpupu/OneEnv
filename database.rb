@@ -31,11 +31,9 @@ ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "one
 
 class Cookbook < ActiveRecord::Base
 	validates_uniqueness_of :name
-	has_and_belongs_to_many :enviroments, :uniq => true
+	#has_and_belongs_to_many :enviroments, :uniq => true
 	serialize :recipes, Array
 	serialize :recipes_deps, Hash
-
-
 
 	public
 	def to_s
@@ -44,6 +42,31 @@ class Cookbook < ActiveRecord::Base
 		s += recipes.length.to_s + "\t"
 		#s += recipes_deps.length
 		s
+	end
+
+	public
+	def update_cb
+		self.recipes = Cookbook.get_recipes(self.path)
+		self.save
+
+
+end
+		
+	public
+	def view_cookbook
+
+			s  = "NAME:\t" + self.name + "\n"
+			s += "PATH:\t" + self.path + "\n"
+			s += "RECIPES:\t" 
+				self.recipes.each{|r| s += "\n " + r }
+			s += "\nDEPENDENCIES:\t" 
+				self.recipes_deps.each do|r,w|
+					s += "\n " + r
+					w.map { |i| s +="'" + i.to_s + "'" }.join(",")
+				end
+
+			s += "\n"
+		return s
 	end
 
 	public
@@ -135,29 +158,7 @@ class Cookbook < ActiveRecord::Base
 		end
 	end
 
-	public 
-	def self.update cb
-		cb.recipes = Cookbook.get_recipes(cb.path)
-		cb.save
-	end
-		
-	public
-	def self.view cb
-		if !cb.nil?
-			s  = "NAME:\t" + cb.name + "\n"
-			s += "PATH:\t" + cb.path + "\n"
-			s += "RECIPES:\t" 
-				cb.recipes.each{|r| s += "\n " + r }
-			s += "\nDEPENDENCIES:\t" 
-				cb.recipes_deps.each do|r,w|
-					s += "\n " + r
-					w.map { |i| s +="'" + i.to_s + "'" }.join(",")
-				end
-
-			s += "\n"
-		end
-		return s
-	end
+	
 
 
 end
@@ -167,7 +168,7 @@ end
 
 class Role < ActiveRecord::Base
     validates_uniqueness_of :name
-    has_and_belongs_to_many :enviroments, :uniq => true
+    #has_and_belongs_to_many :enviroments, :uniq => true
 	serialize :deps_roles, Array
 	serialize :deps_recs, Array
 
@@ -256,8 +257,8 @@ class Enviroment < ActiveRecord::Base
 
 	validates_uniqueness_of :name
 	after_create :create_defaults
-	has_and_belongs_to_many :cookbooks, :uniq => true
-	has_and_belongs_to_many :roles, :uniq => true
+	#has_and_belongs_to_many :cookbooks, :uniq => true
+	#has_and_belongs_to_many :roles, :uniq => true
     
 	private
 	def create_defaults
