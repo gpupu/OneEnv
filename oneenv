@@ -26,7 +26,7 @@ optparse = OptionParser.new do|opt|
 
 
    options[:path] = nil
-   opt.on( '-s', '--path PATH', 'This is the databag,chef or node path' ) do |path|
+   opt.on( '-p', '--path PATH', 'This is the databag,chef or node path' ) do |path|
      options[:path] = path
 
    end
@@ -60,8 +60,8 @@ ID_ENV=options[:id_env]
 
 
 case ARGV[0]
-
-	when 'create'
+	#USO: oneenv create NAME ID_TEMPLATE NODE_PATH [-p PATH_DATABAG]
+	when "create"
 		raise ArgumentError if ARGV.length !=4 
 		NAME=ARGV[1]
 		ID_TEMPLATE=ARGV[2]
@@ -75,7 +75,6 @@ case ARGV[0]
 	##USO:oneenv clone [-i ID_CB]|[-n NAME]
 	when "clone"
 		raise ArgumentError if ARGV.length != 1
-		puts 
 		OneEnvHelper.clone(ID_ENV,NAME_ENV)
 
 	##USO:oneenv show [-i ID_CB]|[-n NAME]
@@ -94,10 +93,11 @@ case ARGV[0]
 		NODE_PATH=ARGV[1]
 		OneEnvHelper.updateNode(ID_ENV,NAME_ENV,NODE_PATH)
 
+	##USO:oneenv set-databags [-i ID_CB]|[-n NAME] [DB_PATH]
 	when "set-databags"
 		#DB_PATH creo que es un argumento obligatorio
 		raise ArgumentError if ARGV.length != 2  		
-		DB_PATH=ARGV[2]
+		DB_PATH=ARGV[1]
 		OneEnvHelper.setDatabag(ID_ENV,NAME_ENV,DB_PATH)
 
 	##USO:oneenv up [-i ID_CB]|[-n NAME] [CHEF_PATH]
@@ -129,7 +129,6 @@ case ARGV[0]
 		raise ArgumentError if ARGV.length != 2 
 		NAME=ARGV[1]
 		OneEnvHelper.deleteRole(NAME)
-
 	else
 	  puts optparse
 	end

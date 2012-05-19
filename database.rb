@@ -301,7 +301,7 @@ class Enviroment < ActiveRecord::Base
 	end
 
 	def setDatabag databags_path
-		if n_path != nil
+		if databags_path != nil
 			self.databags = databags_path
 			self.save
 		else
