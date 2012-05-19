@@ -201,7 +201,7 @@ class Role < ActiveRecord::Base
 				if isextern
 					cp_com = "cp -r #{source} #{dest}" 
 					puts cp_com
-                    iscopy = system(cp_com)
+                   			iscopy = system(cp_com)
 				end
 
 				if iscopy
@@ -254,94 +254,123 @@ end
 
 class Enviroment < ActiveRecord::Base
 
-    validates_uniqueness_of :name
-    after_create :create_defaults
-    has_and_belongs_to_many :cookbooks, :uniq => true
+	validates_uniqueness_of :name
+	after_create :create_defaults
+	has_and_belongs_to_many :cookbooks, :uniq => true
 	has_and_belongs_to_many :roles, :uniq => true
     
-    private
-    def create_defaults
-        if name == nil
-            s = 'env-' + self.id.to_s
-            self.name = s
-            self.save
-        end
-    end
-
-    public
-
-    def to_s
-	s  = id.to_s + "\t"
-        s += name + "\t"
-        s += template.to_s + "\t"
-        s += node + "\t"
-        s += databags.to_s + "\t"
-    end
-
-	public
-	def self.view_enviroment id
-		env=first(:conditions => {:id => id})
-		if !env.nil?
-			s  = "ID:\t" + env.id.to_s + "\n"
-			s += "NAME:\t" + env.name + "\n"
-			s += "BASE TEMPLATE:\t" + env.template.to_s + "\n"
-			if env.databags != nil
-				s += "DATABAG DIR:\t" + env.databags + "\n" 
-			end
-			s += "COOKBOOKS: " + "\t"
-				env.cookbooks.each{|cb| s += ", " + cb.name }
-			s += "\n"
-			s += "ROLES:" + "\t"
-				env.roles.each{|r| s += ", " + r.name}
-			s += "\n"
-		else
-			s +='Can\'t find the enviroment ' + id.to_s
+	private
+	def create_defaults
+		if name == nil
+		    s = 'env-' + self.id.to_s
+		    self.name = s
+		    self.save
 		end
-		s
 	end
 
+	public
+	def to_s
+		s  = id.to_s + "\t"
+		s += name + "\t"
+		s += template.to_s + "\t"
+		s += node + "\t"
+		s += databags.to_s + "\t"
+	end
 
+	public
+	def view_enviroment
+		s  = "ID:\t" + id.to_s + "\n"
+		s += "NAME:\t" + name + "\n"
+		s += "BASE TEMPLATE:\t" + template.to_s + "\n"
+		s += "NODE DIR:\t" + node + "\n"
+		if databags != nil
+			s += "DATABAG DIR:\t" + databags + "\n" 
+		end
+		
+		return s
+	end
+
+	def updateNode node_path
+
+		if node_path != nil
+			self.node = node_path
+			self.save
+		else
+			puts "BAD PATH"
+		end
+	end
+
+	def setDatabag databags_path
+		if n_path != nil
+			self.databags = databags_path
+			self.save
+		else
+			puts "BAD PATH"
+		end
+	end
 
 	public
 	def clone
 		envcopy = Enviroment.create(:template=> self.template, :node=> self.node, :databags=> self.databags)
 	end
 
+	public
+	def self.getEnvById env_id
+		if Enviroment.exists?(:id => env_id)
+			env=Enviroment.first(:conditions=>{:id=>env_id})
+			return env				
+		else
+			puts 'Can\'t find the enviroment with id: ' + env_id
+			return nil
+		end
+	end
+
+	public
+	def self.getEnvByName env_name
+		if Enviroment.exists?(:name =>  env_name)
+			env=Enviroment.first(:conditions=>{:name=> env_name})
+			return env					
+		else
+			puts 'Can\'t find the enviroment with name: ' + env_name
+			return nil
+		end
+	end
+
 end
 
 class CreateSchema < ActiveRecord::Migration
 
-if !ActiveRecord::Base.connection.table_exists?'cookbooks'
-    ActiveRecord::Base.connection.create_table(:cookbooks) do |t|
-        t.column :name, :string, :null=>false, :unique=>true
-        t.column :path, :string, :default=>CB_DIR
-        t.text :recipes
-	t.text :recipes_deps
-        #t.column :enviroments, :enviroment
-    end
-end
-
-if !ActiveRecord::Base.connection.table_exists?'roles'
-	ActiveRecord::Base.connection.create_table(:roles) do |t|
-		t.column :name, :string, :null=>false, :unique=>true
-       		t.column :path, :string, :default=>ROLE_DIR
-		t.text :deps_roles
-		t.text :deps_recs
-        #t.column :enviroments, :enviroment
+	if !ActiveRecord::Base.connection.table_exists?'cookbooks'
+		ActiveRecord::Base.connection.create_table(:cookbooks) do |t|
+			t.column :name, :string, :null=>false, :unique=>true
+			t.column :path, :string, :default=>CB_DIR
+			t.text :recipes
+			t.text :recipes_deps
+			#t.column :enviroments, :enviroment
+		end
 	end
-end
 
-if !ActiveRecord::Base.connection.table_exists?'enviroments'
-    ActiveRecord::Base.connection.create_table(:enviroments) do |t|
-        t.column :name, :string, :default=> nil,:unique=>true
-		t.column :template, :integer, :null=> false
-		t.column :node, :string, :null=> false
-		#t.column :solo_path, :string, :default=>SOLO_DIR
-		t.column :databags, :string, :default=> nil
-		#t.column :roles, :role
-		#t.column :cookbooks, :cookbook
-    end
-end
+	if !ActiveRecord::Base.connection.table_exists?'roles'
+		ActiveRecord::Base.connection.create_table(:roles) do |t|
+			t.column :name, :string, :null=>false, :unique=>true
+			t.column :path, :string, :default=>ROLE_DIR
+			t.text :deps_roles
+			t.text :deps_recs
+			#t.column :enviroments, :enviroment
+		end
+	end
+
+	if !ActiveRecord::Base.connection.table_exists?'enviroments'
+		ActiveRecord::Base.connection.create_table(:enviroments) do |t|
+			t.column :name, :string, :default=> nil,:unique=>true
+			t.column :template, :integer, :null=> false
+			t.column :node, :string, :null=> false
+			#t.column :solo_path, :string, :default=>SOLO_DIR
+			t.column :databags, :string, :default=> nil
+			#t.column :roles, :role
+			#t.column :cookbooks, :cookbook
+		end
+	end
 
 end
 

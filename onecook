@@ -66,19 +66,19 @@ case ARGV[0]
 		raise ArgumentError if ARGV.length != 2
 		PATH=ARGV[1]
 		OneCookHelper.import_repo(PATH)
-	#onecook show [-i ID_CB] [-n NAME]
+	#onecook show [-i ID_CB]|[-n NAME]
 	when "show"
 		raise ArgumentError if ARGV.length != 1
 		OneCookHelper.show(IDCB,NAMECB)
-	#onecook delete [-i ID_CB] [-n NAME]
+	#onecook delete [-i ID_CB]|[-n NAME]
 	when "delete"
 		raise ArgumentError if ARGV.length != 1
 		OneCookHelper.delete(IDCB,NAMECB)
-	#onecook update [-i ID_CB] [-n NAME]
+	#onecook update [-i ID_CB]|[-n NAME]
 	when "update-cb"
 		raise ArgumentError if ARGV.length != 1
 		OneCookHelper.update_cb(IDCB,NAMECB)
-	#onecook check [-i ID_CB] [-n NAME]
+	#onecook check [-i ID_CB]|[-n NAME]
 	when "check"
 		raise ArgumentError if ARGV.length != 1
 		OneCookHelper.check(IDCB,NAMECB)

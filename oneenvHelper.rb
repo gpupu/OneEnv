@@ -32,61 +32,86 @@ class OneEnvHelper
 			end
 		end
 
-		##USO:oneenv show [ID_Env]
-		def self.show(id)	#TODO
-			if Enviroment.exists?(id)
-           			#env = Enviroment.find(id) 
-				#puts env
-				#puts Enviroment.view_enviroment env
-				#Esto creo que esta mal porque el view funciona con id
-				puts Enviroment.view_enviroment id
-			else
-				puts 'Can\'t find the enviroment ' + "#{id}"
+		##USO:oneenv show [-i ID_CB]|[-n NAME]
+		def self.show(idEnv,nameEnv)
+			if(idEnv.nil?)
+				env=Enviroment.getEnvByName(nameEnv)
+			else	
+				env=Enviroment.getEnvById(idEnv)
 			end
-		end		
+			if env!=nil
+				puts env.view_enviroment
+				return 0
+			else
+				return 1
+			end
+		end
+
+		
 	
-		##USO:oneenv clone ID_Env
-		def self.clone(id)
-			if Enviroment.exists?(id)
-				#Enviroment.clone_env(commands[1])
-				Enviroment.find(id).clone
+		##USO:oneenv clone [-i ID_CB]|[-n NAME]
+		def self.clone(idEnv,nameEnv)
+			if(idEnv.nil?)
+				env=Enviroment.getEnvByName(nameEnv)
+			else	
+				env=Enviroment.getEnvById(idEnv)
+			end
+
+			if env!=nil
+				env.clone
+				return 0
 			else
-				puts 'Can\'t find the enviroment ' + "#{id}"
+				return 1
 			end
 		end
 
-		##USO:oneenv delete [ID_Env]
-		def self.delete(id)
-			if Enviroment.exists?(id)
-				env = Enviroment.find(id)
-				#env.cookbooks.clear
-				#env.roles.clear
+		##USO:oneenv delete [-i ID_CB]|[-n NAME]
+		def self.delete(idEnv,nameEnv)
+			if(idEnv.nil?)
+				env=Enviroment.getEnvByName(nameEnv)
+			else	
+				env=Enviroment.getEnvById(idEnv)
+			end
+
+
+			if env!=nil
 				env.delete
-				#Enviroment.delete(commands[1])
+				return 0
 			else
-				puts 'Can\'t find the enviroment ' + "#{id}"
+				return 1
 			end
+
 		end
 
-		##USO: oneenv update-node ID_ENV [NODE_PATH]
-		def self.updateNode(id,n_path)
-			if Enviroment.exists?(id)
-				#env= Enviroment.find(commands[1])
-				if n_path != nil
-					Enviroment.update(id, {:node=> n_path})
-				end
-			else
-				puts 'Can\'t find the enviroment ' + "#{id}"
+		##USO: oneenv update-node [-i ID_CB]|[-n NAME] [NODE_PATH]
+		def self.updateNode(idEnv,nameEnv,n_path)
+			if(idEnv.nil?)
+				env=Enviroment.getEnvByName(nameEnv)
+			else	
+				env=Enviroment.getEnvById(idEnv)
 			end
+			
+			if env!=nil
+				env.updateNode n_path
+				return 0
+			else
+				return 1
+			end		
 		end
 
-		##USO oneenv set-databag ID_ENV [DB_PATH]
-		def self.setDatabag(id,db_path)
-			if Enviroment.exists?(id)
-				env= Enviroment.find(id)
-				Enviroment.update(id, {:databags=> db_path})
+		##USO oneenv set-databag [-i ID_CB]|[-n NAME] [DB_PATH]
+		def self.setDatabag(idEnv,nameEnv,db_path)
+			if(idEnv.nil?)
+				env=Enviroment.getEnvByName(nameEnv)
+			else	
+				env=Enviroment.getEnvById(idEnv)
+			end
+
+			if env!=nil
+				env.setDatabag db_path
+				return 0
 			else
-				puts 'Can\'t find the enviroment ' + "#{id}"
+				return 1
 			end
 		end
 
