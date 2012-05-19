@@ -288,15 +288,12 @@ class Enviroment < ActiveRecord::Base
 			if env.databags != nil
 				s += "DATABAG DIR:\t" + env.databags + "\n" 
 			end
-#Esto sobra? Es que si no se quita,falla porque intenta acceder y no estan creados
-=begin
 			s += "COOKBOOKS: " + "\t"
 				env.cookbooks.each{|cb| s += ", " + cb.name }
 			s += "\n"
 			s += "ROLES:" + "\t"
 				env.roles.each{|r| s += ", " + r.name}
 			s += "\n"
-=end
 		else
 			s +='Can\'t find the enviroment ' + id.to_s
 		end

@@ -2,7 +2,7 @@ require 'database.rb'
 require 'template.rb'
 
 class OneEnvHelper
-		##USO: oneenv create NAME ID_TEMPLATE NODE_PATH [DATABAG_PATH]
+
 		def self.create(name,id,n_path,d_path)
 		#si se intenta crear 2 entornos con el mismo nombre la 2ª vez no hace nada pero tp. dice nada.
 			if File.exists?(n_path)
@@ -24,7 +24,6 @@ class OneEnvHelper
 			Enviroment.create(:name=> name, :template=> id, :node=> node_path, :databags=> datab_path)
 		end
 
-		##USO:oneenv list
 		def self.list()
 			puts "ID\tNAME\tTEMPLATE\tNODE\tDATA BAGS"
            		Enviroment.find(:all).each do |e|
@@ -32,20 +31,16 @@ class OneEnvHelper
 			end
 		end
 
-		##USO:oneenv show [ID_Env]
 		def self.show(id)	#TODO
 			if Enviroment.exists?(id)
-           			#env = Enviroment.find(id) 
-				#puts env
-				#puts Enviroment.view_enviroment env
-				#Esto creo que esta mal porque el view funciona con id
-				puts Enviroment.view_enviroment id
+           			env = Enviroment.find(id) 
+				puts env
+				puts Enviroment.view_enviroment env
 			else
 				puts 'Can\'t find the enviroment ' + "#{id}"
 			end
 		end		
 	
-		##USO:oneenv clone ID_Env
 		def self.clone(id)
 			if Enviroment.exists?(id)
 				#Enviroment.clone_env(commands[1])
@@ -55,7 +50,6 @@ class OneEnvHelper
 			end
 		end
 
-		##USO:oneenv delete [ID_Env]
 		def self.delete(id)
 			if Enviroment.exists?(id)
 				env = Enviroment.find(id)
@@ -68,7 +62,6 @@ class OneEnvHelper
 			end
 		end
 
-		##USO: oneenv update-node ID_ENV [NODE_PATH]
 		def self.updateNode(id,n_path)
 			if Enviroment.exists?(id)
 				#env= Enviroment.find(commands[1])
@@ -80,7 +73,6 @@ class OneEnvHelper
 			end
 		end
 
-		##USO oneenv set-databag ID_ENV [DB_PATH]
 		def self.setDatabag(id,db_path)
 			if Enviroment.exists?(id)
 				env= Enviroment.find(id)
@@ -90,7 +82,6 @@ class OneEnvHelper
 			end
 		end
 
-		##USO:oneenv up ID_entorno [CHEF_PATH]
 		def self.up(id, c_path)
 			if c_path!=nil
 				chef_dir = c_path
@@ -151,7 +142,6 @@ class OneEnvHelper
 			end
 		end
 
-		##USO: oneenv add-role-dir PATH
 		def self.addRoleDir(c_path)		
 			path = File.expand_path(c_path)
 			if File.exists?(path)
@@ -166,7 +156,6 @@ class OneEnvHelper
 			end
 		end
 
-		##USO: oneenv update-role NAME
 		def self.updateRole(name)	
 			if Role.exists?(:name => name)
 				role = Role.first(:conditions=> {:name => name})
@@ -186,7 +175,6 @@ class OneEnvHelper
 			end
 		end
 
-		#USO oneenv list-roles
 		def self.listRoles()
 			puts "ID\tNAME\tPATH"
             		Role.find(:all).each{|r|
@@ -194,7 +182,6 @@ class OneEnvHelper
             		}
 		end
 
-		#USO oneenv delete-role NAME
 		def self.deleteRole(name)
 			if Role.exists?(:name => name)
 				role = Role.first(:conditions => {:name => name})
