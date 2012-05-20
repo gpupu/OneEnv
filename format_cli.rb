@@ -103,4 +103,15 @@ class Format_cli
 		end
 		return sol
 	end
+
+	def Format_cli.view_env(env)
+		str= "%-18s %-1s %-24s"
+		puts str % ["ID",":",env.id.to_s]
+		puts str % ["NAME",":",env.name]
+		puts str % ["BASE TEMPLATE",":",env.template.to_s]
+		puts str % ["NODE DIR",":",env.node]
+		if env.databags != nil
+			puts str % ["DATABAG DIR",":",env.databags] 	
+		end		
+	end	
 end

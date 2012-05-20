@@ -278,6 +278,7 @@ class Enviroment < ActiveRecord::Base
 		s += databags.to_s + "\t"
 	end
 
+=begin
 	public
 	def view_enviroment
 		s  = "ID:\t" + id.to_s + "\n"
@@ -290,6 +291,7 @@ class Enviroment < ActiveRecord::Base
 		
 		return s
 	end
+=end
 
 	def updateNode node_path
 
