@@ -88,4 +88,19 @@ class Format_cli
 			puts str % ["DATABAG DIR",":",env.databags] 	
 		end		
 	end	
+	
+	def Format_cli.view_cb(cb)
+		str= "%-18s %-1s %-24s"
+		rc=""
+		cb.recipes.each{|r| rc += "\n" +"%21s" % "" + r}
+		dp=""
+		cb.recipes_deps.each do|r,w|
+		       dp += "\n"+ "%21s" % "" + r
+		       w.map { |i| dp +="'" + i.to_s + "'" }.join(",")
+		end
+		puts str % ["NAME",":",cb.name]
+		puts str % ["PATH",":",cb.path]
+		puts str % ["RECIPES",": ",rc ]
+		puts str % ["DEPENDENCIES",": ",dp]
+	end
 end

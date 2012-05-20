@@ -63,7 +63,11 @@ class OneCookHelper
 			cb=Cookbook.getCookbookById(idCB)
 		end
 		if cb!=nil
-			puts cb.view_cookbook
+			str_h1="%-70s"
+			str=["COOKBOOK #{cb.id} INFORMATION"]
+			Format_cli.print_header(str_h1,str,true)
+			Format_cli.view_cb(cb)
+#			puts cb.view_cookbook
 
 			return 0
 		else
