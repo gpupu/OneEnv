@@ -1,5 +1,6 @@
 require 'database.rb'
 require 'template.rb'
+require 'format_cli'
 
 class OneEnvHelper
 
@@ -25,9 +26,11 @@ class OneEnvHelper
 		end
 
 		def self.list()
-			puts "ID\tNAME\tTEMPLATE\tNODE\tDATA BAGS"
+			str_h1="%3s %4s %15s %7s %28s"
+			str=["ID","NAME","TEMPLATE","NODE","DATABAGS"]
+			Format_cli.print_header(str_h1,str,true)
            		Enviroment.find(:all).each do |e|
-				puts e.to_s
+				Format_cli.print_env_line(e)
 			end
 		end
 
