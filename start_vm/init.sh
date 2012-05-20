@@ -16,7 +16,7 @@ fi
 
 if [ -f /mnt/chef.sh ]; then
 echo "Ejecutando Chef..."
-	. /mnt/chef.sh >>/var/log/cheflog 2>&1
+	. /mnt/chef.sh > /var/log/cheflog 2>&1
 fi
 
 
