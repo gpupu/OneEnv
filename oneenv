@@ -44,7 +44,7 @@ optparse = OptionParser.new do|opt|
 
    options[:check_deps] = false
    opt.on( '-c', '--check', 'Check dependencies when up a environment') do |c|
-     options[:check_deps] = c
+     options[:check_deps] = true
 
    end
 
@@ -115,7 +115,7 @@ case ARGV[0]
 		puts "ID: #{ID_ENV}"
 		puts "PATH #{PATH}"
 		puts "CHECK: #{CHECK}"
-		OneEnvHelper.up(ID_ENV.to_i,PATH,CHECK)
+		##OneEnvHelper.up(ID_ENV.to_i,PATH,CHECK)
 
 	##USO: oneenv add-role-dir PATH
 	when "add-role-dir"
@@ -145,7 +145,7 @@ case ARGV[0]
 	  puts optparse
 	end
 
-rescue OptionParser::InvalidOption, OptionParser::MissingArgument#,ArgumentError
+rescue OptionParser::InvalidOption, OptionParser::MissingArgument,ArgumentError
 		puts optparse
 		exit
 
