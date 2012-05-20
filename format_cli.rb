@@ -65,9 +65,10 @@ class Format_cli
 	def self.path_format(path)
 		array_aux=File.split(path)
 		sol="/"+array_aux[1]
+
 		length=sol.length		
 
-		while length<24
+		while (length<24 && array_aux[0]!="/")
 			array_aux=File.split(array_aux[0])
 			length=length+array_aux[1].length+1
 			if length<24
