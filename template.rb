@@ -117,12 +117,16 @@ class ConectorONE
 			# Introducimos nombres de las cookbooks y de los roles
 			if !all 
 				cb_list = $deps.get_sh_cb_list
-				cb_names = createContextVariable doc, "CHEFCB", cb_list
-				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << cb_names
+				if cb_list cb_list != ''
+					cb_names = createContextVariable doc, "CHEFCB", cb_list
+					xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << cb_names
+				end
 
 				roles_list = $deps.get_sh_role_list
-				r_names = createContextVariable doc, "CHEFR", roles_list
-				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << r_names
+				if roles_list cb_list != ''
+					r_names = createContextVariable doc, "CHEFR", roles_list
+					xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << r_names
+				end
 
 			end
 						
