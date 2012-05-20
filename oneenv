@@ -32,19 +32,25 @@ optparse = OptionParser.new do|opt|
    end
 
    options[:name_env] = nil
-   opt.on( '-n', '--name NAME_ENV', 'References eviroment by Name' ) do |name_env|
+   opt.on( '-n', '--name NAME_ENV', 'References environment by Name' ) do |name_env|
      options[:name_env] = name_env
    end
 
    options[:id_env] = nil
-   opt.on( '-i', '--id ID_ENV', 'References eviroment by Id' ) do |id_env|
+   opt.on( '-i', '--id ID_ENV', 'References environment by Id' ) do |id_env|
      options[:id_env] = id_env
+
+   end
+
+   options[:check_deps] = false
+   opt.on( '-c', '--check', 'Check dependencies when up a environment') do |c|
+     options[:check_deps] = c
 
    end
 
 
   opt.on("-h","--help","help") do
-    puts opt_parser
+    puts opt_parse
   end
 
 
@@ -54,9 +60,10 @@ end
 begin 
 optparse.parse!
 
-PATH_DATABAG=options[:path]		
+PATH=options[:path]		
 NAME_ENV=options[:name_env]		
 ID_ENV=options[:id_env]
+CHECK=options[:check_deps]
 
 
 case ARGV[0]
@@ -66,7 +73,7 @@ case ARGV[0]
 		NAME=ARGV[1]
 		ID_TEMPLATE=ARGV[2]
 		NODE_PATH=ARGV[3]
-		OneEnvHelper.create(NAME,ID_TEMPLATE,NODE_PATH,PATH_DATABAG)		
+		OneEnvHelper.create(NAME,ID_TEMPLATE,NODE_PATH,PATH)		
 	##USO:oneenv list
 	when "list"
 		raise ArgumentError if ARGV.length != 1
@@ -100,10 +107,15 @@ case ARGV[0]
 		DB_PATH=ARGV[1]
 		OneEnvHelper.setDatabag(ID_ENV,NAME_ENV,DB_PATH)
 
-	##USO:oneenv up [-i ID_CB]|[-n NAME] [CHEF_PATH]
+	##USO:oneenv up [-c] -i ID [-p PATH_ENV]
+	##USO:oneenv up [-c] -n NAME [-p PATH_ENV]
 	when "up"
-		raise ArgumentError if ARGV.length != 2
-		OneEnvHelper.up(ID_ENV,NAME_ENV, PATH_AUX)
+		#puts options.length
+		#raise ArgumentError if options.length < 1 || options.length > 3
+		puts "ID: #{ID_ENV}"
+		puts "PATH #{PATH}"
+		puts "CHECK: #{CHECK}"
+		OneEnvHelper.up(ID_ENV.to_i,PATH,CHECK)
 
 	##USO: oneenv add-role-dir PATH
 	when "add-role-dir"

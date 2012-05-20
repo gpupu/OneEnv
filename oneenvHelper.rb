@@ -124,16 +124,18 @@ class OneEnvHelper
 			end
 		end
 
-		def self.up(id, c_path)
+		def self.up(id, c_path, c_deps)
 			if c_path!=nil
 				chef_dir = c_path
-			else 
+			else
+				puts 'path null'
 				chef_dir = CONFIG['default_solo_path'] 
 			end
+			puts chef_dir
 
 			# TODO dejo esto provisional aqui hasta que lo pongamos como opcion ('-f'?), si esta a true no se evaluan dependencias
 			# a false si se evaluan y se lanza la maquina o no dependiendo del resultado
-			not_dep = false
+			not_dep = !c_deps
 
 			if Enviroment.exists?(id)
 				env = Enviroment.find(id)
@@ -147,10 +149,8 @@ class OneEnvHelper
 					repo_dir << " " + env.databags
 				end
 
-				
 				# La or tiene cortocircuito, si not_dep es true no se llega a evaluar expand_node
 				if not_dep || expand_node(env.node)
-
 					if !not_dep
 						# añadimos cookbooks
 						$deps.get_cb_list.each do |cb|
@@ -161,7 +161,6 @@ class OneEnvHelper
 							rfile = Role.get_filename(r)
 							repo_dir += "#{ROLE_DIR}/#{rfile} "
 						end
-
 					else
 						# añadimos todo
 						repo_dir = CB_DIR + " " + ROLE_DIR
@@ -169,7 +168,7 @@ class OneEnvHelper
 					puts repo_dir
 
 					c= ConectorONE.new
-					c.crearTemplate(env.template.to_i, repo_dir,env.node,env.databags,chef_dir,not_dep)
+					c.crearTemplate(env.template, repo_dir,env.node,env.databags,chef_dir,not_dep)
 					#c.deployMV(idVM,idHost)
 					puts 'montando template...'
 					puts env.template
