@@ -6,8 +6,8 @@
 ##############################################################################
 ONE_LOCATION=ENV["ONE_LOCATION"]
 
-#SCRIPT_DIR="./start_vm"
-SCRIPT_DIR="/srv/cloud/chef"
+SCRIPT_DIR="./start_vm"
+
 
  
 if !ONE_LOCATION
