@@ -38,15 +38,15 @@ class Format_cli
 	end
 
 	def Format_cli.print_cb_line(cb)
-		str= "%3d %20s %10d"
-		puts str % [cb.id.to_s,cb.name,cb.recipes.length]
+		str= "%5d %15s %-20s %7d"
+		puts str % [cb.id.to_s, "",cb.name,cb.recipes.length]
 	end
 
 	def Format_cli.print_env_line(env)
 		#Space Limiters
 		name_cad=env.name[0..9]
 		
-		
+
 		node_cad=path_format(env.node)		
 		
 		if env.databags!=nil

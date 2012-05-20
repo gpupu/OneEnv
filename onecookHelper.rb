@@ -5,8 +5,8 @@ class OneCookHelper
 
 	def self.list
 
-		str_h1="%4s %20s %20s %30s"
-		str=["ID","NAME","NUM RECIPES",""]
+		str_h1="%5s %20s %27s"
+		str=["ID","NAME","NUM RECIPES"]
         	Format_cli.print_header(str_h1,str,true)
 		Cookbook.find(:all).each do |cb|
 			#puts cb.to_s
