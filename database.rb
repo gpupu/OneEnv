@@ -27,8 +27,6 @@ end
 # get active record set up
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
 
-
-
 class Cookbook < ActiveRecord::Base
 	validates_uniqueness_of :name
 	#has_and_belongs_to_many :enviroments, :uniq => true
@@ -48,9 +46,7 @@ class Cookbook < ActiveRecord::Base
 	def update_cb
 		self.recipes = Cookbook.get_recipes(self.path)
 		self.save
-
-
-end
+	end
 		
 	public
 	def view_cookbook
@@ -162,8 +158,6 @@ end
 
 
 end
-
-
 
 
 class Role < ActiveRecord::Base
@@ -278,6 +272,7 @@ class Enviroment < ActiveRecord::Base
 		s += databags.to_s + "\t"
 	end
 
+=begin
 	public
 	def view_enviroment
 		s  = "ID:\t" + id.to_s + "\n"
@@ -290,6 +285,7 @@ class Enviroment < ActiveRecord::Base
 		
 		return s
 	end
+=end
 
 	def updateNode node_path
 

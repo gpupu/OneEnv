@@ -26,7 +26,7 @@ class OneEnvHelper
 		end
 
 		def self.list()
-			str_h1="%3s %4s %15s %7s %28s"
+			str_h1="%3s %-11s %-11s %-24s %-24s"
 			str=["ID","NAME","TEMPLATE","NODE","DATABAGS"]
 			Format_cli.print_header(str_h1,str,true)
            		Enviroment.find(:all).each do |e|
@@ -43,7 +43,11 @@ class OneEnvHelper
 				env=Enviroment.getEnvById(idEnv)
 			end
 			if env!=nil
-				puts env.view_enviroment
+				str_h1="%-70s"
+				str=["ENVIROMENT #{env.id} INFORMATION"]
+				Format_cli.print_header(str_h1,str,true)
+				#puts env.view_enviroment
+				Format_cli.view_env(env)
 				return 0
 
 			else
