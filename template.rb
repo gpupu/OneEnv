@@ -125,6 +125,7 @@ class ConectorONE
 				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << r_names
 
 			end
+						
 
 			# Introduce el path de la ruta chef	
 			dir_chef = createContextVariable doc, "CHEF_DIR", path_chef
@@ -132,14 +133,14 @@ class ConectorONE
 
 			if path_databags != nil
 				# Introduce el nombre del directorio databags
-				#dir_db = File.basename(path_databags)	
 				dir_db = createContextVariable doc, "CHEF_DATABAGS", File.basename(path_databags)
 				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << dir_db
 			end
+			
 
 			template = Template.new(xml,@client)
 			xml_string = template.template_str
-
+puts xml_string
 
 			vm = VirtualMachine.new(VirtualMachine.build_xml,@client)
 			rc = vm.allocate(xml_string)

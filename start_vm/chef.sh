@@ -3,7 +3,7 @@
 readonly DISK="/mnt/"
 readonly CBDISK="${DISK}/cookbooks/"
 readonly RDISK="${DISK}/roles/"
-readonly DBDISK="${DISK}${CHEF_DATABAGS}/"
+readonly DBDISK="${DISK}/${CHEF_DATABAGS}/"
 
 # CHEF_DIR se carga en el context
 readonly CBPATH="${CHEF_DIR}/cookbooks/"
@@ -28,40 +28,43 @@ echo "data_bag_path \"${DBPATH}\"" >> $CPATH
 # Copia todo al disco
 echo "copiando elementos al disco"
 # Copia Cookbooks
-if [ $CHEFCB='' ]; then
-	#oIFS=$IFS
+if [ -n "${CHEFCB}" ]; then
+	echo "copiando cookbooks ${CHEFCB} MODO DEPS"
 	mkdir -v $CBPATH
-	export IFS=";"
-
+	oIFS=$IFS
+	IFS=";"	
 	for cookbook in $CHEFCB 
 	do
 		cp -rv "${DISK}/$cookbook" "${CBPATH}/$cookbook"
 	done
-	unset IFS
-	#IFS=$oIFS
+	IFS=$oIFS
 
 else
-	cp -rv $CBDISK $CBPATH
+	echo "copiando cookbooks a ${CBPATH}"
+	cp -rv $CBDISK $CHEF_DIR
 fi
 
 
 # Copia Roles
-if [ $CHEFR='' ]; then
+if [ -n "${CHEFR}" ]; then
 	mkdir -v $RPATH
-	export IFS=";"
-
+	echo "copiando roles a ${CHEFR} MODO DEPS"
+	oIFS=$IFS
+	IFS=";"
 	for role in $CHEFR 
 	do
 		cp -rv "${DISK}/$role" "${RPATH}/$role"
 	done
-	unset IFS
+	IFS=$oIFS
 
 else
-	cp -rv $CBDISK $CBPATH
+	echo "copiando roles a ${RPATH}"
+	cp -rv $CBDISK $CHEF_DIR
 fi
 
 # Copia Databags
-if [ -d $DBDISK ]; then
+if [ -n "${CHEF_DATABAGS}" ]; then
+	echo "copiando databags a ${DBPATH}"
 	cp -rv $DBDISK $DBPATH
 fi
 

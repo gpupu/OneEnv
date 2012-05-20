@@ -139,7 +139,7 @@ class OneEnvHelper
 
 			# TODO dejo esto provisional aqui hasta que lo pongamos como opcion ('-f'?), si esta a true no se evaluan dependencias
 			# a false si se evaluan y se lanza la maquina o no dependiendo del resultado
-			not_dep = !c_deps
+			#not_dep = !c_deps
 
 			if Enviroment.exists?(id)
 				env = Enviroment.find(id)
@@ -153,9 +153,9 @@ class OneEnvHelper
 					repo_dir << " " + env.databags
 				end
 
-				# La or tiene cortocircuito, si not_dep es true no se llega a evaluar expand_node
-				if not_dep || expand_node(env.node)
-					if !not_dep
+				# La or tiene cortocircuito, si !c_deps es true no se llega a evaluar expand_node
+				if !c_deps || expand_node(env.node)
+					if c_deps
 						# añadimos cookbooks
 						$deps.get_cb_list.each do |cb|
 							repo_dir += "#{CB_DIR}/#{cb} "
@@ -172,7 +172,7 @@ class OneEnvHelper
 					puts repo_dir
 
 					c= ConectorONE.new
-					c.crearTemplate(env.template, repo_dir,env.node,env.databags,chef_dir,not_dep)
+					c.crearTemplate(env.template, repo_dir,env.node,env.databags,chef_dir,!c_deps)
 					#c.deployMV(idVM,idHost)
 					puts 'montando template...'
 					puts env.template
