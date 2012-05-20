@@ -38,15 +38,15 @@ class Format_cli
 	end
 
 	def Format_cli.print_cb_line(cb)
-		str= "%3d %20s %10d"
-		puts str % [cb.id.to_s,cb.name,cb.recipes.length]
+		str= "%5d %15s %-20s %7d"
+		puts str % [cb.id.to_s, "",cb.name,cb.recipes.length]
 	end
 
 	def Format_cli.print_env_line(env)
 		#Space Limiters
 		name_cad=env.name[0..9]
 		
-		
+
 		node_cad=path_format(env.node)		
 		
 		if env.databags!=nil
@@ -88,4 +88,19 @@ class Format_cli
 			puts str % ["DATABAG DIR",":",env.databags] 	
 		end		
 	end	
+	
+	def Format_cli.view_cb(cb)
+		str= "%-18s %-1s %-24s"
+		rc=""
+		cb.recipes.each{|r| rc += "\n" +"%21s" % "" + r}
+		dp=""
+		cb.recipes_deps.each do|r,w|
+		       dp += "\n"+ "%21s" % "" + r
+		       w.map { |i| dp +="'" + i.to_s + "'" }.join(",")
+		end
+		puts str % ["NAME",":",cb.name]
+		puts str % ["PATH",":",cb.path]
+		puts str % ["RECIPES",": ",rc ]
+		puts str % ["DEPENDENCIES",": ",dp]
+	end
 end
