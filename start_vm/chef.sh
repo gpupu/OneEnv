@@ -1,9 +1,10 @@
 #!/bin/bash
 
-readonly DISK="/mnt/"
+readonly DISK="/mnt"
 readonly CBDISK="${DISK}/cookbooks/"
 readonly RDISK="${DISK}/roles/"
 readonly DBDISK="${DISK}/${CHEF_DATABAGS}/"
+
 
 # CHEF_DIR se carga en el context
 readonly CBPATH="${CHEF_DIR}/cookbooks/"
@@ -35,7 +36,7 @@ if [ -n "${CHEFCB}" ]; then
 	IFS=";"	
 	for cookbook in $CHEFCB 
 	do
-		cp -rv "${DISK}/$cookbook" "${CBPATH}/$cookbook"
+		cp -rv "${DISK}/$cookbook" "${CBPATH}$cookbook"
 	done
 	IFS=$oIFS
 
@@ -53,13 +54,15 @@ if [ -n "${CHEFR}" ]; then
 	IFS=";"
 	for role in $CHEFR 
 	do
-		cp -rv "${DISK}/$role" "${RPATH}/$role"
+		cp -rv "${DISK}/$role" "${RPATH}$role"
 	done
 	IFS=$oIFS
 
 else
-	echo "copiando roles a ${RPATH}"
-	cp -rv $CBDISK $CHEF_DIR
+	if [ -f "${RDISK}" ]; then	
+		echo "copiando roles a ${RPATH}"
+		cp -rv $RDISK $CHEF_DIR
+	fi
 fi
 
 # Copia Databags
@@ -69,8 +72,9 @@ if [ -n "${CHEF_DATABAGS}" ]; then
 fi
 
 # Copia node
-cp -rv $DISK/$CHEF_NODE $CHEF_DIR
-
+echo "copiando el node"
+cp -rv "$DISK/$CHEF_NODE" $CHEF_DIR
 # Ejecuta Chef-solo
+
 echo "Ejecuta chef-solo"
 chef-solo -c $CPATH -j $JPATH

@@ -149,8 +149,17 @@ class OneEnvHelper
 				repo_dir = ""
 
 				# Si existen añadimos databags
-				if env.databags != nil
+				if env.databags != nil && 					
+					if !File.exists?(env.databags)
+						puts env.databags + ' don\'t exists'
+						exit
+					end
 					repo_dir << " " + env.databags
+				end
+
+				if !File.exists?(env.node)
+					puts env.node + ' don\'t exists'
+					exit
 				end
 
 				# La or tiene cortocircuito, si !c_deps es true no se llega a evaluar expand_node
@@ -167,6 +176,7 @@ class OneEnvHelper
 						end
 					else
 						# añadimos todo
+						
 						repo_dir = CB_DIR + " " + ROLE_DIR
 					end
 					puts repo_dir
