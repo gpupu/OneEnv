@@ -141,10 +141,9 @@ class OneEnvHelper
 			if c_path!=nil
 				chef_dir = c_path
 			else
-				puts 'path null'
 				chef_dir = CONFIG['default_solo_path'] 
 			end
-			puts chef_dir
+
 
 			# TODO dejo esto provisional aqui hasta que lo pongamos como opcion ('-f'?), si esta a true no se evaluan dependencias
 			# a false si se evaluan y se lanza la maquina o no dependiendo del resultado
@@ -165,11 +164,14 @@ class OneEnvHelper
 					end
 					repo_dir << " " + env.databags
 				end
+				
+
 
 				if !File.exists?(env.node)
 					puts env.node + ' don\'t exists'
 					exit
 				end
+				puts get_json_runl(env.node)
 
 				# La or tiene cortocircuito, si !c_deps es true no se llega a evaluar expand_node
 				if !c_deps || expand_node(env.node)
@@ -188,15 +190,15 @@ class OneEnvHelper
 						
 						repo_dir = CB_DIR + " " + ROLE_DIR
 					end
-					puts repo_dir
+					
 
 					c= ConectorONE.new
 					c.crearTemplate(env.template, repo_dir,env.node,env.databags,chef_dir,!c_deps)
 					#c.deployMV(idVM,idHost)
-					puts 'montando template...'
-					puts env.template
-					puts repo_dir
-					puts env.node
+					#puts 'montando template...'
+					#puts env.template
+					#puts repo_dir
+					#puts env.node
 				else
 					puts 'Incomplete dependencies, review that are correct or use -f option'
 				end

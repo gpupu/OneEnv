@@ -110,11 +110,7 @@ case ARGV[0]
 	##USO:oneenv up [-c] -i ID [-p PATH_ENV]
 	##USO:oneenv up [-c] -n NAME [-p PATH_ENV]
 	when "up"
-		#puts options.length
 		#raise ArgumentError if options.length < 1 || options.length > 3
-		puts "ID: #{ID_ENV}"
-		puts "PATH #{PATH}"
-		puts "CHECK: #{CHECK}"
 		OneEnvHelper.up(ID_ENV.to_i,PATH,CHECK)
 
 	##USO: oneenv add-role-dir PATH

@@ -273,20 +273,6 @@ class Enviroment < ActiveRecord::Base
 		s += databags.to_s + "\t"
 	end
 
-=begin
-	public
-	def view_enviroment
-		s  = "ID:\t" + id.to_s + "\n"
-		s += "NAME:\t" + name + "\n"
-		s += "BASE TEMPLATE:\t" + template.to_s + "\n"
-		s += "NODE DIR:\t" + node + "\n"
-		if databags != nil
-			s += "DATABAG DIR:\t" + databags + "\n" 
-		end
-		
-		return s
-	end
-=end
 
 	def updateNode node_path
 

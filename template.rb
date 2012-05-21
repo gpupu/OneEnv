@@ -80,7 +80,7 @@ class ConectorONE
 			if !xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").empty?
 				if !xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT//FILES").empty?
 					##EXITE EL NODO FILES
-					puts "HAY FILES"
+					
 					data_files_old=xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT//FILES").first
 					files = data_files_old.content + " " + files
 					data_files=Nokogiri::XML::CDATA.new(doc,files)
@@ -144,7 +144,7 @@ class ConectorONE
 
 			template = Template.new(xml,@client)
 			xml_string = template.template_str
-puts xml_string
+
 
 			vm = VirtualMachine.new(VirtualMachine.build_xml,@client)
 			rc = vm.allocate(xml_string)
@@ -153,38 +153,11 @@ puts xml_string
 			if OpenNebula.is_error?(rc)
 				  puts "#{rc.message}"   
 			end
-			return vm.id
+			
 
 	end
 
-	public
-	def deployMV(idMV,idHost)
-		
-			vm_pool= VirtualMachinePool.new(@client, -1)
-			rc= vm_pool.info
-
-			if OpenNebula.is_error?(rc)
-				  puts "#{rc.message}"   
-			end
-
-			vm_pool.each do |vm|	
-				puts vm['ID']
-				puts idMV.to_s
-				if vm['ID'] == idMV.to_s
-					puts "DEPLOY"
-					rc=vm.deploy(idHost)
-					if OpenNebula.is_error?(rc)
-						puts "#{rc.message}" 
-					else
-					 	puts "DEPLOY"
-					end				
-
-				end
-			end
-
-		
-
-	end
+	
 	private
 	def createNodeFiles doc,files
 		puts "NO HAY FILES"		
