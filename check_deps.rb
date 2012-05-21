@@ -242,7 +242,7 @@ end
 ################################################################
 
 def get_recipe_deps(recipe_name, cb_path)
-	regex = /.*include_recipe +("|')([^"]+)("|')/
+	regex = /.*include_recipe +("|')([^"#]+)("|')/
 	#dir = cb_path.sub(/\/$/, "")
 	cb_path = File.expand_path(cb_path)
 	if File.exists? "#{cb_path}/recipes/#{recipe_name}.rb"

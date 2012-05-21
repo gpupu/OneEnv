@@ -178,7 +178,7 @@ class Role < ActiveRecord::Base
 	public
 	def self.role_create r_name, r_path
 
-        if r_path == nil
+        if (r_path == nil)  || (r_path==ROLE_DIR)
 			isextern = false
 			source=ROLE_DIR + '/' + r_name
 			dest=ROLE_DIR
@@ -187,6 +187,7 @@ class Role < ActiveRecord::Base
 			source = r_path + '/' + r_name
 			dest=ROLE_DIR
         end
+
 
 		if !exists?(:name=>r_name)
 			r_path = File.expand_path(r_path)
