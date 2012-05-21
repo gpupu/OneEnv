@@ -43,10 +43,12 @@ class OneCookHelper
 	end
 
 	def self.delete(idCB,nameCB)
-		if(idCB.nil?)
+		if(!nameCB.nil?)
 			cb=Cookbook.getCookbookByName(nameCB)
-		else	
+		elsif(!idCB.nil?)	
 			cb=Cookbook.getCookbookById(idCB)
+		else
+			puts "COOKBOOK_ID/NAME argument needed for this action.\nPlease, write: 'onecook -h' for help."		
 		end
 		if cb!=nil
 			cb.delete
@@ -57,10 +59,12 @@ class OneCookHelper
 	end
 
 	def self.show(idCB,nameCB)
-		if(idCB.nil?)
+		if(!nameCB.nil?)
 			cb=Cookbook.getCookbookByName(nameCB)
-		else	
+		elsif(!idCB.nil?)	
 			cb=Cookbook.getCookbookById(idCB)
+		else
+			puts "COOKBOOK_ID/NAME argument needed for this action.\nPlease, write: 'onecook -h' for help."		
 		end
 		if cb!=nil
 			str_h1="%-70s"
@@ -76,10 +80,12 @@ class OneCookHelper
 	end
 
 	def self.update_cb(idCB,nameCB)
-		if(idCB.nil?)
+		if(!nameCB.nil?)
 			cb=Cookbook.getCookbookByName(nameCB)
-		else	
+		elsif(!idCB.nil?)	
 			cb=Cookbook.getCookbookById(idCB)
+		else
+			puts "COOKBOOK_ID/NAME argument needed for this action.\nPlease, write: 'onecook -h' for help."		
 		end
 		if cb!=nil
 			cb.update_cb
@@ -90,10 +96,12 @@ class OneCookHelper
 	end
 
 	def self.check(idCB,nameCB)
-		if(idCB.nil?)
+		if(!nameCB.nil?)
 			cb=Cookbook.getCookbookByName(nameCB)
-		else	
+		elsif(!idCB.nil?)	
 			cb=Cookbook.getCookbookById(idCB)
+		else
+			puts "COOKBOOK_ID/NAME argument needed for this action.\nPlease, write: 'onecook -h' for help."		
 		end
 		if cb!=nil
 			cb_name = cb.name
