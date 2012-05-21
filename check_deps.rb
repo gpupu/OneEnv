@@ -2,6 +2,7 @@
 
 require 'deps_list.rb'
 require 'json'
+require 'format_cli'
 #require 'database.rb'
 
 #TODO Limpiar código, hay cosas que no se usan
@@ -81,10 +82,14 @@ def list_deps(cbs)
 		s = "All recipes depencies are provided"
 	else
 		s = ""
+		str_h1= "%9s %35s %30s"
+		str =["RECIPES","DEPENDENCIES",""]
+		Format_cli.print_header(str_h1,str,true)
 		cb_deps = Array.new
 		cbs.each do |n, deps|
 			deps.each do |d|
-				s += "\n#{n} -> #{d}"
+				#s += "\n#{n} -> #{d}"
+				s+= "\n"+ "%1s %-20s %-9s %-20s" % ["",n,"->",d]
 				cb_ar = d.split("::")
 				if !cb_deps.include?(cb_ar[0])
 					cb_deps.push(cb_ar[0])
@@ -254,10 +259,10 @@ def get_recipe_deps(recipe_name, cb_path)
         		if m
           			if !m[2].match(/::/)
             			r_deps << (m[2] + "::default")
-						puts r_deps
+						#puts r_deps
           			else
             			r_deps << m[2]
-						puts r_deps
+						#puts r_deps
           			end
         		end
       		end

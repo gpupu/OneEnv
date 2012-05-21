@@ -37,11 +37,14 @@ class OneEnvHelper
 
 		##USO:oneenv show [-i ID_CB]|[-n NAME]
 		def self.show(idEnv,nameEnv)
-			if(idEnv.nil?)
+			if(!nameEnv.nil?)
 				env=Enviroment.getEnvByName(nameEnv)
-			else	
+			elsif(!idEnv.nil?)	
 				env=Enviroment.getEnvById(idEnv)
+			else
+				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
 			end
+
 			if env!=nil
 				str_h1="%-70s"
 				str=["ENVIROMENT #{env.id} INFORMATION"]
@@ -60,12 +63,13 @@ class OneEnvHelper
 
 		##USO:oneenv clone [-i ID_CB]|[-n NAME]
 		def self.clone(idEnv,nameEnv)
-			if(idEnv.nil?)
+			if(!nameEnv.nil?)
 				env=Enviroment.getEnvByName(nameEnv)
-			else	
+			elsif(!idEnv.nil?)	
 				env=Enviroment.getEnvById(idEnv)
+			else
+				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
 			end
-
 			if env!=nil
 				env.clone
 				return 0
@@ -77,10 +81,12 @@ class OneEnvHelper
 
 		##USO:oneenv delete [-i ID_CB]|[-n NAME]
 		def self.delete(idEnv,nameEnv)
-			if(idEnv.nil?)
+			if(!nameEnv.nil?)
 				env=Enviroment.getEnvByName(nameEnv)
-			else	
+			elsif(!idEnv.nil?)	
 				env=Enviroment.getEnvById(idEnv)
+			else
+				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
 			end
 
 
@@ -96,11 +102,12 @@ class OneEnvHelper
 
 		##USO: oneenv update-node [-i ID_CB]|[-n NAME] [NODE_PATH]
 		def self.updateNode(idEnv,nameEnv,n_path)
-			if(idEnv.nil?)
+			if(!nameEnv.nil?)
 				env=Enviroment.getEnvByName(nameEnv)
-			else	
+			elsif(!idEnv.nil?)	
 				env=Enviroment.getEnvById(idEnv)
-
+			else
+				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
 			end
 			
 			if env!=nil
@@ -114,10 +121,12 @@ class OneEnvHelper
 
 		##USO oneenv set-databag [-i ID_CB]|[-n NAME] [DB_PATH]
 		def self.setDatabag(idEnv,nameEnv,db_path)
-			if(idEnv.nil?)
+			if(!nameEnv.nil?)
 				env=Enviroment.getEnvByName(nameEnv)
-			else	
+			elsif(!idEnv.nil?)	
 				env=Enviroment.getEnvById(idEnv)
+			else
+				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
 			end
 
 			if env!=nil
