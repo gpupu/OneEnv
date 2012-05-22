@@ -89,7 +89,6 @@ class OneEnvHelper
 				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
 			end
 
-
 			if env!=nil
 				env.delete
 				return 0
@@ -216,6 +215,18 @@ class OneEnvHelper
 				puts path + ' don\'t exists'
 			end
 		end
+
+		def self.addRole(c_path)		
+			path = File.expand_path(c_path)
+			if File.exists?(path)
+				role = File.basename(path)
+				path = File.dirname(path)
+				Role.role_create(role,path) if File.extname(role) == ".rb" || File.extname(role) == ".json"
+			else
+				puts path + ' don\'t exists'
+			end
+		end
+
 
 		def self.updateRole(name)	
 			if Role.exists?(:name => name)

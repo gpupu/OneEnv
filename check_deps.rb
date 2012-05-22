@@ -212,7 +212,8 @@ def get_ruby_runl(path)
             	rl = line.split("\"")
             	rl.delete_if {|x|
                 	x.include?("run_list") or
-                	x.include?(",")
+                	x.include?(",") or 
+					x.include?(")")
             	}
 				puts rl
 				return rl

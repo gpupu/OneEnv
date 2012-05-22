@@ -17,7 +17,8 @@ optparse = OptionParser.new do|opt|
   opt.separator  "     * update-node [-i <ID_Env>]|[-n <NAME_Env>] [-p <NODE_PATH>]\n\tChanges the path of the Enviroment's node"
   opt.separator  "     * set-databags [-i <ID_Env>]|[-n <NAME_Env>] <DB_PATH>\n\tSets a Databag path to an existing Enviroment"
   opt.separator  "     * up [-i <ID_Env>]|[-n <NAME_Env>] [-p <CHEF_PATH>]\n\t"
-  opt.separator  "     * add-role-dir <PATH>\n\tAdds a Role path"
+  opt.separator  "     * add-role-dir <PATH>\n\tAdds all Roles from a directory path"
+  opt.separator  "     * add-role <PATH>\n\tAdds a Role from path"
   opt.separator  "     * update-role <NAME>\n\tUpdates the given Role"
   opt.separator  "     * list-roles\n\tLists the Roles"
   opt.separator  "     * delete-role <NAME>\n\tDeletes a given Role"
@@ -119,6 +120,11 @@ case ARGV[0]
 		PATH=ARGV[1]
 		OneEnvHelper.addRoleDir(PATH)
 
+	##USO: oneenv add-role-dir PATH
+	when "add-role"
+		raise ArgumentError if ARGV.length != 2 
+		PATH=ARGV[1]
+		OneEnvHelper.addRole(PATH)
 
 	##USO: oneenv update-role NAME
 	when "update-role"
