@@ -144,11 +144,6 @@ class OneEnvHelper
 				chef_dir = CONFIG['default_solo_path'] 
 			end
 
-
-			# TODO dejo esto provisional aqui hasta que lo pongamos como opcion ('-f'?), si esta a true no se evaluan dependencias
-			# a false si se evaluan y se lanza la maquina o no dependiendo del resultado
-			#not_dep = !c_deps
-
 			if Enviroment.exists?(id)
 				env = Enviroment.find(id)
 				#idHost=commands[2]
