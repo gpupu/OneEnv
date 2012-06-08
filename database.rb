@@ -10,7 +10,6 @@ CONFIG_FILE = 'oneenv.cnf'
 
 begin
 	CONFIG = YAML.load_file(CONFIG_FILE)
-	# TODO Cuidado con esto!! ¿mantiene valor si se cambia el archivo de configuración?
 	CB_DIR = File.expand_path(CONFIG['default_cb_dir'])
 	ROLE_DIR = File.expand_path(CONFIG['default_role_dir'])
 rescue Errno::ENOENT => notfound
@@ -24,7 +23,7 @@ end
 
 
 
-# get active record set up
+
 ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
 
 class Cookbook < ActiveRecord::Base
