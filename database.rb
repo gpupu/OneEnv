@@ -177,8 +177,8 @@ class Role < ActiveRecord::Base
 
 	public
 	def self.role_create r_name, r_path
-
-        if (r_path == nil)  || (r_path==ROLE_DIR)
+		r_path = File.expand_path(r_path)
+		if (r_path == nil)  || (r_path==ROLE_DIR)
 			isextern = false
 			source=ROLE_DIR + '/' + r_name
 			dest=ROLE_DIR
@@ -188,20 +188,19 @@ class Role < ActiveRecord::Base
 			dest=ROLE_DIR
         end
 
-
 		if !exists?(:name=>r_name)
-			r_path = File.expand_path(r_path)
 			if File.exists?(r_path)
-				
+
 				iscopy=true
 				if isextern
 					cp_com = "cp -r #{source} #{dest}" 
 					puts cp_com
-                   			iscopy = system(cp_com)
+                   	iscopy = system(cp_com)
 				end
 
 				if iscopy
 					r_path +="/#{r_name}"
+
 					# leemos el run_list
 					if File.extname(r_name) == ".rb"
 						rdeps = get_ruby_runl(r_path)
@@ -210,9 +209,8 @@ class Role < ActiveRecord::Base
 					if File.extname(r_name) == ".json"
 						rdeps = get_json_runl(r_path)
 						r_name = File.basename(r_name, ".json")
-					end
-					puts rdeps
-					
+					end	
+
 					#dividimos en recetas y roles
 					roles_list = []
 					recs_list = []

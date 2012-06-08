@@ -89,7 +89,6 @@ class OneEnvHelper
 				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
 			end
 
-
 			if env!=nil
 				env.delete
 				return 0
@@ -143,11 +142,6 @@ class OneEnvHelper
 			else
 				chef_dir = CONFIG['default_solo_path'] 
 			end
-
-
-			# TODO dejo esto provisional aqui hasta que lo pongamos como opcion ('-f'?), si esta a true no se evaluan dependencias
-			# a false si se evaluan y se lanza la maquina o no dependiendo del resultado
-			#not_dep = !c_deps
 
 			if Enviroment.exists?(id)
 				env = Enviroment.find(id)
@@ -221,6 +215,18 @@ class OneEnvHelper
 				puts path + ' don\'t exists'
 			end
 		end
+
+		def self.addRole(c_path)		
+			path = File.expand_path(c_path)
+			if File.exists?(path)
+				role = File.basename(path)
+				path = File.dirname(path)
+				Role.role_create(role,path) if File.extname(role) == ".rb" || File.extname(role) == ".json"
+			else
+				puts path + ' don\'t exists'
+			end
+		end
+
 
 		def self.updateRole(name)	
 			if Role.exists?(:name => name)

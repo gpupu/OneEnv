@@ -5,16 +5,6 @@ require 'json'
 require 'format_cli'
 #require 'database.rb'
 
-#TODO Limpiar código, hay cosas que no se usan
-=begin
-def find_deps(cookbook_dir)
-  nel = Hash.new { |h, k| h[k] = [] }
-  Dir.glob("#{cookbook_dir}/").each do |r|
-    deps_for(r, nel)
-  end
-  nel
-end
-=end
 #nombre receta => [COOBOOK::recipe,..]
 def find_deps2(cookbook_dir)
   nel = Hash.new { |h, k| h[k] = [] }
@@ -34,18 +24,6 @@ def find_deps2(cookbook_dir)
   nel
 end
 
-#TODO No muestra bien los nombres
-=begin
-def show_deps_list(hlist)
-	s = ""
-	hlist.each do |r,d|
-		s += "#{r}: "
-		d.each{|deps| s += ", #{deps}"}
-
-	end
-	s
-end
-=end
 
 def deps_for(dir, nel)
   regex = /.*include_recipe +("|')([^"]+)("|')/
@@ -224,24 +202,25 @@ end
 
 #devuelve array dependencias de un rb
 def get_ruby_runl(path)
-	regex = /.*run_list +(("|')([^"]+)("|'),)*(("|')([^"]+)("|'))/
-
+	regexp = /.*run_list? *\(?(( )*("|')([^"]+)("|')( )*,( )*)*(("|')([^"]+)("|')( )*)\)?/
 	open(path) do |f|
     	f.each do |line|
-        	m = line.match(regex)
+        	m = line.match(regexp)# || line.match(regexp)
 			rl = line.split("\"")
         	if m
 				puts 'entra dentro'
             	rl = line.split("\"")
             	rl.delete_if {|x|
                 	x.include?("run_list") or
-                	x.include?(",")
+                	x.include?(",") or 
+					x.include?(")")
             	}
 				puts rl
 				return rl
         	end
     	end
 	end
+	nil
 end
 
 ################################################################
