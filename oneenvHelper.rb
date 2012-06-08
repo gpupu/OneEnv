@@ -248,10 +248,24 @@ class OneEnvHelper
 		end
 
 		def self.listRoles()
-			puts "ID\tNAME\tPATH"
+			str_h1="%3s %-11s %-32s %-10s %-8s"
+			str=["ID","NAME","PATH","ROL_DEPS","REC_DEPS"]
+			Format_cli.print_header(str_h1,str,true)
             		Role.find(:all).each{|r|
-                		puts r.to_s
+                		Format_cli.print_role_line(r)
             		}
+		end
+
+		def self.showRole(name)
+			if Role.exists?(:name => name)
+				role = Role.first(:conditions => {:name => name})
+				str_h1="%-70s"
+				str=["ROLE #{role.id} INFORMATION"]
+				Format_cli.print_header(str_h1,str,true)
+				Format_cli.view_role(role)
+			else
+				puts 'This role don\'t exists in the database'
+			end			
 		end
 
 		def self.deleteRole(name)

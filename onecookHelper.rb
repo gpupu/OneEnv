@@ -9,7 +9,6 @@ class OneCookHelper
 		str=["ID","NAME","NUM RECIPES"]
         	Format_cli.print_header(str_h1,str,true)
 		Cookbook.find(:all).each do |cb|
-			#puts cb.to_s
 			Format_cli.print_cb_line(cb)
 		end
 		return 0
@@ -71,8 +70,6 @@ class OneCookHelper
 			str=["COOKBOOK #{cb.id} INFORMATION"]
 			Format_cli.print_header(str_h1,str,true)
 			Format_cli.view_cb(cb)
-#			puts cb.view_cookbook
-
 			return 0
 		else
 			return 1

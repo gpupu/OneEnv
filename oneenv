@@ -143,6 +143,12 @@ case ARGV[0]
 		raise ArgumentError if ARGV.length != 2 
 		NAME=ARGV[1]
 		OneEnvHelper.deleteRole(NAME)
+	
+	#USO oneenv show-role NAME
+	when "show-role"
+		raise ArgumentError if ARGV.length != 2 
+		NAME=ARGV[1]
+		OneEnvHelper.showRole(NAME)
 	else
 	  puts optparse
 	end
