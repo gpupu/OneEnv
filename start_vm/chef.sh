@@ -78,3 +78,5 @@ cp -rv "$DISK/$CHEF_NODE" $CHEF_DIR
 
 echo "Ejecuta chef-solo"
 chef-solo -c $CPATH -j $JPATH
+
+
