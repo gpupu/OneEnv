@@ -1,4 +1,5 @@
 require 'database.rb'
+require 'check_runlist.rb'
 require 'template.rb'
 require 'format_cli'
 
@@ -136,7 +137,8 @@ class OneEnvHelper
 			end
 		end
 
-		def self.up(id, c_path, c_deps)
+		def self.up(id, c_path,c_deps)
+			puts c_deps
 			if c_path!=nil
 				chef_dir = c_path
 			else
@@ -145,9 +147,6 @@ class OneEnvHelper
 
 			if Enviroment.exists?(id)
 				env = Enviroment.find(id)
-				#idHost=commands[2]
-				#puts idHost
-				#repo_dir = CB_DIR + " " + ROLE_DIR
 				repo_dir = ""
 
 				# Si existen añadimos databags
@@ -165,36 +164,54 @@ class OneEnvHelper
 					puts env.node + ' don\'t exists'
 					exit
 				end
-				puts get_json_runl(env.node)
+				
+				
+				expand=contain_roles(env.node)
+				if(expand || c_deps)
+					dep_resueltas=expand_node(env.node)
 
-				# La or tiene cortocircuito, si !c_deps es true no se llega a evaluar expand_node
-				if !c_deps || expand_node(env.node)
-					if c_deps
-						# añadimos cookbooks
-						$deps.get_cb_list.each do |cb|
-							repo_dir += "#{CB_DIR}/#{cb} "
-						end
-						# añadimos roles
-						$deps.get_role_list.each do |r|
-							rfile = Role.get_filename(r)
-							repo_dir += "#{ROLE_DIR}/#{rfile} "
-						end
-					else
-						# añadimos todo
-						
-						repo_dir = CB_DIR + " " + ROLE_DIR
+
+					# añadimos cookbooks
+					array_cb=$deps.get_cb_list
+
+					##quitamos repeticiones
+					array_cb.each do |cb|
+						repo_dir += "#{CB_DIR}/#{cb} "
 					end
-					
+
+					# añadimos roles
+					array_roles=$deps.get_role_list
+
+					##quitamos repeticiones
+					array_roles.each do |r|
+						rfile = Role.get_filename(r)
+						repo_dir += "#{ROLE_DIR}/#{rfile} "
+					end
+
+					#Creamos template
+					if(!dep_resueltas)
+						puts 'Incomplete dependencies, review that are correct'
+						exit
+					end
 
 					c= ConectorONE.new
-					c.crearTemplate(env.template, repo_dir,env.node,env.databags,chef_dir,!c_deps)
-					#c.deployMV(idVM,idHost)
-					#puts 'montando template...'
-					#puts env.template
-					#puts repo_dir
-					#puts env.node
+					c.crearTemplate(env.template, repo_dir,env.node,env.databags,chef_dir,$deps)
+				
+
 				else
-					puts 'Incomplete dependencies, review that are correct or use -f option'
+					# añadimos cookbooks
+					list_resources=check_runlist(env.node)
+					array_cb=list_resources.cookbooks_list
+					if(!array_cb.empty?)
+						array_cb.each do |cb|
+							repo_dir += "#{CB_DIR}/#{cb} "
+						end
+					end
+					
+					#Creamos template
+					array_roles=[]
+					c= ConectorONE.new
+					c.crearTemplate(env.template, repo_dir,env.node,env.databags,chef_dir,list_resources)
 				end
 
 			else 

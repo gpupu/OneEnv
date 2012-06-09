@@ -41,7 +41,7 @@ class ConectorONE
 	end
 
 
-	def crearTemplate(num_template,path_repo,path_json,path_databags,path_chef,all)
+	def crearTemplate(num_template,path_repo,path_json,path_databags,path_chef,list_resources)
 
 		xml_s=""
 
@@ -114,22 +114,25 @@ class ConectorONE
 			node_name = createContextVariable doc, "CHEF_NODE", name
 			xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_name
 
+		puts "ELEMENTOS EN EL TEMPLATE:"
+		puts "COOKBOOKS"
+		puts  list_resources.cookbooks_list
+
+		puts "ROLES"
+		puts  list_resources.role_list
+
 			# Introducimos nombres de las cookbooks y de los roles
-			if !all 
-				cb_list = $deps.get_sh_cb_list
-				if cb_list != ''
-					cb_names = createContextVariable doc, "CHEFCB", cb_list
-					xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << cb_names
-				end
-
-				roles_list = $deps.get_sh_role_list
-				if roles_list  != ''
-					r_names = createContextVariable doc, "CHEFR", roles_list
-					xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << r_names
-				end
-
+			if !list_resources.cookbooks_list.empty?
+				cb_names = createContextVariable doc, "CHEFCB", list_resources.get_sh_cb_list 
+				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << cb_names
 			end
-						
+
+			if !list_resources.role_list.empty?
+			
+				r_names = createContextVariable doc, "CHEFR", list_resources.get_sh_role_list 
+				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << r_names
+			end
+	
 
 			# Introduce el path de la ruta chef	
 			dir_chef = createContextVariable doc, "CHEF_DIR", path_chef

@@ -238,9 +238,18 @@ class Role < ActiveRecord::Base
 	end
 
 	def self.get_filename rname
-		rfile = first(:conditions=>{:name=>rname}).path
-		rfile = File.basename(rfile)
-		rfile
+
+		if Role.exists?(:name => rname)
+			role=Role.first(:conditions=>{:name=>rname})
+			rfile=role.path
+			rfile = File.basename(rfile)
+			rfile
+			return rfile					
+		else
+			puts 'Can\'t find the role with name: ' + rname
+			return nil
+		end
+
 	end
 
 end

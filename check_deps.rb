@@ -3,7 +3,7 @@
 require 'deps_list.rb'
 require 'json'
 require 'format_cli'
-#require 'database.rb'
+
 
 #nombre receta => [COOBOOK::recipe,..]
 def find_deps2(cookbook_dir)
@@ -88,16 +88,11 @@ def expand_node(node_path)
 	$deps = Deps_List.new
 	node_ar = get_json_runl(node_path)
 	comp = expand_sons(node_ar)
-
-=begin
-	puts "\nrecipes list"
-	puts $deps.cookbooks_list
-	puts "\nroles list"
-	puts $deps.role_list
-=end
-	#puts comp
 	comp
 end
+
+
+
 
 
 def expand_sons(rl_array)
@@ -114,7 +109,7 @@ def expand_sons(rl_array)
 			comp = expand_role(r) && comp
 		end
 	end
-	#puts comp
+
 	comp
 end
 
@@ -191,14 +186,28 @@ end
 
 ###########################################################################
 
-#devuelve array dependencias de un json
-def get_json_runl(path)
-	jfile = File.read(path)
-	runl = JSON.parse(jfile, :create_additions=>false)
-	runl = runl['run_list']
 
+def get_json_runl(path)
+runl=[]
+	if File.exists?(path)
+		jfile = File.read(path)
+		begin
+		runl = JSON.parse(jfile, :create_additions=>false)
+		runl = runl['run_list']
+		rescue JSON::ParserError
+			puts 'Bad runlist'
+			exit
+		end
+
+	else
+		puts path
+		puts 'Node path is not correct' 
+	end
 	return runl
 end
+
+
+
 
 #devuelve array dependencias de un rb
 def get_ruby_runl(path)
