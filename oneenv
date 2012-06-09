@@ -14,7 +14,7 @@ optparse = OptionParser.new do|opt|
   opt.separator  "     * clone [-i <ID_Env>]|[-n <NAME_Env>]\n\tClones an existing Enviroment"
   opt.separator  "     * show [-i <ID_Env>]|[-n <NAME_Env>]\n\tPrints the information of an existing Enviroment"
   opt.separator  "     * delete [-i <ID_Env>]|[-n <NAME_Env>]\n\tDeletes an existing Enviroment"
-  opt.separator  "     * update-node [-i <ID_Env>]|[-n <NAME_Env>] [-p <NODE_PATH>]\n\tChanges the path of the Enviroment's node"
+  opt.separator  "     * update-node [-i <ID_Env>]|[-n <NAME_Env>] [<NODE_PATH>]\n\tChanges the path of the Enviroment's node"
   opt.separator  "     * set-databags [-i <ID_Env>]|[-n <NAME_Env>] <DB_PATH>\n\tSets a Databag path to an existing Enviroment"
   opt.separator  "     * up [-i <ID_Env>]|[-n <NAME_Env>] [-p <CHEF_PATH>]\n\tLaunches the given Enviroment"
   opt.separator  ""
