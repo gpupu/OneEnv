@@ -50,12 +50,7 @@ class OneEnvHelper
 				str_h1="%-70s"
 				str=["ENVIROMENT #{env.id} INFORMATION"]
 				Format_cli.print_header(str_h1,str,true)
-				#puts env.view_enviroment
 				Format_cli.view_env(env)
-				return 0
-
-			else
-				return 1
 			end
 		end
 
@@ -73,9 +68,6 @@ class OneEnvHelper
 			end
 			if env!=nil
 				env.clone
-				return 0
-			else
-				return 1
 			end
 		end
 
@@ -92,9 +84,6 @@ class OneEnvHelper
 
 			if env!=nil
 				env.delete
-				return 0
-			else
-				return 1
 			end
 
 		end
@@ -112,9 +101,6 @@ class OneEnvHelper
 			
 			if env!=nil
 				env.updateNode n_path
-				return 0
-			else
-				return 1
 			end		
 		end
 
@@ -131,9 +117,6 @@ class OneEnvHelper
 
 			if env!=nil
 				env.setDatabag db_path
-				return 0
-			else
-				return 1
 			end
 		end
 

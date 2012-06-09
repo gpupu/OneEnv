@@ -107,7 +107,9 @@ case ARGV[0]
 	when "up"
 		#+raise ArgumentError if options.length < 1 || options.length > 3
 		OneEnvHelper.up(ID_ENV.to_i,PATH,CHECK)
-
+	else
+	  puts optparse
+	end
 
 rescue OptionParser::InvalidOption, OptionParser::MissingArgument,ArgumentError
 		puts optparse
