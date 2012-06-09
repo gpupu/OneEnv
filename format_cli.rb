@@ -61,6 +61,29 @@ class Format_cli
 
 	end
 
+
+	def Format_cli.print_role_line(role)
+		#Space Limiters
+		name_cad=role.name[0..9]
+		path_cad=path_format(role.path)		
+		
+		if role.deps_roles!=nil
+			d_roles="YES"
+		else
+			d_roles="NO"
+		end
+
+		if role.deps_recs!=nil
+			d_recs="YES"
+		else
+			d_recs="NO"
+		end
+		
+		str="%3s %-11s %-32s %-10s %-8s"
+		puts str % [role.id.to_s,name_cad,path_cad,d_roles, d_recs]
+
+	end
+
 	private	
 	def self.path_format(path)
 		array_aux=File.split(path)
@@ -103,4 +126,26 @@ class Format_cli
 		puts str % ["RECIPES",": ",rc ]
 		puts str % ["DEPENDENCIES",": ",dp]
 	end
+
+	def Format_cli.view_role(role)
+		str= "%-24s %-1s %-24s"
+		puts str % ["ID",":",role.id.to_s]
+		puts str % ["NAME",":",role.name]
+		puts str % ["PATH",":",role.path.to_s]
+		if role.deps_roles!=nil
+			dp=""
+			role.deps_roles.each do|r|
+		       		dp += "\n"+ "%27s" % "" + r
+			end			
+			puts str % ["DEPENDENCIES (ROLES)",":",dp]
+		end
+		if role.deps_recs!=nil
+			dp=""
+			role.deps_recs.each do|r|
+		       		dp += "\n"+ "%27s" % "" + r
+			end			
+			puts str % ["DEPENDENCIES (RECIPES)",":",dp] 	
+		end	
+	end
+
 end
