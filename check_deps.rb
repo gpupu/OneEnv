@@ -118,7 +118,6 @@ def expand_roles(roles_ar)
 	roles_ar.each do |r|
 		comp = expand_role(r) && comp
 	end
-	#puts comp
 	comp
 end
 
@@ -127,7 +126,6 @@ def expand_role(r)
 	if !$deps.exists_role?(r)
 		$deps.add_role(r)
 
-		puts r
 		if Role.exists?(:name => r.to_s)
 			role = Role.first(:conditions=>{:name=>r})
 			# expandimos cookbooks

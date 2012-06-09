@@ -137,7 +137,7 @@ class Cookbook < ActiveRecord::Base
 			cb=Cookbook.first(:conditions=>{:id=>cb_id})
 			return cb					
 		else
-			puts 'Can\'t find the cookbook with id: ' + cb_id
+			puts 'Can\'t find the cookbook with id: ' + cb_id + ' in the database'
 			return nil
 		end
 	end
@@ -148,7 +148,7 @@ class Cookbook < ActiveRecord::Base
 			cb=Cookbook.first(:conditions=>{:name=>cb_name})
 			return cb					
 		else
-			puts 'Can\'t find the cookbook with name: ' + cb_name
+			puts 'Can\'t find the cookbook with name: ' + cb_name + ' in the database'
 			return nil
 		end
 	end
@@ -160,7 +160,7 @@ end
 
 
 class Role < ActiveRecord::Base
-    validates_uniqueness_of :name
+	validates_uniqueness_of :name
 	serialize :deps_roles, Array
 	serialize :deps_recs, Array
 
@@ -173,6 +173,42 @@ class Role < ActiveRecord::Base
 		s += deps_recs.to_s + "\t"
 	end
 
+
+	public
+	def self.get_recipes_list(r_path)
+		# leemos el run_list
+		rdeps = get_json_runl(r_path)
+		#obtenemos recetas
+		recs_list = []
+		rdeps.each do |d|
+			if d.start_with?('recipe')
+				d = d[7..-2]	#toma solo el interior
+				recs_list.push d
+			end
+		end
+		return recs_list
+	end	
+			
+
+
+
+	public 
+	def self.get_roles_list(r_path)
+		# leemos el run_list
+		rdeps = get_json_runl(r_path)	
+		#obtenemos recetas
+		roles_list = []
+		rdeps.each do |d|
+			if d.start_with?('role')
+		                d = d[5..-2]    #toma solo el interior
+		                roles_list.push d
+		        end
+		end
+		return roles_list
+	end
+
+
+
 	public
 	def self.role_create r_name, r_path
 		r_path = File.expand_path(r_path)
@@ -184,44 +220,30 @@ class Role < ActiveRecord::Base
 			isextern=true
 			source = r_path + '/' + r_name
 			dest=ROLE_DIR
-        end
+		end
 
 		if !exists?(:name=>r_name)
 			if File.exists?(r_path)
-
-				iscopy=true
+			iscopy=true
 				if isextern
 					cp_com = "cp -r #{source} #{dest}" 
 					puts cp_com
-                   	iscopy = system(cp_com)
+					iscopy = system(cp_com)
 				end
 
 				if iscopy
 					r_path +="/#{r_name}"
+					recs_list=get_recipes_list(r_path)
+					roles_list=get_roles_list(r_path)
 
-					# leemos el run_list
-					if File.extname(r_name) == ".rb"
-						rdeps = get_ruby_runl(r_path)
-						r_name = File.basename(r_name, ".rb")
-					end
-					if File.extname(r_name) == ".json"
-						rdeps = get_json_runl(r_path)
-						r_name = File.basename(r_name, ".json")
-					end	
+                                        if File.extname(r_name) == ".rb"
+                                                r_name = File.basename(r_name, ".rb")
+                                        end
+                                        if File.extname(r_name) == ".json"
+                                                r_name = File.basename(r_name, ".json")
+                                        end 					
 
-					#dividimos en recetas y roles
-					roles_list = []
-					recs_list = []
-					rdeps.each do |d|
-						if d.start_with?('role')
-							d = d[5..-2]	#toma solo el interior
-							roles_list.push d
-						end
-						if d.start_with?('recipe')
-							d = d[7..-2]	#toma solo el interior
-							recs_list.push d
-						end
-					end
+
 
 					create(:name=> r_name, :path=> r_path, :deps_roles=>roles_list, :deps_recs=>recs_list )
 				else
@@ -236,6 +258,8 @@ class Role < ActiveRecord::Base
 		end
 	end
 
+
+	public
 	def self.get_filename rname
 		if Role.exists?(:name => rname)
 			role=Role.first(:conditions=>{:name=>rname})
@@ -257,7 +281,7 @@ class Role < ActiveRecord::Base
 			role=Role.first(:conditions=>{:id=>role_id})
 			return role					
 		else
-			puts 'Can\'t find the role with id: ' + role_id
+			puts 'Can\'t find the role with id: ' + role_id + ' in the database'
 			return nil
 		end
 	end
@@ -268,12 +292,20 @@ class Role < ActiveRecord::Base
 			role=Role.first(:conditions=>{:name=>role_name})
 			return role					
 		else
-			puts 'Can\'t find the role with name: ' + role_name
+			puts 'Can\'t find the role with name: ' + role_name + ' in the database'
 			return nil
 		end
 	end
 
-
+	public 
+	def update_role
+		r_path=self.path
+		recs_list=Role.get_recipes_list(r_path)
+		roles_list=Role.get_roles_list(r_path)
+		self.deps_roles=roles_list
+		self.deps_recs=recs_list
+		self.save
+	end
 
 
 end
@@ -332,7 +364,7 @@ class Enviroment < ActiveRecord::Base
 			env=Enviroment.first(:conditions=>{:id=>env_id})
 			return env				
 		else
-			puts 'Can\'t find the enviroment with id: ' + env_id
+			puts 'Can\'t find the enviroment with id: ' + env_id + ' in the database'
 			return nil
 		end
 	end
@@ -343,7 +375,7 @@ class Enviroment < ActiveRecord::Base
 			env=Enviroment.first(:conditions=>{:name=> env_name})
 			return env					
 		else
-			puts 'Can\'t find the enviroment with name: ' + env_name
+			puts 'Can\'t find the enviroment with name: ' + env_name + ' in the database'
 			return nil
 		end
 	end

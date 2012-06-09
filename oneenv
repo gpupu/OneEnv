@@ -105,7 +105,7 @@ case ARGV[0]
 
 	##USO:oneenv up [-i ID_CB]|[-n NAME] [-c] [-p PATH_ENV]
 	when "up"
-		#+raise ArgumentError if options.length < 1 || options.length > 3
+		raise ArgumentError if ARGV.length != 1
 		OneEnvHelper.up(ID_ENV.to_i,PATH,CHECK)
 	else
 	  puts optparse

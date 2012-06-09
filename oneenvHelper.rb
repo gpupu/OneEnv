@@ -121,7 +121,6 @@ class OneEnvHelper
 		end
 
 		def self.up(id, c_path,c_deps)
-			puts c_deps
 			if c_path!=nil
 				chef_dir = c_path
 			else
@@ -164,7 +163,7 @@ class OneEnvHelper
 
 					# añadimos roles
 					array_roles=$deps.get_role_list
-
+					puts array_roles
 					##quitamos repeticiones
 					array_roles.each do |r|
 						rfile = Role.get_filename(r)
@@ -191,8 +190,6 @@ class OneEnvHelper
 						end
 					end
 					
-					#Creamos template
-					array_roles=[]
 					c= ConectorONE.new
 					c.crearTemplate(env.template, repo_dir,env.node,env.databags,chef_dir,list_resources)
 				end
