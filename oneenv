@@ -17,12 +17,6 @@ optparse = OptionParser.new do|opt|
   opt.separator  "     * update-node [-i <ID_Env>]|[-n <NAME_Env>] [-p <NODE_PATH>]\n\tChanges the path of the Enviroment's node"
   opt.separator  "     * set-databags [-i <ID_Env>]|[-n <NAME_Env>] <DB_PATH>\n\tSets a Databag path to an existing Enviroment"
   opt.separator  "     * up [-i <ID_Env>]|[-n <NAME_Env>] [-p <CHEF_PATH>]\n\tLaunches the given Enviroment"
-  opt.separator  "     * add-role-dir <PATH>\n\tAdds all Roles from a directory path"
-  opt.separator  "     * add-role <PATH>\n\tAdds a Role from path"
-  opt.separator  "     * update-role <NAME>\n\tUpdates the given Role"
-  opt.separator  "     * list-roles\n\tLists the Roles"
-  opt.separator  "     * delete-role <NAME>\n\tDeletes a given Role"
-  opt.separator  "     * show-role <NAME>\n\tShows information about the given Role"
   opt.separator  ""
   opt.separator  "Options"
 
@@ -109,50 +103,11 @@ case ARGV[0]
 		DB_PATH=ARGV[1]
 		OneEnvHelper.setDatabag(ID_ENV,NAME_ENV,DB_PATH)
 
-	##USO:oneenv up [-c] -i ID [-p PATH_ENV]
-	##USO:oneenv up [-c] -n NAME [-p PATH_ENV]
+	##USO:oneenv up [-i ID_CB]|[-n NAME] [-c] [-p PATH_ENV]
 	when "up"
 		#+raise ArgumentError if options.length < 1 || options.length > 3
 		OneEnvHelper.up(ID_ENV.to_i,PATH,CHECK)
 
-	##USO: oneenv add-role-dir PATH
-	when "add-role-dir"
-		raise ArgumentError if ARGV.length != 2 
-		PATH=ARGV[1]
-		OneEnvHelper.addRoleDir(PATH)
-
-	##USO: oneenv add-role-dir PATH
-	when "add-role"
-		raise ArgumentError if ARGV.length != 2 
-		PATH=ARGV[1]
-		OneEnvHelper.addRole(PATH)
-
-	##USO: oneenv update-role NAME
-	when "update-role"
-		raise ArgumentError if ARGV.length != 2 
-		NAME=ARGV[1]
-		OneEnvHelper.updateRole(NAME)
-
-	#USO oneenv list-roles
-	when "list-roles"
-		raise ArgumentError if ARGV.length != 1 
-		OneEnvHelper.listRoles()
-
-
-	#USO oneenv delete-role NAME
-	when "delete-role"
-		raise ArgumentError if ARGV.length != 2 
-		NAME=ARGV[1]
-		OneEnvHelper.deleteRole(NAME)
-	
-	#USO oneenv show-role NAME
-	when "show-role"
-		raise ArgumentError if ARGV.length != 2 
-		NAME=ARGV[1]
-		OneEnvHelper.showRole(NAME)
-	else
-	  puts optparse
-	end
 
 rescue OptionParser::InvalidOption, OptionParser::MissingArgument,ArgumentError
 		puts optparse

@@ -11,7 +11,6 @@ class OneCookHelper
 		Cookbook.find(:all).each do |cb|
 			Format_cli.print_cb_line(cb)
 		end
-		return 0
 	end
 
 	
@@ -29,10 +28,8 @@ class OneCookHelper
 					Cookbook.cb_create(cb,path)
 				end
 			end
-			return 0
 		else
 			puts path + ' don\'t exists'
-			return 1
 		end
 
 	end
@@ -45,15 +42,10 @@ class OneCookHelper
 		if(!nameCB.nil?)
 			cb=Cookbook.getCookbookByName(nameCB)
 		elsif(!idCB.nil?)	
-			cb=Cookbook.getCookbookById(idCB)
-		else
-			puts "COOKBOOK_ID/NAME argument needed for this action.\nPlease, write: 'onecook -h' for help."		
+			cb=Cookbook.getCookbookById(idCB)	
 		end
 		if cb!=nil
 			cb.delete
-			return 0
-		else
-			return 1
 		end
 	end
 
@@ -61,18 +53,13 @@ class OneCookHelper
 		if(!nameCB.nil?)
 			cb=Cookbook.getCookbookByName(nameCB)
 		elsif(!idCB.nil?)	
-			cb=Cookbook.getCookbookById(idCB)
-		else
-			puts "COOKBOOK_ID/NAME argument needed for this action.\nPlease, write: 'onecook -h' for help."		
+			cb=Cookbook.getCookbookById(idCB)	
 		end
 		if cb!=nil
 			str_h1="%-70s"
 			str=["COOKBOOK #{cb.id} INFORMATION"]
 			Format_cli.print_header(str_h1,str,true)
 			Format_cli.view_cb(cb)
-			return 0
-		else
-			return 1
 		end
 	end
 
@@ -80,15 +67,10 @@ class OneCookHelper
 		if(!nameCB.nil?)
 			cb=Cookbook.getCookbookByName(nameCB)
 		elsif(!idCB.nil?)	
-			cb=Cookbook.getCookbookById(idCB)
-		else
-			puts "COOKBOOK_ID/NAME argument needed for this action.\nPlease, write: 'onecook -h' for help."		
+			cb=Cookbook.getCookbookById(idCB)		
 		end
 		if cb!=nil
 			cb.update_cb
-			return 0
-		else
-			return 1
 		end
 	end
 
@@ -96,9 +78,7 @@ class OneCookHelper
 		if(!nameCB.nil?)
 			cb=Cookbook.getCookbookByName(nameCB)
 		elsif(!idCB.nil?)	
-			cb=Cookbook.getCookbookById(idCB)
-		else
-			puts "COOKBOOK_ID/NAME argument needed for this action.\nPlease, write: 'onecook -h' for help."		
+			cb=Cookbook.getCookbookById(idCB)	
 		end
 		if cb!=nil
 			cb_name = cb.name
@@ -106,9 +86,6 @@ class OneCookHelper
 			clean_deps(deps)
 			dep_str = list_deps(deps)
 			puts dep_str
-			return 0
-		else
-			return 1
 		end
 	end
 

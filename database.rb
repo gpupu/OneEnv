@@ -161,7 +161,6 @@ end
 
 class Role < ActiveRecord::Base
     validates_uniqueness_of :name
-    #has_and_belongs_to_many :enviroments, :uniq => true
 	serialize :deps_roles, Array
 	serialize :deps_recs, Array
 
@@ -238,7 +237,6 @@ class Role < ActiveRecord::Base
 	end
 
 	def self.get_filename rname
-
 		if Role.exists?(:name => rname)
 			role=Role.first(:conditions=>{:name=>rname})
 			rfile=role.path
@@ -252,14 +250,38 @@ class Role < ActiveRecord::Base
 
 	end
 
+
+	public
+	def self.getRoleById role_id
+		if Role.exists?(:id => role_id)
+			role=Role.first(:conditions=>{:id=>role_id})
+			return role					
+		else
+			puts 'Can\'t find the role with id: ' + role_id
+			return nil
+		end
+	end
+
+	public
+	def self.getRoleByName role_name
+		if Role.exists?(:name => role_name)
+			role=Role.first(:conditions=>{:name=>role_name})
+			return role					
+		else
+			puts 'Can\'t find the role with name: ' + role_name
+			return nil
+		end
+	end
+
+
+
+
 end
 
 class Enviroment < ActiveRecord::Base
 
 	validates_uniqueness_of :name
 	after_create :create_defaults
-	#has_and_belongs_to_many :cookbooks, :uniq => true
-	#has_and_belongs_to_many :roles, :uniq => true
     
 	private
 	def create_defaults
@@ -326,6 +348,8 @@ class Enviroment < ActiveRecord::Base
 		end
 	end
 
+
+
 end
 
 class CreateSchema < ActiveRecord::Migration
@@ -336,7 +360,6 @@ class CreateSchema < ActiveRecord::Migration
 			t.column :path, :string, :default=>CB_DIR
 			t.text :recipes
 			t.text :recipes_deps
-			#t.column :enviroments, :enviroment
 		end
 	end
 
@@ -346,7 +369,7 @@ class CreateSchema < ActiveRecord::Migration
 			t.column :path, :string, :default=>ROLE_DIR
 			t.text :deps_roles
 			t.text :deps_recs
-			#t.column :enviroments, :enviroment
+
 		end
 	end
 
@@ -355,10 +378,8 @@ class CreateSchema < ActiveRecord::Migration
 			t.column :name, :string, :default=> nil,:unique=>true
 			t.column :template, :integer, :null=> false
 			t.column :node, :string, :null=> false
-			#t.column :solo_path, :string, :default=>SOLO_DIR
 			t.column :databags, :string, :default=> nil
-			#t.column :roles, :role
-			#t.column :cookbooks, :cookbook
+
 		end
 	end
 
