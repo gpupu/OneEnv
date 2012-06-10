@@ -1,0 +1,93 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require 'oneroleHelper'
+
+options = {}
+
+optparse = OptionParser.new do|opt|
+  opt.banner = "Usage: oneenv COMMAND [OPTIONS]"
+  opt.separator  ""
+  opt.separator  "COMMANDS"
+  opt.separator  "     * add <PATH>\n\tAdds a Role from path"
+  opt.separator  "     * delete <NAME>\n\tDeletes a given Role"
+  opt.separator  "     * show <NAME>\n\tShows information about the given Role"
+  opt.separator  "     * update <NAME>\n\tUpdates the given Role"
+  opt.separator  "     * list\n\tLists the Roles"
+  opt.separator  "     * import-repo <PATH>\n\tAdds all Roles from a directory path"
+  opt.separator  ""
+  opt.separator  "Options"
+
+
+
+   options[:name_role] = nil
+   opt.on( '-n', '--name NAME_ROLE', 'References role by Name' ) do |name_role|
+     options[:name_role] = name_role
+   end
+
+   options[:id_role] = nil
+   opt.on( '-i', '--id ID_ROLE', 'References role by Id' ) do |id_role|
+     options[:id_role] = id_role
+
+   end
+
+  opt.on("-h","--help","help") do
+    puts opt_parse
+  end
+
+
+end
+
+
+begin 
+optparse.parse!
+
+NAME_ROLE=options[:name_role]		
+ID_ROLE=options[:id_role]
+
+
+
+case ARGV[0]
+
+	##USO: onerole add PATH
+	when "add"
+		raise ArgumentError if ARGV.length != 2 
+		PATH=ARGV[1]
+		OneRoleHelper.add(PATH)
+
+	#USO onerole delete [-i ID_CB]|[-n NAME]
+	when "delete"
+		raise ArgumentError if ARGV.length != 1
+		OneRoleHelper.delete(ID_ROLE,NAME_ROLE)
+	
+	#USO onerole show [-i ID_CB]|[-n NAME]
+	when "show"
+		raise ArgumentError if ARGV.length != 1
+		OneRoleHelper.show(ID_ROLE,NAME_ROLE)
+
+	##USO: onerole import-repo PATH
+	when "import-repo"
+		raise ArgumentError if ARGV.length != 2
+		PATH=ARGV[1]
+		OneRoleHelper.addDir(PATH)
+
+	##USO: onerole update [-i ID_CB]|[-n NAME]
+	when "update"
+		raise ArgumentError if ARGV.length != 1
+		OneRoleHelper.update_role(ID_ROLE,NAME_ROLE)
+
+	#USO onerole list
+	when "list"
+		raise ArgumentError if ARGV.length != 1
+		OneRoleHelper.list()
+
+	else
+	  puts optparse
+	end
+
+rescue OptionParser::InvalidOption, OptionParser::MissingArgument,ArgumentError
+		puts optparse
+		exit
+
+end
+
