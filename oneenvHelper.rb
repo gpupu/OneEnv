@@ -41,9 +41,7 @@ class OneEnvHelper
 			if(!nameEnv.nil?)
 				env=Enviroment.getEnvByName(nameEnv)
 			elsif(!idEnv.nil?)	
-				env=Enviroment.getEnvById(idEnv)
-			else
-				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
+				env=Enviroment.getEnvById(idEnv)	
 			end
 
 			if env!=nil
@@ -62,9 +60,7 @@ class OneEnvHelper
 			if(!nameEnv.nil?)
 				env=Enviroment.getEnvByName(nameEnv)
 			elsif(!idEnv.nil?)	
-				env=Enviroment.getEnvById(idEnv)
-			else
-				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
+				env=Enviroment.getEnvById(idEnv)		
 			end
 			if env!=nil
 				env.clone
@@ -77,9 +73,7 @@ class OneEnvHelper
 			if(!nameEnv.nil?)
 				env=Enviroment.getEnvByName(nameEnv)
 			elsif(!idEnv.nil?)	
-				env=Enviroment.getEnvById(idEnv)
-			else
-				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
+				env=Enviroment.getEnvById(idEnv)		
 			end
 
 			if env!=nil
@@ -94,9 +88,7 @@ class OneEnvHelper
 			if(!nameEnv.nil?)
 				env=Enviroment.getEnvByName(nameEnv)
 			elsif(!idEnv.nil?)	
-				env=Enviroment.getEnvById(idEnv)
-			else
-				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
+				env=Enviroment.getEnvById(idEnv)		
 			end
 			
 			if env!=nil
@@ -110,9 +102,7 @@ class OneEnvHelper
 			if(!nameEnv.nil?)
 				env=Enviroment.getEnvByName(nameEnv)
 			elsif(!idEnv.nil?)	
-				env=Enviroment.getEnvById(idEnv)
-			else
-				puts "ENVIROMENT_ID/NAME argument needed for this action.\nPlease, write: 'oneenv -h' for help."		
+				env=Enviroment.getEnvById(idEnv)		
 			end
 
 			if env!=nil
@@ -120,15 +110,21 @@ class OneEnvHelper
 			end
 		end
 
-		def self.up(id, c_path,c_deps)
+		def self.up(idEnv,nameEnv, c_path,c_deps)
+
 			if c_path!=nil
 				chef_dir = c_path
 			else
 				chef_dir = CONFIG['default_solo_path'] 
 			end
 
-			if Enviroment.exists?(id)
-				env = Enviroment.find(id)
+			if(!nameEnv.nil?)
+				env=Enviroment.getEnvByName(nameEnv)
+			elsif(!idEnv.nil?)	
+				env=Enviroment.getEnvById(idEnv)	
+			end
+
+			if(!env.nil?)
 				repo_dir = ""
 
 				# Si existen añadimos databags
@@ -193,9 +189,6 @@ class OneEnvHelper
 					c= ConectorONE.new
 					c.crearTemplate(env.template, repo_dir,env.node,env.databags,chef_dir,list_resources)
 				end
-
-			else 
-				puts 'There is not an environment with that id'
 			end
 		end
 
