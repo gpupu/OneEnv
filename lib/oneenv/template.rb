@@ -4,19 +4,14 @@
 ##############################################################################
 # Required libraries
 ##############################################################################
-ONE_LOCATION=ENV["ONE_LOCATION"]
-
-SCRIPT_DIR="./start_vm"
-
-
  
 if !ONE_LOCATION
-    RUBY_LIB_LOCATION="/usr/lib/one/ruby"
+    LIB_LOCATION="/usr/lib/one"
 else
-    RUBY_LIB_LOCATION=ONE_LOCATION+"/lib/ruby"
+    LIB_LOCATION=ONE_LOCATION+"/lib"
 end
- 
-$: << RUBY_LIB_LOCATION
+SCRIPT_DIR=LIB_LOCATION+"/sh/start_env"
+
 
 #require 'nokogiri/XML'
 require 'OpenNebula'
@@ -69,6 +64,7 @@ class ConectorONE
 		
 			script_init= File.expand_path(SCRIPT_DIR) + '/init.sh'
 			script_chef= File.expand_path(SCRIPT_DIR) + '/chef.sh'
+			puts script_init
 
 			
 

@@ -1,5 +1,5 @@
-require 'database.rb'
-require 'format_cli'
+require 'oneenv/database.rb'
+require 'cli/oneenv_helper/format_cli.rb'
 
 class OneRoleHelper
 		def self.addDir(c_path)		
