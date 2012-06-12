@@ -85,7 +85,7 @@ case ARGV[0]
 	  puts optparse
 	end
 
-rescue OptionParser::InvalidOption, OptionParser::MissingArgument
+rescue OptionParser::InvalidOption, OptionParser::MissingArgument,ArgumentError
 		puts optparse
 		exit
 end
