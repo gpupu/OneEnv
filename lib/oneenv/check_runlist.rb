@@ -1,7 +1,7 @@
 require 'json'
-require 'database'
-require 'deps_list'
-require 'check_deps'
+require 'oneenv/database.rb'
+require 'oneenv/deps_list'
+require 'oneenv/check_deps'
 
 
 def get_recipes(runl_array)

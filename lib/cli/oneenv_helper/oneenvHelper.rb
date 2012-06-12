@@ -1,7 +1,7 @@
-require 'database.rb'
-require 'check_runlist.rb'
-require 'template.rb'
-require 'format_cli'
+require 'oneenv/database.rb'
+require 'oneenv/check_runlist.rb'
+require 'oneenv/template.rb'
+require 'cli/oneenv_helper/format_cli.rb'
 
 class OneEnvHelper
 

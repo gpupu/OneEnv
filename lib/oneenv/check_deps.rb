@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'deps_list.rb'
+require 'oneenv/deps_list.rb'
 require 'json'
-require 'format_cli'
+require 'cli/oneenv_helper/format_cli.rb'
 
 
 #nombre receta => [COOBOOK::recipe,..]

@@ -2,18 +2,25 @@
 
 require 'rubygems'
 require 'active_record'
-require 'check_deps.rb'
+require 'oneenv/check_deps.rb'
+
+#ONE_LOCATION=ENV["ONE_LOCATION"]
+
+if !ONE_LOCATION
+    ONE_ETC_LOCATION="/etc/one"
+else
+    ONE_ETC_LOCATION=ONE_LOCATION+"/etc"
+end
 
 
-
-CONFIG_FILE = 'oneenv.cnf'
+CONFIG_FILE = ONE_ETC_LOCATION+"/oneenv.conf"
 
 begin
 	CONFIG = YAML.load_file(CONFIG_FILE)
 	CB_DIR = File.expand_path(CONFIG['default_cb_dir'])
 	ROLE_DIR = File.expand_path(CONFIG['default_role_dir'])
 rescue Errno::ENOENT => notfound
-	puts "Not Found oneenv.cnf"
+	puts "Not Found oneenv.conf"
 	exit
 rescue  => badargument
 	puts "Bad argument in oneenv.conf"
@@ -177,7 +184,12 @@ class Role < ActiveRecord::Base
 	public
 	def self.get_recipes_list(r_path)
 		# leemos el run_list
-		rdeps = get_json_runl(r_path)
+		if File.extname(r_path) == ".rb"
+			rdeps = get_ruby_runl(r_path)
+		end
+        if File.extname(r_path) == ".json"
+			rdeps = get_json_runl(r_path)
+		end
 		#obtenemos recetas
 		recs_list = []
 		rdeps.each do |d|
@@ -195,7 +207,12 @@ class Role < ActiveRecord::Base
 	public 
 	def self.get_roles_list(r_path)
 		# leemos el run_list
-		rdeps = get_json_runl(r_path)	
+		if File.extname(r_path) == ".rb"
+			rdeps = get_ruby_runl(r_path)
+		end
+        if File.extname(r_path) == ".json"
+			rdeps = get_json_runl(r_path)
+		end	
 		#obtenemos recetas
 		roles_list = []
 		rdeps.each do |d|
@@ -233,14 +250,19 @@ class Role < ActiveRecord::Base
 
 				if iscopy
 					r_path +="/#{r_name}"
+					puts r_path
 					recs_list=get_recipes_list(r_path)
+					puts recs_list
 					roles_list=get_roles_list(r_path)
+					puts roles_list
 
                                         if File.extname(r_name) == ".rb"
                                                 r_name = File.basename(r_name, ".rb")
+                                                puts "ruby "+ r_name
                                         end
                                         if File.extname(r_name) == ".json"
                                                 r_name = File.basename(r_name, ".json")
+                                                puts "json "+ r_name
                                         end 					
 
 

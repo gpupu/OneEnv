@@ -39,6 +39,10 @@ if [ -n "${CHEFCB}" ]; then
 		cp -rv "${DISK}/$cookbook" "${CBPATH}$cookbook"
 	done
 	IFS=$oIFS
+
+else
+	echo "copiando cookbooks a ${CBPATH}"
+	cp -rv $CBDISK $CHEF_DIR
 fi
 
 
