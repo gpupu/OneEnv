@@ -3,7 +3,7 @@
 
 if [ -z "$ONE_LOCATION" ] ; then
     echo "Installing system wide..."
-    ONE_BIN_DIR="/usr/bin/one"
+    ONE_BIN_DIR="/usr/bin"
     ONE_LIB_DIR="/usr/lib/one"
     ONE_ETC_DIR="/etc/one"
     ONE_VAR_DIR="/var/lib/one"
