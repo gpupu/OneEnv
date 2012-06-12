@@ -67,7 +67,7 @@ class Format_cli
 		name_cad=role.name[0..9]
 		path_cad=path_format(role.path)		
 		
-		if role.deps_roles!=nil
+		if !role.deps_roles.empty?
 			d_roles="YES"
 		else
 			d_roles="NO"
