@@ -82,10 +82,10 @@ class ConectorONE
 
 			target= "vdb"
 
-			###EDITAR CONTEXTO
+			###EDIT CONTEXT
 			if !xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").empty?
 				if !xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT//FILES").empty?
-					##EXITE EL NODO FILES
+					# Node file exists
 					
 					data_files_old=xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT//FILES").first
 					files = data_files_old.content + " " + files
@@ -99,7 +99,7 @@ class ConectorONE
 				
 
 				else
-					#NO EXISTE NODO FILES
+					# Node files not exists
 					node_files = createNodeFiles doc, files
 					node_target=createNodeTarget doc, target
 					xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_files
@@ -107,7 +107,7 @@ class ConectorONE
 
 				end
 			else		
-				##NO EXISTE NODO CONTEXT
+				# Context node not exists
 				node_files= createNodeFiles doc, files
 				node_target=createNodeTarget doc, target
 				node_context=createNodeContext doc, node_files, node_target
@@ -115,19 +115,18 @@ class ConectorONE
 
 			end
 
-			# Introduce el nombre del node
+			# Insert node name
 			name = File.basename(path_json)	# no nos importa quedarnos también con la extension
 			node_name = createContextVariable doc, "CHEF_NODE", name
 			xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << node_name
 
-		puts "ELEMENTOS EN EL TEMPLATE:"
-		puts "COOKBOOKS"
+		puts "Cookbooks:"
 		puts  list_resources.cookbooks_list
 
-		puts "ROLES"
+		puts "Roles"
 		puts  list_resources.role_list
 
-			# Introducimos nombres de las cookbooks y de los roles
+			# Insert nodes and roles names
 			if !list_resources.cookbooks_list.empty?
 				cb_names = createContextVariable doc, "CHEFCB", list_resources.get_sh_cb_list 
 				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << cb_names
@@ -140,12 +139,12 @@ class ConectorONE
 			end
 	
 
-			# Introduce el path de la ruta chef	
+			# Insert Chef path
 			dir_chef = createContextVariable doc, "CHEF_DIR", path_chef
 			xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << dir_chef
 
 			if path_databags != nil
-				# Introduce el nombre del directorio databags
+				# databag's dir name
 				dir_db = createContextVariable doc, "CHEF_DATABAGS", File.basename(path_databags)
 				xml.xpath("//VMTEMPLATE//TEMPLATE//CONTEXT").first << dir_db
 			end
@@ -169,7 +168,6 @@ class ConectorONE
 	
 	private
 	def createNodeFiles doc,files
-		puts "NO HAY FILES"		
 		node_files=Nokogiri::XML::Node.new("FILES", doc)
 		data_files=data=Nokogiri::XML::CDATA.new(doc,files)
 		node_files << data_files
@@ -178,7 +176,6 @@ class ConectorONE
 
 	private
 	def createNodeContext doc, node_files, node_target
-		puts "NO HAY CONTEXT"
 		node_context=Nokogiri::XML::Node.new("CONTEXT", doc)
 		node_context << node_target
 		node_context << node_files

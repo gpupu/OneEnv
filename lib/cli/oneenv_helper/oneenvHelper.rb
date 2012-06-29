@@ -22,7 +22,6 @@ require 'cli/oneenv_helper/format_cli.rb'
 class OneEnvHelper
 
 		def self.create(name,id,n_path,d_path)
-		#si se intenta crear 2 entornos con el mismo nombre la 2ª vez no hace nada pero tp. dice nada.
 			if File.exists?(n_path)
 				node_path = File.expand_path(n_path)
 			else 
@@ -143,7 +142,7 @@ class OneEnvHelper
 			if(!env.nil?)
 				repo_dir = ""
 
-				# Si existen añadimos databags
+				# add databags if exists
 				if env.databags != nil && 					
 					if !File.exists?(env.databags)
 						puts env.databags + ' don\'t exists'
@@ -165,24 +164,24 @@ class OneEnvHelper
 					dep_resueltas=expand_node(env.node)
 
 
-					# añadimos cookbooks
+					# add cookbooks
 					array_cb=$deps.get_cb_list
 
-					##quitamos repeticiones
+					# delete repetitions
 					array_cb.each do |cb|
 						repo_dir += "#{CB_DIR}/#{cb} "
 					end
 
-					# añadimos roles
+					# add roles
 					array_roles=$deps.get_role_list
 					puts array_roles
-					##quitamos repeticiones
+					# delete repetitions
 					array_roles.each do |r|
 						rfile = Role.get_filename(r)
 						repo_dir += "#{ROLE_DIR}/#{rfile} "
 					end
 
-					#Creamos template
+					# create template
 					if(!dep_resueltas)
 						puts 'Incomplete dependencies, review that are correct'
 						exit
@@ -193,7 +192,7 @@ class OneEnvHelper
 				
 
 				else
-					# añadimos cookbooks
+					# add cookbooks
 					list_resources=check_runlist(env.node)
 					array_cb=list_resources.cookbooks_list
 					if(!array_cb.empty?)

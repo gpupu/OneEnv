@@ -24,7 +24,6 @@ def get_recipes(runl_array)
 array_recipes=[]
 	if !runl_array.nil?
 		runl_array.each do |r|
-			##Obtiene la receta
 			r = r[7..-2]
 		
 			if !r.include?("::")

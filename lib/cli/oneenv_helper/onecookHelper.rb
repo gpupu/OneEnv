@@ -36,7 +36,7 @@ class OneCookHelper
 		if File.exists?(path)
 			cbs_list = Dir.entries(path)
 			cbs_list.each do |cb|
-				# Comprueba que es un CB
+				# Make sure is a cookbook
 				cb_dir = path + '/' + cb
 				puts cb_dir
 				if Cookbook.isCookbook? cb_dir
@@ -51,7 +51,7 @@ class OneCookHelper
 	end
 
 	def self.add(name,path)
-	 Cookbook.cb_create(name,path)
+		Cookbook.cb_create(name,path)
 	end
 
 	def self.delete(idCB,nameCB)

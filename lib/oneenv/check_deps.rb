@@ -21,21 +21,14 @@ require 'json'
 require 'cli/oneenv_helper/format_cli.rb'
 
 
-#nombre receta => [COOBOOK::recipe,..]
 def find_deps2(cookbook_dir)
   nel = Hash.new { |h, k| h[k] = [] }
   
   Dir.glob("#{cookbook_dir}/recipes/*.rb").each do |r|
-	#puts cookbook_dir
 	cb_name = File.basename(cookbook_dir)
-	#puts cb_name
 	rec = File.basename(r, ".rb")
-	#puts "Estoy dentro de findeps2 y viendo a #{r}"
-	#puts rec
 	rdeps=get_recipe_deps(rec, cookbook_dir) 
-	#if rdeps != []
     nel["#{rec}"] = rdeps
-	#end
   end
   nel
 end
@@ -90,8 +83,7 @@ def list_deps(cbs)
 				end
 			end
 		end
-		#s += "\n\nThese cookbooks may be needed: "
-		#s += "\t" +  cb_deps.join(", ")
+
 	end
 	return s
 end
@@ -115,13 +107,11 @@ def expand_sons(rl_array)
 	comp = true
 	rl_array.each do |r|
 		if r.start_with?('recipe')
-			#puts "#{r} es una recipe"
-			r = r[7..-2]	#toma solo el interior
+			r = r[7..-2]	# 'recipe[' size = 7
 			comp = expand_recipe(r) && comp
 		end
 		if r.start_with?('role')
-			#puts "#{r} es un rol"
-			r = r[5..-2]	#toma solo el interior
+			r = r[5..-2]	# 'role[]' size = 5
 			comp = expand_role(r) && comp
 		end
 	end
@@ -144,9 +134,9 @@ def expand_role(r)
 
 		if Role.exists?(:name => r.to_s)
 			role = Role.first(:conditions=>{:name=>r})
-			# expandimos cookbooks
+
 			comp = expand_cookbooks(role.deps_recs)
-			# expandimos roles
+
 			comp = expand_roles(role.deps_roles) && comp
 			return comp
 		else
@@ -154,9 +144,8 @@ def expand_role(r)
 			return false
 		end
 	else
-		#si ya existe no lo añade y corta para evitar ciclos
+		#cut to avoid cycles if exists
 	end
-	#puts comp
 	comp
 end
 
@@ -175,16 +164,15 @@ def expand_recipe(rec_comp)
 			rec_comp += "::default"
 		end
 		$deps.add_cb(rec_comp)
-		# Comprobamos que existe en la base de datos la dependencia (el hijo)
+		# Check if exists in the database
 		cb_name = rec_comp.split("::")[0]
 		if Cookbook.exists?(:name => cb_name)
 			cb = Cookbook.first(:conditions=>{:name=>cb_name})
-			# cogemos el nombre de la receta de la que depende
+			# take recipe's name
 			rec = rec_comp.split("::")[1]
-			#puts rec
-			# cogemos el array de las dependencias de esa receta en concreto
+
+			# dependencies array of this recipe
 			cb_deps = cb.recipes_deps[rec]
-			#puts cb_deps
 			comp = expand_cookbooks(cb_deps)
 			return comp
 		else
@@ -192,9 +180,8 @@ def expand_recipe(rec_comp)
 			return false
 		end
 	else
-		#si ya existe no lo añade y corta para evitar ciclos
+		# cut to avoid cycles if exists
 	end
-	#puts comp
 	comp
 end
 
@@ -222,8 +209,7 @@ end
 
 
 
-
-#devuelve array dependencias de un rb
+# return dependencies array
 def get_ruby_runl(path)
 	regexp = /.*run_list? *\(?(( )*("|')([^"]+)("|')( )*,( )*)*(("|')([^"]+)("|')( )*)\)?/
 	open(path) do |f|
@@ -250,7 +236,6 @@ end
 
 def get_recipe_deps(recipe_name, cb_path)
 	regex = /.*include_recipe +("|')([^"#]+)("|')/
-	#dir = cb_path.sub(/\/$/, "")
 	cb_path = File.expand_path(cb_path)
 	if File.exists? "#{cb_path}/recipes/#{recipe_name}.rb"
 		r_deps = []
@@ -261,10 +246,10 @@ def get_recipe_deps(recipe_name, cb_path)
         		if m
           			if !m[2].match(/::/)
             			r_deps << (m[2] + "::default")
-						#puts r_deps
+            			
           			else
             			r_deps << m[2]
-						#puts r_deps
+
           			end
         		end
       		end
