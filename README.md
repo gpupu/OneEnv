@@ -2,7 +2,7 @@
 Environment provisioning tool for OpenNebula
 
 ## Description ##
-OneEnv is an environment provisioning tool that adds OpenNebula the ability to deploy environments in an easy and flexible way. The user would be able to write different agnostic configurations as code powered by Chef Solo.
+OneEnv is an environment provisioning tool that adds OpenNebula the ability to deploy environments in an easy and flexible way. The user would be able to write different configurations as code thanks to Chef Solo.
 
 ## Requirements ##
 Any OpenNebula version with contextualization support should work, but it is recommended 3.0 or higher where OneEnv has been tested.
@@ -85,7 +85,7 @@ By default , all cookbooks and roles included will be copy to var/chef directory
 ### Options ###
 		
 	-c, --check
-		Check dependencies when up a environment
+		Check dependencies when launching a environment
 	-i, --id ID_ENV
 		References environment, cookbook or role by ID
 	-n, --name NAME_ENV
