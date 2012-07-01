@@ -28,7 +28,7 @@ if !ONE_LOCATION
     
 else
     ONE_ETC_LOCATION=ONE_LOCATION+"/etc"
-    ONE_DB_LOCATION=ONE_LOCATION
+    ONE_DB_LOCATION=ONE_LOCATION+"/var"
 end
 
 
@@ -147,7 +147,6 @@ class Cookbook < ActiveRecord::Base
 		iscoobook=false
 		if File.directory?(cb_dir)
 			cont= Dir.entries cb_dir
-			#puts cont
 			# is a cookbook if include metadata file
 			iscoobook=cont.include?('metadata.rb')
 		end

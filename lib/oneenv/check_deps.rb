@@ -111,7 +111,7 @@ def expand_sons(rl_array)
 			comp = expand_recipe(r) && comp
 		end
 		if r.start_with?('role')
-			r = r[5..-2]	# 'role[]' size = 5
+			r = r[5..-2]	# 'role[' size = 5
 			comp = expand_role(r) && comp
 		end
 	end
