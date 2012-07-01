@@ -24,12 +24,16 @@ require 'oneenv/check_deps.rb'
 
 if !ONE_LOCATION
     ONE_ETC_LOCATION="/etc/one"
+    ONE_DB_LOCATION="/var/lib/one"
+    
 else
     ONE_ETC_LOCATION=ONE_LOCATION+"/etc"
+    ONE_DB_LOCATION=ONE_LOCATION
 end
 
 
 CONFIG_FILE = ONE_ETC_LOCATION+"/oneenv.conf"
+DB_FILE = ONE_DB_LOCATION+"/oneenv.db"
 
 begin
 	CONFIG = YAML.load_file(CONFIG_FILE)
@@ -46,8 +50,7 @@ end
 
 
 
-
-ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => "oneenv.db")
+ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => DB_FILE)
 
 class Cookbook < ActiveRecord::Base
 	validates_uniqueness_of :name
