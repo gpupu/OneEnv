@@ -25,7 +25,6 @@ else
 end
 
 $: << RUBY_LIB_LOCATION
-#$: << RUBY_LIB_LOCATION+"/cli"
 
 require 'optparse'
 require 'cli/oneenv_helper/onecookHelper'
@@ -39,7 +38,7 @@ optparse = OptionParser.new do|opt|
   opt.separator  "COMMANDS"
   opt.separator  "     * add <NAME> [-p <PATH>]\n\tAdds a new a Cookbook to the repository."
   opt.separator  "     * list\n\tLists all Cookbooks"
-  opt.separator  "     * import-repo <PATH>\n\tImports all the Cookbooks to the repository from the given path"
+  opt.separator  "     * import-repo <PATH>\n\tImports all Cookbooks to the repository from the given path"
   opt.separator  "     * delete [-n <COOKBOOK_NAME>]|[-i <COOKBOOK_ID>]\n\tDeletes the given Cookbook"
   opt.separator  "     * show [-n <COOKBOOK_NAME>]|[-i <COOKBOOK_ID>]\n\tPrints the information of the given Cookbook"
   opt.separator  "     * update-cb [-n <COOKBOOK_NAME>]|[-i <COOKBOOK_ID>]\n\tUpdates the given Cookbook"
@@ -64,7 +63,7 @@ optparse = OptionParser.new do|opt|
 
    end
 
-  opt.on("-h","--help","Shows this message") do
+  opt.on("-h","--help","Shows this help") do
     puts optparse
   end
 

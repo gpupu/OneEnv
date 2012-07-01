@@ -22,7 +22,7 @@ readonly RDISK="${DISK}/roles/"
 readonly DBDISK="${DISK}/${CHEF_DATABAGS}/"
 
 
-# CHEF_DIR se carga en el context
+# CHEF_DIR in CONTEXT
 readonly CBPATH="${CHEF_DIR}/cookbooks/"
 readonly RPATH="${CHEF_DIR}/roles/"
 readonly DBPATH="${CHEF_DIR}/data_bags/"
@@ -30,23 +30,20 @@ readonly DBPATH="${CHEF_DIR}/data_bags/"
 readonly JPATH="${CHEF_DIR}/${CHEF_NODE}"
 readonly CPATH="${CHEF_DIR}/config.rb"
 
-# Crea el directorio (no hace nada si ya existe)
+
 mkdir -vp $CHEF_DIR
 
-
-# Crea el archivo solo.rb
-echo "Creando archivo configuracion"
+# Config file
+echo "Creating Chef's config file"
 echo "file_cache_path \"${CHEF_DIR}\"" > $CPATH
 echo "cookbook_path \"${CBPATH}\"" >> $CPATH
 echo "role_path \"${RPATH}\"" >> $CPATH
 echo "data_bag_path \"${DBPATH}\"" >> $CPATH
 
 
-# Copia todo al disco
-echo "copiando elementos al disco"
-# Copia Cookbooks
+# copying cookbooks
 if [ -n "${CHEFCB}" ]; then
-	echo "copiando cookbooks ${CHEFCB} MODO DEPS"
+	echo "copying cookbooks ${CHEFCB} MODO DEPS"
 	mkdir -v $CBPATH
 	oIFS=$IFS
 	IFS=";"	
@@ -57,7 +54,7 @@ if [ -n "${CHEFCB}" ]; then
 	IFS=$oIFS
 
 else
-	echo "copiando cookbooks a ${CBPATH}"
+	echo "copying cookbooks to ${CBPATH}"
 	cp -rv $CBDISK $CHEF_DIR
 fi
 
@@ -65,7 +62,7 @@ fi
 # Copia Roles
 if [ -n "${CHEFR}" ]; then
 	mkdir -v $RPATH
-	echo "copiando roles a ${CHEFR} MODO DEPS"
+	echo "copying roles to ${CHEFR} MODO DEPS"
 	oIFS=$IFS
 	IFS=";"
 	for role in $CHEFR 
@@ -76,23 +73,23 @@ if [ -n "${CHEFR}" ]; then
 
 else
 	if [ -f "${RDISK}" ]; then	
-		echo "copiando roles a ${RPATH}"
+		echo "copying roles to ${RPATH}"
 		cp -rv $RDISK $CHEF_DIR
 	fi
 fi
 
 # Copia Databags
 if [ -n "${CHEF_DATABAGS}" ]; then
-	echo "copiando databags a ${DBPATH}"
+	echo "copying databags to ${DBPATH}"
 	cp -rv $DBDISK $DBPATH
 fi
 
 # Copia node
-echo "copiando el node"
+echo "coopyng node"
 cp -rv "$DISK/$CHEF_NODE" $CHEF_DIR
 # Ejecuta Chef-solo
 
-echo "Ejecuta chef-solo"
+echo "Chef solo exec"
 chef-solo -c $CPATH -j $JPATH
 
 

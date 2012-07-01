@@ -25,7 +25,6 @@ else
 end
 
 $: << RUBY_LIB_LOCATION
-#$: << RUBY_LIB_LOCATION+"/cli"
 
 require 'optparse'
 require 'cli/oneenv_helper/oneenvHelper'
@@ -36,14 +35,14 @@ optparse = OptionParser.new do|opt|
   opt.banner = "Usage: oneenv COMMAND [OPTIONS]"
   opt.separator  ""
   opt.separator  "COMMANDS"
-  opt.separator  "     * create <NAME> <ID_TEMPLATE> <NODE_PATH> [-p <DATABAG_PATH>]\n\tCreates a new Enviroment."
+  opt.separator  "     * create <NAME> <ID_TEMPLATE> <NODE_PATH> [-p <DATABAG_PATH>]\n\tCreates a new Environment."
   opt.separator  "     * list\n\tLists all Enviroments."
-  opt.separator  "     * clone [-i <ID_Env>]|[-n <NAME_Env>]\n\tClones an existing Enviroment"
-  opt.separator  "     * show [-i <ID_Env>]|[-n <NAME_Env>]\n\tPrints the information of an existing Enviroment"
-  opt.separator  "     * delete [-i <ID_Env>]|[-n <NAME_Env>]\n\tDeletes an existing Enviroment"
-  opt.separator  "     * update-node [-i <ID_Env>]|[-n <NAME_Env>] [<NODE_PATH>]\n\tChanges the path of the Enviroment's node"
-  opt.separator  "     * set-databags [-i <ID_Env>]|[-n <NAME_Env>] <DB_PATH>\n\tSets a Databag path to an existing Enviroment"
-  opt.separator  "     * up [-i <ID_Env>]|[-n <NAME_Env>] [-p <CHEF_PATH>]\n\tLaunches the given Enviroment"
+  opt.separator  "     * clone [-i <ID_Env>]|[-n <NAME_Env>]\n\tClones an existing Environment"
+  opt.separator  "     * show [-i <ID_Env>]|[-n <NAME_Env>]\n\tPrints the information of an existing Environment"
+  opt.separator  "     * delete [-i <ID_Env>]|[-n <NAME_Env>]\n\tDeletes an existing Environment"
+  opt.separator  "     * update-node [-i <ID_Env>]|[-n <NAME_Env>] [<NODE_PATH>]\n\tChanges the path of the Environment's node"
+  opt.separator  "     * set-databags [-i <ID_Env>]|[-n <NAME_Env>] <DB_PATH>\n\tSets a Databag path to an existing Environment"
+  opt.separator  "     * up [-i <ID_Env>]|[-n <NAME_Env>] [-p <CHEF_PATH>]\n\tLaunches the given Environment"
   opt.separator  ""
   opt.separator  "Options"
 
@@ -72,8 +71,8 @@ optparse = OptionParser.new do|opt|
    end
 
 
-  opt.on("-h","--help","help") do
-    puts opt_parse
+  opt.on("-h","--help","Shows this help") do
+    puts optparse
   end
 
 

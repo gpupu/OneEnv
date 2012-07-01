@@ -54,7 +54,6 @@ ActiveRecord::Base.establish_connection(:adapter => 'sqlite3', :database => DB_F
 
 class Cookbook < ActiveRecord::Base
 	validates_uniqueness_of :name
-	#has_and_belongs_to_many :enviroments, :uniq => true
 	serialize :recipes, Array
 	serialize :recipes_deps, Hash
 
@@ -63,7 +62,6 @@ class Cookbook < ActiveRecord::Base
 		s  = id.to_s + "\t"
 		s += name + "\t\t\t"
 		s += recipes.length.to_s + "\t"
-		#s += recipes_deps.length
 		s
 	end
 
@@ -129,9 +127,8 @@ class Cookbook < ActiveRecord::Base
 	public
 	def self.get_recipes path
 		r_path = path   + '/recipes'
-		#puts r_path
 		recs = Dir.entries(r_path)
-		#puts recs
+		
 		if recs.size > 2
 			recipe_names= Array.new
 			recs.each{|r|
@@ -151,7 +148,7 @@ class Cookbook < ActiveRecord::Base
 		if File.directory?(cb_dir)
 			cont= Dir.entries cb_dir
 			#puts cont
-			# es cookbook si incluye un archivo metadata.rb
+			# is a cookbook if include metadata file
 			iscoobook=cont.include?('metadata.rb')
 		end
 		return iscoobook
@@ -202,18 +199,19 @@ class Role < ActiveRecord::Base
 
 	public
 	def self.get_recipes_list(r_path)
-		# leemos el run_list
+		# reading run_list
 		if File.extname(r_path) == ".rb"
 			rdeps = get_ruby_runl(r_path)
 		end
         if File.extname(r_path) == ".json"
 			rdeps = get_json_runl(r_path)
 		end
-		#obtenemos recetas
+		
+		# get recipes
 		recs_list = []
 		rdeps.each do |d|
 			if d.start_with?('recipe')
-				d = d[7..-2]	#toma solo el interior
+				d = d[7..-2]	
 				recs_list.push d
 			end
 		end
@@ -225,14 +223,15 @@ class Role < ActiveRecord::Base
 
 	public 
 	def self.get_roles_list(r_path)
-		# leemos el run_list
+		# reading run_list
 		if File.extname(r_path) == ".rb"
 			rdeps = get_ruby_runl(r_path)
 		end
         if File.extname(r_path) == ".json"
 			rdeps = get_json_runl(r_path)
 		end	
-		#obtenemos recetas
+		
+		#get recipes
 		roles_list = []
 		rdeps.each do |d|
 			if d.start_with?('role')

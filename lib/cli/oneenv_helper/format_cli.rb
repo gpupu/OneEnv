@@ -15,7 +15,7 @@
 #---------------------------------------------------------------------------#
 
 class Format_cli
- # Sets bold font
+	# Sets bold font
 	def Format_cli.scr_bold
 		print "\33[1m"
 	end
